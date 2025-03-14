@@ -2,17 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StageData : MonoBehaviour
+[CreateAssetMenu]
+public class StageData : ScriptableObject
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [Header("카메라 제한")]
+    [SerializeField]
+    private float cameraLimitMinX;
+    [SerializeField]
+    private float cameraLimitMaxX;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [Header("플레이어 제한")]
+    [SerializeField]
+    private float playerLmitMinX;
+    [SerializeField]
+    private float playerLmitMaxX;
+
+    [Header("맵 제한")]
+    [SerializeField]
+    private float mapLimitMinY;
+
+    public float CameraLimitMinX => cameraLimitMinX;
+    public float CameraLimitMaxX => cameraLimitMaxX;
+
+    public float PlayerLimitMinX => playerLmitMinX;
+    public float PlayerLimitMaxX => playerLmitMaxX;
+
+    public float MapLimitMinY => mapLimitMinY;
 }
