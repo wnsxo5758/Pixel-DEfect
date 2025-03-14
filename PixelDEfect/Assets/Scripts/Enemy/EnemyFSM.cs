@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum EnemyState { None = -1, Idle = 0, Wander, Pursuit, Attack, Dead }
-public class EnemyFSM : MonoBehaviour
+public abstract class EnemyFSM : MonoBehaviour
 {
     [SerializeField]
     private EnemyState enemyState = EnemyState.None;
@@ -23,9 +23,9 @@ public class EnemyFSM : MonoBehaviour
     private Transform target;
 
 
-    private EnemyBase enemyBase;
-    private MovementRigidbody2D movement;
-    private EnemyAnimator animator;
+    protected EnemyBase enemyBase;
+    protected MovementRigidbody2D movement;
+    protected EnemyAnimator animator;
     private void Awake()
     {
         enemyBase = GetComponent<EnemyBase>();
@@ -35,17 +35,9 @@ public class EnemyFSM : MonoBehaviour
         {
             target = GameObject.FindWithTag("Player").transform;
         }
-    }
-
-    private void Start()
-    {
         ChangeState(EnemyState.Idle);
     }
-    public void SetUp(Transform _target)
-    {
-        this.target = _target;
-    }
-    private void OnDisable()
+    private void OnDisable() // 비활성화될 경우
     {
         StopCoroutine(enemyState.ToString());
         enemyState = EnemyState.None;
@@ -116,7 +108,7 @@ public class EnemyFSM : MonoBehaviour
             if (enemyBase.IsFacingRight == true) { enemyBase.ChangeFacing(); }
         }
     }
-    private void CalculateDistanceToTargetAndSelectState() //플레이어와의 거리 측정후 상태 변경
+    public virtual void CalculateDistanceToTargetAndSelectState() //플레이어와의 거리 측정후 상태 변경
     {
         if (target == null) return; // 목표가 없으면 리턴
 
@@ -140,17 +132,12 @@ public class EnemyFSM : MonoBehaviour
 
     private IEnumerator AutoChangeFromIdleToWander() // 일정 시간이 지난 뒤, 배회상태로 변경
     {
-
         int changeTime = Random.Range(1, 5);
 
         yield return new WaitForSeconds(changeTime);
 
         ChangeState(EnemyState.Wander);
     }
-
-
-
-
     private IEnumerator Pursuit() // 추적
     {
         Debug.Log($"{gameObject.name}은 플레이어를 향해 이동중");
@@ -175,22 +162,7 @@ public class EnemyFSM : MonoBehaviour
         }
     }
 
-    private IEnumerator Attack()
-    {
-        //이동을 멈춤
-
-        Debug.Log("플레이어에 대한 공격!");
-        while (true)
-        {
-            movement.MoveTo(0);
-            animator.isAttack = true;
-            animator.UpdateAnimation(0);
-
-            CalculateDistanceToTargetAndSelectState();
-            yield return null;
-        }
-
-    }
+    protected abstract IEnumerator Attack();
 
     private void OnDrawGizmos()
     {
