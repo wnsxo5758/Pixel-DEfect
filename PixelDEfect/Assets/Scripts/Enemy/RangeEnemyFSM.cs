@@ -4,19 +4,17 @@ using UnityEngine;
 
 public class RangeEnemy : EnemyFSM
 {
-    [Header("근접 공격 관련")]
+    [Header("원거리 공격 관련")]
     [SerializeField]
     private int damage;
     [SerializeField]
-    private float coolTime; // 근접 공격 쿨탕미
+    private float coolTime; // 공격 쿨타임
     [SerializeField]
     private float currentCoolTime; // 현재 쿨타임
 
 
     protected override IEnumerator Attack()
     {
-        //이동을 멈춤
-
         Debug.Log("플레이어에 대한 공격!");
         while (true)
         {

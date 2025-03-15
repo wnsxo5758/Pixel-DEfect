@@ -34,7 +34,7 @@ public class BulletBase : MonoBehaviour
         {
             if (collision.CompareTag("Enemy"))
             {
-                collision.GetComponent<EnemyBase>().DecreaseHp(damage);
+                collision.GetComponent<EnemyFSM>().TakeDamage(damage);
             }
             //만약 버튼이나 그런 것들이 총알과 상호작용한다면 사용
             //else if()

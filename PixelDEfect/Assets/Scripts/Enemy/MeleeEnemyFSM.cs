@@ -11,12 +11,9 @@ public class MeleeEnemyFSM : EnemyFSM
     private float coolTime; // 근접 공격 쿨탕미
     [SerializeField]
     private float currentCoolTime; // 현재 쿨타임
-
-
     protected override IEnumerator Attack() 
     {
         //이동을 멈춤
-
         Debug.Log("플레이어에 대한 공격!");
         while (true)
         {
@@ -27,6 +24,10 @@ public class MeleeEnemyFSM : EnemyFSM
             CalculateDistanceToTargetAndSelectState();
             yield return null;
         }
-
     }
+
+    private void MeleeAttack() // 근접공격
+    {
+    }
+
 }

@@ -8,6 +8,7 @@ public class EnemyAnimator : MonoBehaviour
     private EnemyFSM enemy;
     private MovementRigidbody2D movement; // 움직임
     public bool isAttack;
+    private bool isDeath; // 사망시
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -16,6 +17,8 @@ public class EnemyAnimator : MonoBehaviour
 
     public void UpdateAnimation(float x)
     {
+        if (isDeath == true) return;  // 사망시 애니메이션 작동 X
+
         if (x != 0)
         {
             SpriteFlipX(x);
@@ -33,6 +36,12 @@ public class EnemyAnimator : MonoBehaviour
         {
             animator.SetFloat("velocityY", movement.Velocity.y);  // Y 값에 따라 상태 변경
         }
+    }
+
+    public void isDead()
+    {
+        animator.SetTrigger("isDead"); // 사망시 값 설정
+        isDeath = true;
     }
 
     private void SpriteFlipX(float x) // 방향전환
