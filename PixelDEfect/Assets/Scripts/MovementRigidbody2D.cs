@@ -7,6 +7,7 @@ public class MovementRigidbody2D : MonoBehaviour
     [Header("레이어 마스크")]
     [SerializeField]
     private LayerMask groundCheckLayer;
+    
     [Header("움직임")]
     [SerializeField]
     private float walkSpeed; // 걷기 속도
@@ -20,8 +21,7 @@ public class MovementRigidbody2D : MonoBehaviour
     private float highGravityScale; // 강한 중력 (일반 점프시)
    
     private float moveSpeed; // 현재 움직이는 속도
-
-
+    
     private Vector2 collisionSize; // 
     private Vector2 footPos; // 발 위치
 

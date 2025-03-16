@@ -19,9 +19,23 @@ public class PlayerController : MonoBehaviour
     private KeyCode selectMagicBack = KeyCode.Q; // 뒷칸의 마법 선택
     [SerializeField]
     private KeyCode selectMagicFront = KeyCode.E; // 앞칸의 마법 선택
+    [SerializeField]
+    private KeyCode interactKeyCode = KeyCode.F; // 상호작용
+    [SerializeField]
+    private KeyCode throwKeyCode = KeyCode.R;
+    
     private int currentSkillNumber; //선택된 스킬 넘버
 
+    [Header("상호작용")] 
+    [SerializeField] private Transform grabPoint;
+    [SerializeField] private Transform rayPoint;
+    [SerializeField] private float rayDistance;
+    [SerializeField] private int throwPower;
 
+    private Vector2 rayDirection = new Vector2(1f, 0f);
+    private GameObject grabbedObject;
+    private int layerIndex;
+    
     private MovementRigidbody2D movement;
     private PlayerAnimator playerAnimator;
     private PlayerHp playerHp;
@@ -34,6 +48,7 @@ public class PlayerController : MonoBehaviour
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         playerAttack = GetComponent<PlayerAttack>();
         playerHp = GetComponent<PlayerHp>();
+        layerIndex = LayerMask.NameToLayer("Objects");
     }
 
     private void Update()
@@ -47,6 +62,7 @@ public class PlayerController : MonoBehaviour
         UpdateJump();
         UpdateSkillNumber();
         UpdateAttack();
+        UpdateInteract(x);
         playerAnimator.UpdateAnimation(x);
         HealPlayer();
     }
@@ -106,5 +122,43 @@ public class PlayerController : MonoBehaviour
             movement.IsLongJump = false;
         }
 
+    }
+
+    private void UpdateInteract(float x)
+    {
+        if (x != 0)
+        {
+            rayDirection = new Vector2(Mathf.Sign(x), 0f);
+        }
+        
+        RaycastHit2D hitInfo = Physics2D.Raycast(rayPoint.position, rayDirection
+            , rayDistance);
+
+        if (hitInfo.collider != null && hitInfo.collider.gameObject.layer == layerIndex)
+        {
+            if (Input.GetKeyDown(interactKeyCode) && grabbedObject == null) // 그랩 가능 상태
+            {
+                grabbedObject = hitInfo.collider.gameObject;
+                grabbedObject.GetComponent<Rigidbody2D>().isKinematic = true;
+                grabbedObject.transform.position = grabPoint.position;
+                grabbedObject.transform.SetParent(transform);
+            }
+            else if (Input.GetKeyDown(interactKeyCode)) // 내려 놓기
+            {
+                grabbedObject.GetComponent<Rigidbody2D>().isKinematic = false;
+                grabbedObject.transform.SetParent(null);
+                grabbedObject = null;
+            }
+            else if (Input.GetKeyDown(throwKeyCode)) // 던지기
+            {
+                Vector2 throwDir = rayDirection + new Vector2(0, 1f);
+                grabbedObject.GetComponent<Rigidbody2D>().isKinematic = false;
+                grabbedObject.transform.SetParent(null);
+                grabbedObject.GetComponent<Rigidbody2D>().AddForce(throwDir * throwPower, ForceMode2D.Impulse);
+                grabbedObject = null;
+            }
+        }
+        
+        Debug.DrawRay(rayPoint.position,  rayDirection * rayDistance);
     }
 }
