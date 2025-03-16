@@ -47,7 +47,7 @@ public abstract class EnemyFSM : MonoBehaviour
     private float WanderTime; // 방황하는 시간 
 
     [SerializeField]
-    private Transform target;
+    protected Transform target;
 
     protected MovementRigidbody2D movement;
     protected EnemyAnimator animator;
@@ -58,9 +58,6 @@ public abstract class EnemyFSM : MonoBehaviour
         animator = GetComponentInChildren<EnemyAnimator>();
         SetUp();
     }
-
-
-
 
     private Vector2 dir;
 

@@ -11,14 +11,12 @@ public class TurretFSM : EnemyFSM
     private Transform firePos; // 총알 발사 위치
     [SerializeField]
     private GameObject bulletPrefab; // 총알 프리팹
-
     [SerializeField]
     private float maxCoolTime; // 쿨타임
+
+
     private float currentCoolTime; //현재 쿨타임
     private bool isAttack; // 공격 중인가
-
-    [SerializeField]
-    private Transform target;
 
     private void TurretAttack() // 터렛 공격
     {
