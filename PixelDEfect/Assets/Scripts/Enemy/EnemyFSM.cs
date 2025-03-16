@@ -18,7 +18,7 @@ public abstract class EnemyFSM : MonoBehaviour
     [SerializeField]
     private float pursuitLimitRange; // 추적최대치
     [SerializeField]
-    private float distanceToAttack; // 공격하는 거리
+    protected float distanceToAttack; // 공격하는 거리
     [SerializeField]
     private float checkWallDistance; // 벽 확인 거리
     [SerializeField]
@@ -40,7 +40,7 @@ public abstract class EnemyFSM : MonoBehaviour
     [SerializeField]
     private int amount; // 드랍하는 코인의 최댓값
 
-    private EnemyState enemyState = EnemyState.None;
+    protected EnemyState enemyState = EnemyState.None;
     [SerializeField]
     private float waitTime; // Idle시 대기 시간
     [SerializeField]
