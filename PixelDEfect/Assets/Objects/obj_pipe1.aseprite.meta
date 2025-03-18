@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: be5ff49ac49748842b392e29392e998f
+guid: 0e3e1030dea9e7949b2738cc49b3a8b6
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -122,18 +122,18 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: obj_dumpster
+  - name: obj_pipe1
     originalName: 
-    pivot: {x: 0.49999997, y: -0.03883495}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 122
-      height: 103
-    spriteID: 935f58a11c03578409d56068a2e0460b
+      width: 252
+      height: 432
+    spriteID: 9a587d3b8ef7fff4783460ddb48b206e
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -145,21 +145,21 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: -1315508410
-    name: obj_dumpster
+    guid: 1931965429
+    name: obj_pipe1
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: obj_dumpster
+    - name: obj_pipe1
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 3
-        y: 4
-        width: 122
-        height: 103
-      spriteId: 935f58a11c03578409d56068a2e0460b
+        x: 2
+        y: 0
+        width: 252
+        height: 432
+      spriteId: 9a587d3b8ef7fff4783460ddb48b206e
     linkedCells: []
     parentIndex: -1
   platformSettings:
@@ -178,5 +178,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 128, y: 115}
-  previousTextureSize: {x: 256, y: 128}
+  canvasSize: {x: 256, y: 432}
+  previousTextureSize: {x: 512, y: 512}
