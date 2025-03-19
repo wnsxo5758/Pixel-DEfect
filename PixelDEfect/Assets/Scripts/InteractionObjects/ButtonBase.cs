@@ -21,9 +21,11 @@ public class ButtonBase : MonoBehaviour
     private Sprite inActiveSprite; // 비활성화시
 
     private SpriteRenderer sprite;
+    private AudioSource audio;
     private void Awake()
     {
         sprite  = GetComponentInChildren<SpriteRenderer>();
+        audio = GetComponent<AudioSource>();
         UpdateSprite();
     }
 
@@ -40,8 +42,9 @@ public class ButtonBase : MonoBehaviour
         if(isActiving == false)
         {
             isActive = !isActive; // 누르면 활성화
-            ButtonActive();
-            UpdateSprite();
+            ButtonActive(); // 버튼 활성화
+            UpdateSprite(); // 버튼 스프라이트 변경
+            audio.Play();  // 효과음 
         }
     }
 
