@@ -21,8 +21,12 @@ public class PlayerInteraction : MonoBehaviour
     {
         if(collision.CompareTag("Button"))
         {
-
             button = collision.GetComponent<ButtonBase>();
         }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        button =null;   
     }
 }
