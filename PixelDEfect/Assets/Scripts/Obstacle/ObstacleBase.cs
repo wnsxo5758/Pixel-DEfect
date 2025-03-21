@@ -16,7 +16,8 @@ public class ObstacleBase : MonoBehaviour
 
         if (isInstantDeath)
         {
-
+            collision.GetComponent<PlayerHp>().DecreaseHp(damage);
+            collision.GetComponent<PlayerInteraction>().MoveToSpawnPoint();
         }
 
         else // 즉사 장애물이 아니라면 체력 감소
