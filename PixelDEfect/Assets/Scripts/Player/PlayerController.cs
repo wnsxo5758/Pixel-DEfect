@@ -19,28 +19,14 @@ public class PlayerController : MonoBehaviour
     private KeyCode selectMagicBack = KeyCode.Q; // 뒷칸의 마법 선택
     [SerializeField]
     private KeyCode selectMagicFront = KeyCode.E; // 앞칸의 마법 선택
-    [SerializeField]
-    private KeyCode interactKeyCode = KeyCode.F; // 상호작용
-    [SerializeField]
-    private KeyCode throwKeyCode = KeyCode.R;
     
     private int currentSkillNumber; //선택된 스킬 넘버
-
-    [Header("상호작용")] 
-    [SerializeField] private Transform grabPoint;
-    [SerializeField] private Transform rayPoint;
-    [SerializeField] private float rayDistance;
-    [SerializeField] private int throwPower;
-
-    private Vector2 rayDirection = new Vector2(1f, 0f);
-    private GameObject grabbedObject;
-    private int layerIndex;
     
     private MovementRigidbody2D movement;
     private PlayerAnimator playerAnimator;
     private PlayerHp playerHp;
     private PlayerAttack playerAttack;
-
+    private PlayerInteraction playerInteraction;
 
     private void Awake()
     {
@@ -48,7 +34,7 @@ public class PlayerController : MonoBehaviour
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         playerAttack = GetComponent<PlayerAttack>();
         playerHp = GetComponent<PlayerHp>();
-        layerIndex = LayerMask.NameToLayer("Objects");
+        playerInteraction = GetComponent<PlayerInteraction>();
     }
 
     private void Update()
@@ -57,48 +43,19 @@ public class PlayerController : MonoBehaviour
         float offset = 0.5f + Input.GetAxisRaw("Sprint") * 0.5f;
 
         x *= offset;
-
+        
         UpdateMove(x);
-        UpdateJump();
         UpdateSkillNumber();
-        UpdateAttack();
-        UpdateInteract(x);
-        playerAnimator.UpdateAnimation(x);
         HealPlayer();
-    }
-    public void UpdateSkillNumber()
-    {
-        if (Input.GetKeyDown(selectMagicBack)) // 이전 마법 설정
+        
+        if (playerInteraction.IsConnected == false) //밀고 당기기 상태인지 확인
         {
-
-        }
-        else if (Input.GetKeyDown(selectMagicFront)) // 다음 마법 설정
-        {
-
+            playerAnimator.UpdateAnimation(x);
+            UpdateJump();
+            UpdateAttack();
         }
     }
-    private void HealPlayer()
-    {
-        if (Input.GetKeyDown(healKeyCode))
-        {
-            playerHp.IncreaseHp();
-        }
-    }
-
-
-    private void UpdateAttack() // 공격
-    {
-        if (Input.GetKeyDown(meleeAttack))
-        {
-            playerAttack.MeleeAttack();
-        }
-        else if (Input.GetKeyDown(magicAttack))
-        {
-            playerAttack.MagicAttack(currentSkillNumber);
-        }
-
-
-    }
+    
     private void UpdateMove(float x)
     {
         movement.MoveTo(x);
@@ -123,8 +80,40 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+    
+    private void UpdateAttack() // 공격
+    {
+        if (Input.GetKeyDown(meleeAttack))
+        {
+            playerAttack.MeleeAttack();
+        }
+        else if (Input.GetKeyDown(magicAttack))
+        {
+            playerAttack.MagicAttack(currentSkillNumber);
+        }
+    }
 
-    private void UpdateInteract(float x)
+    private void HealPlayer()
+    {
+        if (Input.GetKeyDown(healKeyCode))
+        {
+            playerHp.IncreaseHp();
+        }
+    }
+    
+    public void UpdateSkillNumber()
+    {
+        if (Input.GetKeyDown(selectMagicBack)) // 이전 마법 설정
+        {
+
+        }
+        else if (Input.GetKeyDown(selectMagicFront)) // 다음 마법 설정
+        {
+
+        }
+    }
+    
+    /* private void UpdateInteract(float x)
     {
         if (x != 0)
         {
@@ -161,4 +150,5 @@ public class PlayerController : MonoBehaviour
         
         Debug.DrawRay(rayPoint.position,  rayDirection * rayDistance);
     }
+    */
 }

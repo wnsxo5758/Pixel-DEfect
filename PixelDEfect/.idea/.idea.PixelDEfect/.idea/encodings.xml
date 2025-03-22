@@ -3,8 +3,11 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Enemy/EnemyFSM.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Enemy/Turret/TurretFSM.cs" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Assets/Scripts/InteractionObjects/ButtonBase.cs" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Assets/Scripts/InteractionObjects/InteractableObject.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/MovementRigidbody2D.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Player/PlayerAnimator.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Player/PlayerController.cs" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Assets/Scripts/Player/PlayerInteraction.cs" charset="EUC-KR" />
   </component>
 </project>
