@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MovementRigidbody2D : MonoBehaviour
@@ -40,7 +41,7 @@ public class MovementRigidbody2D : MonoBehaviour
         collider = GetComponent<Collider2D>();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         UpdateCollision();
         JumpHeight();
@@ -81,5 +82,17 @@ public class MovementRigidbody2D : MonoBehaviour
         {
             rigid.gravityScale = highGravityScale;
         }
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        
+        if(IsGrounded)
+            Gizmos.color = Color.green;
+        else 
+            Gizmos.color = Color.red;
+        
+        Gizmos.DrawWireCube(footPos, collisionSize);
     }
 }

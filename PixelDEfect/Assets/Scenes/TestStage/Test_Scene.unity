@@ -9112,11 +9112,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundCheckLayer:
     serializedVersion: 2
-    m_Bits: 8
-  walkSpeed: 8
-  runSpeed: 16
-  jumpForce: 30
-  lowGravityScale: 5
+    m_Bits: 1032
+  walkSpeed: 6
+  runSpeed: 8
+  jumpForce: 40
+  lowGravityScale: 10
   highGravityScale: 10
 --- !u!50 &680686592
 Rigidbody2D:
