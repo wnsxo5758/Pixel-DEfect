@@ -56,6 +56,10 @@ public abstract class EnemyFSM : MonoBehaviour
     {
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
+    }
+
+    private void Start()
+    {
         SetUp();
     }
 
