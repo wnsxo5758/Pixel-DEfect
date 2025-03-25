@@ -10,7 +10,11 @@ public class ButtonBase : MonoBehaviour
     [SerializeField]
     protected bool isActive; // 버튼이 활성화되었는가 
     [SerializeField]
-    protected bool isActiving; // 문이 활성화 중인가
+    protected bool isActiving; // 작동 중인가
+    [SerializeField]
+    protected bool isCount; // 시간제한이 있는 버튼인가
+    [SerializeField]
+    protected float Maxtime; // 시간제한 값
     [SerializeField]
     protected InteractableObject[] connectedObjects; // 버튼과 상호작용할 오브젝트
     
@@ -42,7 +46,7 @@ public class ButtonBase : MonoBehaviour
         if(isActiving == false)
         {
             isActive = !isActive; // 누르면 활성화
-            ButtonActive(); // 버튼 활성화
+            StartCoroutine(nameof(ButtonActive));
             UpdateSprite(); // 버튼 스프라이트 변경
             audio.Play();  // 효과음 
         }
