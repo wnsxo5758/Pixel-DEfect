@@ -15,7 +15,7 @@ public class PlayerInteraction : MonoBehaviour
     [Header("스프링 조인트")] 
     [SerializeField] private float springFrequency = 0f;
     [SerializeField] private float springDamping = 0.9f;
-    [SerializeField] private float springDistance = 1.1f;
+    [SerializeField] private float springDistance = 1f;
 
     private GameObject detectedObject;
     private Rigidbody2D objectRb;
@@ -26,12 +26,15 @@ public class PlayerInteraction : MonoBehaviour
     private DoorBase door; // 가까운 문
     private Transform respawnPoint; // 리스폰 포인트(장애물에 죽을 경우)
 
+    private MovementRigidbody2D movement;
+
     private void Start()
     {
+        movement = GetComponent<MovementRigidbody2D>();
         springJoint = gameObject.AddComponent<SpringJoint2D>();
         springJoint.anchor = interactPoint.localPosition;
         springJoint.enabled = false;
-        springJoint.autoConfigureDistance = false;
+        springJoint.autoConfigureDistance = true;
         springJoint.frequency = springFrequency;
         springJoint.dampingRatio = springDamping;
         springJoint.distance = springDistance;
@@ -96,10 +99,13 @@ public class PlayerInteraction : MonoBehaviour
 
         if (objectRb != null)
         {
+            Vector2 anchor = objectRb.transform.InverseTransformPoint(interactPoint.position);
+            springJoint.connectedAnchor = new Vector2(0, anchor.y);
             springJoint.connectedBody = objectRb;
             springJoint.enabled = true;
             IsConnected = true;
             objectRb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            movement.InteractSpeed = objectRb.mass;
         }
     }
     
@@ -111,6 +117,7 @@ public class PlayerInteraction : MonoBehaviour
         IsConnected = false;
         objectRb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         objectRb = null;
+        movement.InteractSpeed = 1;
     }
     
     //GUI 디버그 표시

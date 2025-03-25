@@ -42,6 +42,11 @@ public class PlayerController : MonoBehaviour
         float x = Input.GetAxisRaw("Horizontal");
         float offset = 0.5f + Input.GetAxisRaw("Sprint") * 0.5f;
 
+        if (playerInteraction.IsConnected)
+        {
+            offset = 0.5f;
+        }
+        
         x *= offset;
         
         UpdateMove(x);

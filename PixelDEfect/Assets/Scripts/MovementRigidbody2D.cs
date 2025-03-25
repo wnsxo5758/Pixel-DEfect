@@ -8,8 +8,8 @@ public class MovementRigidbody2D : MonoBehaviour
     [Header("레이어 마스크")]
     [SerializeField]
     private LayerMask groundCheckLayer;
-    
-    [Header("움직임")]
+
+    [Header("움직임")] 
     [SerializeField]
     private float walkSpeed; // 걷기 속도
     [SerializeField]
@@ -22,8 +22,9 @@ public class MovementRigidbody2D : MonoBehaviour
     private float highGravityScale; // 강한 중력 (일반 점프시)
    
     private float moveSpeed; // 현재 움직이는 속도
+    private float initialSpeed; // 초기 속도
     
-    private Vector2 collisionSize; // 
+    private Vector2 collisionSize; // 바닥 검사 size
     private Vector2 footPos; // 발 위치
 
     private Rigidbody2D rigid;
@@ -31,17 +32,21 @@ public class MovementRigidbody2D : MonoBehaviour
 
     public bool IsLongJump { set; get; } = false;
     public bool IsGrounded { private set; get; } = false;
-
+    public float InteractSpeed
+    {
+        set => walkSpeed = initialSpeed * (1 / value);
+    }
     public Vector2 Velocity => rigid.velocity;
 
     private void Awake()
     {
+        initialSpeed = walkSpeed;
         moveSpeed = walkSpeed;
         rigid = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         UpdateCollision();
         JumpHeight();
@@ -58,7 +63,7 @@ public class MovementRigidbody2D : MonoBehaviour
     {
         Bounds bounds = collider.bounds;
 
-        collisionSize = new Vector2((bounds.max.x - bounds.min.x) * 0.5f, 0.1f);
+        collisionSize = new Vector2((bounds.max.x - bounds.min.x) * 0.95f, 0.1f);
         footPos = new Vector2(bounds.center.x, bounds.min.y);
 
         IsGrounded = Physics2D.OverlapBox(footPos, collisionSize, 0, groundCheckLayer);
