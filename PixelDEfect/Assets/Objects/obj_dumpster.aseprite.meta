@@ -124,7 +124,7 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: obj_dumpster
     originalName: 
-    pivot: {x: 0.49999997, y: -0.03883495}
+    pivot: {x: 0.5, y: 0.4}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
