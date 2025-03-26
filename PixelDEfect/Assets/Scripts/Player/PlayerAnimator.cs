@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class PlayerAnimator : MonoBehaviour
 {
+    private static readonly int VelocityX = Animator.StringToHash("VelocityX");
+    private static readonly int VelocityY = Animator.StringToHash("VelocityY");
+    private static readonly int IsJump = Animator.StringToHash("IsJump");
+    private static readonly int IsAttack = Animator.StringToHash("IsAttack");
+    private static readonly int IsConnected = Animator.StringToHash("IsConnected");
 
     private Animator animator; // 애니메이션 
     private MovementRigidbody2D movement; // 움직임
@@ -16,30 +21,22 @@ public class PlayerAnimator : MonoBehaviour
         attack = GetComponentInParent<PlayerAttack>();
     }
 
-    public void UpdateAnimation(float x)
+    public void MovementAnim(float x)
     {
-        if (x != 0)
-        {
-            SpriteFlipX(x);
-        }
-        animator.SetBool("isJump", !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
-
         if (movement.IsGrounded)
         {
-            animator.SetFloat("velocityX", Mathf.Abs(x)); // X 값에 따라 변경
+            animator.SetFloat(VelocityX, Mathf.Abs(x)); // X 값에 따라 변경
         }
         else
         {
-            animator.SetFloat("velocityY", movement.Velocity.y); // Y 값에 따라 변경 -> y가 작으면 공중에서 내려가는 모션, 높으면 올라가는 모션
+            animator.SetFloat(VelocityY, movement.Velocity.y); // Y 값에 따라 변경 -> y가 작으면 공중에서 내려가는 모션, 높으면 올라가는 모션
         }
-
-        if (attack.IsMelee)
-        {
-            animator.SetBool("isAttack", attack.IsMelee); // 공격 중인지에 따라 애니메이션 변경
-        }
+        
+        animator.SetBool(IsJump, !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
     }
-    private void SpriteFlipX(float x)
+
+    public void HoldAnim()
     {
-        transform.parent.localScale = new Vector3((x < 0 ? -1 : 1), 1, 1);
+        animator.SetBool(IsConnected, true);
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour
@@ -64,14 +65,12 @@ public class PlayerInteraction : MonoBehaviour
             {
                 DisconnectObject();
             }
-            else if (detectedObject != null)
+            else
             {
-                if (door != null) return; //문에 서있는 상태에서 상호작용 예외처리
                 ConnectObject();
             }
         }
     }
-    
     //상호작용 감지
     void DetectInteractableObject()
     {
@@ -89,11 +88,14 @@ public class PlayerInteraction : MonoBehaviour
             detectedObject = null;
         }
     }
+
     
     //오브젝트 연결
     void ConnectObject() 
     {
         if (detectedObject == null) return;
+        
+        if (door != null) return; //문에 서 있는 상태에서 상호작용 예외처리
         
         objectRb = detectedObject.GetComponent<Rigidbody2D>();
 

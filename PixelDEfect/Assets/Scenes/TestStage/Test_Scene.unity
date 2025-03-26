@@ -624,22 +624,22 @@ CompositeCollider2D:
         Y: -130000000
   m_CompositePaths:
     m_Paths:
-    - - {x: -12.00003, y: -13}
-      - {x: -11.99997, y: -11}
-      - {x: 36, y: -10.99997}
-      - {x: 35.999973, y: 11}
-      - {x: 29, y: 10.99997}
-      - {x: 28.999971, y: 1}
-      - {x: 12, y: 0.99997073}
-      - {x: 11.99997, y: -4}
-      - {x: -8, y: -3.9999704}
-      - {x: -8.00003, y: 3}
-      - {x: -17, y: 3.0000293}
-      - {x: -17.000029, y: 14}
-      - {x: -23, y: 13.999971}
-      - {x: -22.999971, y: -13}
+    - - {x: -12, y: -11}
+      - {x: 36, y: -11}
+      - {x: 36, y: 11}
+      - {x: 29, y: 11}
+      - {x: 29, y: 1}
+      - {x: 12, y: 1}
+      - {x: 12, y: -4}
+      - {x: -8, y: -4}
+      - {x: -8, y: 3}
+      - {x: -17, y: 3}
+      - {x: -17, y: 14}
+      - {x: -23, y: 14}
+      - {x: -23, y: -13}
+      - {x: -12, y: -13}
   m_VertexDistance: 0.0005
-  m_OffsetDistance: 0.00005
+  m_OffsetDistance: 0
   m_UseDelaunayMesh: 0
   m_CompositeGameObject: {fileID: 421226249}
 --- !u!50 &421226253
@@ -9024,6 +9024,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageData: {fileID: 11400000, guid: f050f4c803de5b941ba6ce1bedac6443, type: 2}
   jumpKeyCode: 32
+  holdKeyCode: 102
   healKeyCode: 101
   meleeAttack: 323
   magicAttack: 324
@@ -9074,7 +9075,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!4 &680686593
 Transform:

@@ -74,6 +74,7 @@ public class MovementRigidbody2D : MonoBehaviour
         if (IsGrounded)
         {
             rigid.velocity = new Vector2(rigid.velocity.x, jumpForce);
+            IsGrounded = false;
         }
     }
 
