@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,12 +14,15 @@ public class PlayerAnimator : MonoBehaviour
     private Animator animator; // 애니메이션 
     private MovementRigidbody2D movement; // 움직임
     private PlayerAttack attack; // 플레이어 공격
+    private PlayerInteraction playerInteraction; // 상호작용
 
+    private float pnpDirection;
     private void Awake()
     {
         animator = GetComponent<Animator>();
         movement = GetComponentInParent<MovementRigidbody2D>();
         attack = GetComponentInParent<PlayerAttack>();
+        playerInteraction = GetComponentInParent<PlayerInteraction>();
     }
 
     public void MovementAnim(float x)
@@ -35,8 +39,16 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool(IsJump, !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
     }
 
-    public void HoldAnim()
+    public void EnterHoldAnim(float dir)
     {
-        animator.SetBool(IsConnected, true);
+        animator.SetBool(IsConnected, playerInteraction.IsConnected);
+        pnpDirection = dir;
+    }
+    
+    public void PushAndPullAnim(float x)
+    {
+        animator.SetFloat(VelocityX, pnpDirection * x);
+        
+        animator.SetBool(IsConnected, playerInteraction.IsConnected);
     }
 }

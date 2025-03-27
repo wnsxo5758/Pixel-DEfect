@@ -102,12 +102,13 @@ namespace PlayerStates
         {
             animator = player.GetComponentInChildren<PlayerAnimator>();
             playerInteraction = player.GetComponent<PlayerInteraction>();
+            animator.EnterHoldAnim(player.transform.localScale.x);
         }
 
         public override void Execute(PlayerController player)
         {
             float input = player.HandleInput();
-            
+            animator.PushAndPullAnim(input);
             if (playerInteraction.IsConnected == false)
             {
                 player.RevertToPreviousState();

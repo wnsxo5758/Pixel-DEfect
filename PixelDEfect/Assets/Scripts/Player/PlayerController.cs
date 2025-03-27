@@ -24,7 +24,6 @@ public class PlayerController : MonoBehaviour
     private PlayerAttack playerAttack;
     private PlayerInteraction playerInteraction;
     private PlayerStateMachine<PlayerController> stateMachine;
-    private PlayerAnimator animator;
 
     private void Awake()
     {
