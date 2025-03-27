@@ -8,9 +8,12 @@ public class MeleeEnemyFSM : EnemyFSM
     [SerializeField]
     private int damage;
     [SerializeField]
-    private float coolTime; // 근접 공격 쿨탕미
+    private float coolTime; // 근접 공격 쿨타임
     [SerializeField]
     private float currentCoolTime; // 현재 쿨타임
+    [SerializeField]
+    private Collider2D attackCollider; // 공격할곳
+
     protected override IEnumerator Attack() 
     {
         //이동을 멈춤
@@ -20,14 +23,45 @@ public class MeleeEnemyFSM : EnemyFSM
             movement.MoveTo(0);
             animator.isAttack = true;
             animator.UpdateAnimation(0);
-
+            StartCoroutine(nameof(MeleeAttack));
             CalculateDistanceToTargetAndSelectState();
             yield return null;
         }
     }
 
-    private void MeleeAttack() // 근접공격
+
+    private IEnumerator MeleeAttack()
     {
+        if (currentCoolTime > 0) yield break;
+
+        currentCoolTime = coolTime;
+        attackCollider.enabled = true;
+        Debug.Log($"{gameObject.name}이 공격 시도");
+        yield return new WaitForSeconds(0.3f);
+        attackCollider.enabled = false;
+        while (currentCoolTime > 0)
+        {
+            currentCoolTime -= Time.deltaTime;
+            yield return null;
+        }
+        
+
+        
     }
+      
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.CompareTag("Player"))
+        {
+            PlayerHp playerHp = collision.GetComponent<PlayerHp>();
+            if(playerHp != null)
+            {
+                playerHp.DecreaseHp(damage);
+                Debug.Log($"{gameObject.name}의 공격이 플레이어에게 {damage}의 데미지 부여");
+            }
+        }
+    }
+
 
 }
