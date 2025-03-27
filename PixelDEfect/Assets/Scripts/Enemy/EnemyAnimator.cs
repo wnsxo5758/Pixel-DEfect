@@ -5,7 +5,6 @@ using UnityEngine;
 public class EnemyAnimator : MonoBehaviour
 {
     private Animator animator;
-    private EnemyFSM enemy;
     private MovementRigidbody2D movement; // 움직임
     public bool isAttack;
     private bool isDeath; // 사망시
@@ -38,7 +37,7 @@ public class EnemyAnimator : MonoBehaviour
         }
     }
 
-    public void isDead()
+    public void Death()
     {
         animator.SetTrigger("isDead"); // 사망시 값 설정
         isDeath = true;

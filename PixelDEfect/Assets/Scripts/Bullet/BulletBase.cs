@@ -5,17 +5,17 @@ using UnityEngine;
 public class BulletBase : MonoBehaviour
 {
     [SerializeField]
-    private int damage; // 총알 데미지
+    protected int damage; // 총알 데미지
     [SerializeField]
-    private float speed; // 총알 속도
+    protected float speed; // 총알 속도
     [SerializeField]
-    private AudioClip hitSound;
+    protected AudioClip hitSound;
     [SerializeField]
     private bool players; // 플레이어 것인가?
 
     MovementRigidbody2D movement;
-    AudioSource audio;
-    Animator animator;
+    protected AudioSource audio;
+    protected Animator animator;
     private void Awake()
     {
         movement = GetComponent<MovementRigidbody2D>();
@@ -23,12 +23,12 @@ public class BulletBase : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
     }
 
-    public void SetUp(float x)
+    public virtual void SetUp(float x)
     {
         movement.MoveTo(x);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private  void OnTriggerEnter2D(Collider2D collision)
     {
         if (players == true)
         {
@@ -36,11 +36,6 @@ public class BulletBase : MonoBehaviour
             {
                 collision.GetComponent<EnemyFSM>().TakeDamage(damage);
             }
-            //만약 버튼이나 그런 것들이 총알과 상호작용한다면 사용
-            //else if()
-            //{
-
-            //}
         }
         else
         {
@@ -53,11 +48,15 @@ public class BulletBase : MonoBehaviour
         StartCoroutine(nameof(DestoryBullet));
     }
 
-    private IEnumerator DestoryBullet()
+    protected virtual IEnumerator DestoryBullet()
     {
-        animator.SetTrigger("isHit");
-        PlaySound(hitSound);
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+        movement.MoveTo(0);
+        GetComponent<Collider2D>().enabled = false;
+        //애니메이션 추가시 설정
+        //animator.SetTrigger("isHit");
+        //PlaySound(hitSound);
+        //yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+        yield return null;
         Destroy(gameObject);
     }
 

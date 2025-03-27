@@ -28,11 +28,11 @@ public abstract class EnemyFSM : MonoBehaviour
 
     [Header("효과음")]
     [SerializeField]
-    private AudioClip hitClip; // 피격시 효과음
+    protected AudioClip hitClip; // 피격시 효과음
     [SerializeField]
-    private AudioClip deadClip; // 사망시 효과음 
+    protected AudioClip deadClip; // 사망시 효과음 
     [SerializeField]
-    private AudioClip attackClip; // 공격 효과음
+    protected AudioClip attackClip; // 공격 효과음
 
     [Header("사망시 보상")]
     [SerializeField]
@@ -56,6 +56,7 @@ public abstract class EnemyFSM : MonoBehaviour
     {
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
+        audio = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -244,7 +245,7 @@ public abstract class EnemyFSM : MonoBehaviour
     protected virtual IEnumerator Dead() // 사망
     {
 
-        animator.isDead(); // 적 사망 애니메이션 
+        animator.Death(); // 적 사망 애니메이션 
         yield return null;
     }
     protected abstract IEnumerator Attack(); // 하위 객체에서 공격 구현
