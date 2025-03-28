@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 7db7f7c288102d14e800eecaa7deff34
+guid: 5efc91b004eb2d546b843131517c501d
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -122,7 +122,7 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: obj_pipe3 1
+  - name: wall_pipe4
     originalName: 
     pivot: {x: 0.5, y: 0}
     alignment: 9
@@ -131,9 +131,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 496
-      height: 496
-    spriteID: 54cadb7b5415aaf41800baefdf594b06
+      width: 252
+      height: 66
+    spriteID: f9bd4c68e093bae45a8cd827758b7951
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -145,21 +145,21 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: -2094571706
-    name: obj_pipe3 1
+    guid: 1761965977
+    name: wall_pipe4
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: obj_pipe3
+    - name: wall_pipe4
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
-        width: 496
-        height: 496
-      spriteId: 54cadb7b5415aaf41800baefdf594b06
+        width: 252
+        height: 66
+      spriteId: f9bd4c68e093bae45a8cd827758b7951
     linkedCells: []
     parentIndex: -1
   platformSettings:
@@ -178,5 +178,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 496, y: 496}
-  previousTextureSize: {x: 512, y: 512}
+  canvasSize: {x: 252, y: 66}
+  previousTextureSize: {x: 512, y: 128}
