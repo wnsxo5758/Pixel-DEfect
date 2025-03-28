@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class MovementRigidbody2D : MonoBehaviour
@@ -8,6 +7,8 @@ public class MovementRigidbody2D : MonoBehaviour
     [Header("레이어 마스크")]
     [SerializeField]
     private LayerMask groundCheckLayer;
+    [SerializeField]
+    private LayerMask belowCollisionLayer;
 
     [Header("움직임")] 
     [SerializeField]
@@ -29,6 +30,7 @@ public class MovementRigidbody2D : MonoBehaviour
 
     private Rigidbody2D rigid;
     private Collider2D collider;
+    public Collider2D HitBelowObject { private set; get; }
 
     public bool IsLongJump { set; get; } = false;
     public bool IsGrounded { private set; get; } = false;
@@ -67,6 +69,8 @@ public class MovementRigidbody2D : MonoBehaviour
         footPos = new Vector2(bounds.center.x, bounds.min.y);
 
         IsGrounded = Physics2D.OverlapBox(footPos, collisionSize, 0, groundCheckLayer);
+
+        HitBelowObject = Physics2D.OverlapBox(footPos, collisionSize, 0, belowCollisionLayer);
     }
 
     public void Jump() //점프
