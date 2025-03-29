@@ -5,25 +5,20 @@ using UnityEngine;
 public class MovementRigidbody2D : MonoBehaviour
 {
     [Header("레이어 마스크")]
-    [SerializeField]
-    private LayerMask groundCheckLayer;
-    [SerializeField]
-    private LayerMask belowCollisionLayer;
-
+    [SerializeField] private LayerMask groundCheckLayer;
+    [SerializeField] private LayerMask belowCollisionLayer;
+    
     [Header("움직임")] 
-    [SerializeField]
-    private float walkSpeed; // 걷기 속도
-    [SerializeField]
-    private float runSpeed; // 달리기 속도
-    [SerializeField]
-    private float jumpForce; // 점프력
-    [SerializeField]
-    private float lowGravityScale; // 약한 중력 (높은 점프시)
-    [SerializeField]
-    private float highGravityScale; // 강한 중력 (일반 점프시)
+    [SerializeField] private float walkSpeed; // 걷기 속도
+    [SerializeField] private float runSpeed; // 달리기 속도
+    [SerializeField] private float climbSpeed; // 사다리 속도
+    [SerializeField] private float jumpForce; // 점프력
+    [SerializeField] private float lowGravityScale; // 약한 중력 (높은 점프시)
+    [SerializeField] private float highGravityScale; // 강한 중력 (일반 점프시)
    
     private float moveSpeed; // 현재 움직이는 속도
     private float initialSpeed; // 초기 속도
+    private bool weightlessness = false;
     
     private Vector2 collisionSize; // 바닥 검사 size
     private Vector2 footPos; // 발 위치
@@ -90,10 +85,37 @@ public class MovementRigidbody2D : MonoBehaviour
         }
         else
         {
-            rigid.gravityScale = highGravityScale;
+            if (!weightlessness)
+            {
+                rigid.gravityScale = highGravityScale;
+            }
         }
     }
+    
+    public void Climb(float y)
+    {
+        rigid.velocity = new Vector2(0, y * climbSpeed);
+    }
 
+    public void LadderJump(float x)
+    {
+        if(x != 0) x = Mathf.Sign(x);
+        rigid.velocity = new Vector2(x * walkSpeed, jumpForce / 2);
+    }
+        
+    public void DisableGravity()
+    {
+        rigid.gravityScale = 0;
+        rigid.velocity = Vector2.zero;
+        weightlessness = true;
+    }
+
+    public void EnableGravity()
+    {
+        rigid.gravityScale = highGravityScale;
+        weightlessness = false;
+    }
+    
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

@@ -10,6 +10,7 @@ public class PlayerAnimator : MonoBehaviour
     private static readonly int IsJump = Animator.StringToHash("IsJump");
     private static readonly int IsAttack = Animator.StringToHash("IsAttack");
     private static readonly int IsConnected = Animator.StringToHash("IsConnected");
+    private static readonly int IsClimbing = Animator.StringToHash("IsClimbing");
 
     private Animator animator; // 애니메이션 
     private MovementRigidbody2D movement; // 움직임
@@ -24,7 +25,7 @@ public class PlayerAnimator : MonoBehaviour
         attack = GetComponentInParent<PlayerAttack>();
         playerInteraction = GetComponentInParent<PlayerInteraction>();
     }
-
+    
     public void MovementAnim(float x)
     {
         if (movement.IsGrounded)
@@ -50,5 +51,15 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetFloat(VelocityX, pnpDirection * x);
         
         animator.SetBool(IsConnected, playerInteraction.IsConnected);
+    }
+
+    public void SetClimbAnim(bool isOnLadder)
+    {
+        animator.SetBool(IsClimbing, isOnLadder);
+    }
+    
+    public void ClimbAnim(float y)
+    {
+        animator.SetFloat(VelocityY, y);
     }
 }

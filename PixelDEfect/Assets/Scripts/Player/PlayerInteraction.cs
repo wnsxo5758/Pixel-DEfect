@@ -1,20 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [Header("상호작용 키")]
-    [SerializeField] private KeyCode input = KeyCode.G;
-
     [Header("레이캐스트")]
     [SerializeField] private float rayDistance = 1f;
     [SerializeField] private LayerMask interactableLayer;
     [SerializeField] private Transform interactPoint;
 
     [Header("스프링 조인트")] 
-    [SerializeField] private float springFrequency = 0f;
+    [SerializeField] private float springFrequency;
     [SerializeField] private float springDamping = 0.9f;
     [SerializeField] private float springDistance = 1f;
 
@@ -42,37 +36,34 @@ public class PlayerInteraction : MonoBehaviour
         
         IsConnected = false;
         interactableLayer = LayerMask.GetMask("Objects");
+
+        InputManager.Instance.OnInteractPressed += OnInteract;
     }
     
     private void Update()
     {
-        DetectInteractableObject();
-        
-        if(Input.GetKeyDown(input) && button!= null)
+        DetectHoldableObject();
+    }
+
+    // 상호작용 입력
+    void OnInteract()
+    {
+        if (button != null)
         {
             button.ButtonTrigger();
             Debug.Log("버튼을 클릭");
         }
-        else if(Input.GetKeyDown(input) && door != null)
+        else if (door != null)
         {
+            if (IsConnected) gameObject.GetComponent<PlayerController>().RevertToPreviousState();
+            
             door.ActiveDoor(gameObject);
             Debug.Log("문을 사용");
         }
-        
-        if (Input.GetKeyDown(input)) 
-        {
-            if (IsConnected)
-            {
-                DisconnectObject();
-            }
-            else
-            {
-                ConnectObject();
-            }
-        }
     }
-    //상호작용 감지
-    void DetectInteractableObject()
+    
+    // 홀드 오브젝트 감지
+    void DetectHoldableObject()
     {
         Vector2 direction = new Vector2(Mathf.Sign(transform.localScale.x), 0);
         RaycastHit2D hit = Physics2D.Raycast(interactPoint.position, 
@@ -89,14 +80,20 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    
-    //오브젝트 연결
-    void ConnectObject() 
+    // 홀드 체크
+    public bool CheckHold()
     {
-        if (detectedObject == null) return;
+        if (!IsConnected)
+        {
+            if (detectedObject) return true;
+        }
+
+        return false;
+    }
         
-        if (door != null) return; //문에 서 있는 상태에서 상호작용 예외처리
-        
+    // 오브젝트 연결
+    public void ConnectObject() 
+    {
         objectRb = detectedObject.GetComponent<Rigidbody2D>();
 
         if (objectRb != null)
@@ -111,8 +108,8 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
     
-    //오브젝트 연결 해제
-    void DisconnectObject() 
+    // 오브젝트 연결 해제
+    public void DisconnectObject() 
     {
         springJoint.enabled = false;
         springJoint.connectedBody = null;
@@ -122,7 +119,7 @@ public class PlayerInteraction : MonoBehaviour
         movement.InteractSpeed = 1;
     }
     
-    //GUI 디버그 표시
+    // GUI 디버그 표시
     void OnGUI() 
     {
         GUI.Label(new Rect(1000, 10, 300, 20), 

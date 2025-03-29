@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -8,15 +9,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private StageData stageData;
     
-    [Header("조작키")]
-    [SerializeField] private KeyCode jumpKeyCode = KeyCode.Space;
-    [SerializeField] private KeyCode holdKeyCode = KeyCode.F;
-    [SerializeField] private KeyCode healKeyCode = KeyCode.E;
-    [SerializeField] private KeyCode meleeAttack = KeyCode.Mouse0; // 근접 공격
-    [SerializeField] private KeyCode magicAttack = KeyCode.Mouse1; // 원거리 공격
-    [SerializeField] private KeyCode selectMagicBack = KeyCode.Q; // 뒷칸의 마법 선택
-    [SerializeField] private KeyCode selectMagicFront = KeyCode.E; // 앞칸의 마법 선택
-    
     private int currentSkillNumber; //선택된 스킬 넘버
     
     private MovementRigidbody2D movement;
@@ -24,6 +16,8 @@ public class PlayerController : MonoBehaviour
     private PlayerAttack playerAttack;
     private PlayerInteraction playerInteraction;
     private PlayerStateMachine<PlayerController> stateMachine;
+
+    public bool IsOnLadder { get; set; } = false; //사다리 
 
     private void Awake()
     {
@@ -38,6 +32,9 @@ public class PlayerController : MonoBehaviour
         stateMachine = new PlayerStateMachine<PlayerController>();
         stateMachine.Setup(this, new PlayerStates.Idle());
         stateMachine.SetGlobalState(new PlayerStates.StateGlobal());
+        
+        InputManager.Instance.OnJumpPressed += OnJump;
+        InputManager.Instance.OnHoldPressed += OnHold;
     }
     
     private void Update()
@@ -45,10 +42,11 @@ public class PlayerController : MonoBehaviour
         stateMachine.Execute();
     }
 
-    public float HandleInput()
+    //입력 관련 메소드
+    public float HorizontalInput() // 좌우 입력
     {
-        float x = Input.GetAxisRaw("Horizontal");
-        float offset = 0.5f + Input.GetAxisRaw("Sprint") * 0.5f;
+        float x = InputManager.Instance.HorizontalInput;
+        float offset = 0.5f + InputManager.Instance.SprintInput * 0.5f;
 
         if (playerInteraction.IsConnected)
         {
@@ -56,25 +54,22 @@ public class PlayerController : MonoBehaviour
         }
 
         return x * offset;
-    } // 입력 처리
+    }
+
+    public float VerticalInput() // 상하 입력 (사다리)
+    {
+        float y = InputManager.Instance.VerticalInput;
+
+        return y;
+    }
     
-    public void UpdateMove(float x)
+    public void OnJump() // 점프 입력
     {
-        movement.MoveTo(x);
-
-        float xPos = Mathf.Clamp(transform.position.x, stageData.PlayerLimitMinX, stageData.PlayerLimitMaxX);
-        transform.position = new Vector2(xPos, transform.position.y);
-    } // 이동 메소드
-
-    public void HandleJump()
-    {
-        if(Input.GetKeyDown(jumpKeyCode))
+        if (movement.IsGrounded)
         {
-            if (movement.IsGrounded)
-            {
-                ChangeState(new PlayerStates.Jump());
-            }
+            ChangeState(new PlayerStates.Jump());
         }
+        
         /* 롱점프 구현 시
          if (Input.GetKey(jumpKeyCode))
         {
@@ -85,16 +80,52 @@ public class PlayerController : MonoBehaviour
             movement.IsLongJump = false;
         }
         */
-    } // 점프 처리
+    }
 
-    public void HandleHold()
+    public void OnHold() // 홀드 입력
     {
-        if (playerInteraction.IsConnected)
+        if (playerInteraction.CheckHold())
         {
             ChangeState(new PlayerStates.Hold());
         }
-    } // 홀드 처리
+        else
+        {
+            if (playerInteraction.IsConnected)
+            {
+                RevertToPreviousState();
+            }
+        }
+    } 
     
+    public void OnLadderJump()
+    {
+        if (IsOnLadder)
+        {
+            movement.LadderJump(HorizontalInput());
+            ChangeState(new PlayerStates.Idle());
+        }
+    }
+    
+    public void UpdateMove(float x) // 이동
+    {
+        movement.MoveTo(x);
+
+        float xPos = Mathf.Clamp(transform.position.x, stageData.PlayerLimitMinX, stageData.PlayerLimitMaxX);
+        transform.position = new Vector2(xPos, transform.position.y);
+    } 
+    
+    public void UpdateBelowCollision() // 바닥이 플랫폼인지 확인
+    {
+        if (movement.HitBelowObject != null)
+        {
+            if (movement.HitBelowObject.TryGetComponent<PlatformBase>(out var platform))
+            {
+                //기능 추가 예정
+            }
+        }
+    }
+    
+    /*
     public void UpdateAttack() // 공격
     {
         if (Input.GetKeyDown(meleeAttack))
@@ -106,6 +137,7 @@ public class PlayerController : MonoBehaviour
             playerAttack.MagicAttack(currentSkillNumber);
         }
     }
+    
 
     public void HealPlayer()
     {
@@ -126,6 +158,7 @@ public class PlayerController : MonoBehaviour
 
         }
     }
+    */
 
     public void ChangeState(State<PlayerController> newState)
     {
