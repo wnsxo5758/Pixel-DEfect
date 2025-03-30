@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b150ca3dba33b340afe2cd1437974b6, type: 3}
   m_Name: TempStage
   m_EditorClassIdentifier: 
-  cameraLimitMinX: 0
-  cameraLimitMaxX: 0
-  playerLmitMinX: 0
-  playerLmitMaxX: 0
-  mapLimitMinY: 0
+  cameraLimitMinX: -50
+  cameraLimitMaxX: 300
+  playerLmitMinX: -50
+  playerLmitMaxX: 300
+  mapLimitMinY: -10
