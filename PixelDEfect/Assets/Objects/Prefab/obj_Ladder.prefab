@@ -115,19 +115,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 62fdb48082cc3ed4daa6cabe6a539827, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 62fdb48082cc3ed4daa6cabe6a539827, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 62fdb48082cc3ed4daa6cabe6a539827, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.56
+      value: -6.84
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 62fdb48082cc3ed4daa6cabe6a539827, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.128
+      value: 8.02
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 62fdb48082cc3ed4daa6cabe6a539827, type: 3}
       propertyPath: m_LocalPosition.z
@@ -243,3 +243,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topPlatform: {fileID: 393864073085075909}
+  ladderLength: 1
+  ladderSegmentPrefab: {fileID: 4612177874313785215, guid: 8a3caaa04a73ba647b78584eb4853114, type: 3}
+  segmentHeight: 3.2
