@@ -14,7 +14,7 @@ public class ButtonBase : MonoBehaviour
     [SerializeField]
     protected bool isCount; // 시간제한이 있는 버튼인가
     [SerializeField]
-    protected float Maxtime; // 시간제한 값
+    protected float timeToLimit; // 시간제한 값
     [SerializeField]
     protected InteractableObject[] connectedObjects; // 버튼과 상호작용할 오브젝트
     
@@ -43,12 +43,50 @@ public class ButtonBase : MonoBehaviour
 
     public void ButtonTrigger() // 버튼 활성화시 작동
     {
-        if(isActiving == false)
+        if(isCount)
         {
-            StartCoroutine(nameof(ButtonActive));
+            if (isActiving == false)
+            {
+                StartCoroutine(nameof(TimeLimitButton));
+            }
+
+        }
+        else
+        {
+            if(isActiving == false)
+            {
+                StartCoroutine(nameof(ButtonActive));
+            }
+
         }
     }
+    protected virtual IEnumerator TimeLimitButton()
+    {
+        isActiving = true;
+        isActive = true;
+        UpdateSprite(); // 버튼 스프라이트 변경
+        audio.Play();  // 효과음 
+        if (connectedObjects != null) // 작동되는 오브젝트가 있다면
+        {
+            foreach (var obj in connectedObjects)
+            {
+                obj.Trigger();
+            }
+        }
+        yield return new WaitForSeconds(timeToLimit); // 
+        isActive = false;
+        isActiving = false;
+        UpdateSprite(); // 버튼 스프라이트 변경
+        if (connectedObjects != null) // 작동되는 오브젝트가 있다면
+        {
+            foreach (var obj in connectedObjects)
+            {
+                obj.Trigger();
+            }
+        }
 
+
+    }
     protected virtual IEnumerator ButtonActive()
     {
         isActiving = true; // 작동시작

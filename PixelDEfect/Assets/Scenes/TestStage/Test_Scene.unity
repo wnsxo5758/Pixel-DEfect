@@ -9624,7 +9624,7 @@ MonoBehaviour:
   isActive: 0
   isActiving: 0
   isCount: 0
-  Maxtime: 0
+  timeToLimit: 0
   connectedObjects:
   - {fileID: 2064133221}
   activeSprite: {fileID: 0}
@@ -10109,6 +10109,79 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1001 &1752181090
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1766897273259281953, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: isCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1766897273259281953, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: timeToLimit
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1766897273259281953, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: connectedObjects.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1766897273259281953, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: connectedObjects.Array.data[0]
+      value: 
+      objectReference: {fileID: 147826034}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.51
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426047882345916346, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8770055949978775901, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
+      propertyPath: m_Name
+      value: TimeLimitButton
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: def53f7ad08ffae4c9b831cf590f8d41, type: 3}
 --- !u!1 &1767530990
 GameObject:
   m_ObjectHideFlags: 0
@@ -11371,6 +11444,7 @@ SceneRoots:
   - {fileID: 659571776}
   - {fileID: 2815555148388680330}
   - {fileID: 4861929295142510935}
+  - {fileID: 1752181090}
   - {fileID: 838608019}
   - {fileID: 3632063765980820874}
   - {fileID: 108383773}
