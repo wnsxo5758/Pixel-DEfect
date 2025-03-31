@@ -4,10 +4,17 @@ using UnityEngine;
 
 public class Ladder : MonoBehaviour
 {
+    [Header("Settings")]
     [SerializeField] private BoxCollider2D topPlatform;
-    [SerializeField] private int ladderLength = 1;
     [SerializeField] private GameObject ladderSegmentPrefab;
     [SerializeField] private float segmentHeight = 1f;
+    [SerializeField] private int ladderLength = 1;
+    
+    [Header("TopPlatform")]
+    [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private float detectionRadius = 0.5f;
+
+    private Vector3 detectionPoint = Vector3.zero;
     
     private BoxCollider2D ladderCollider;
     private readonly List<GameObject> ladderSegments = new List<GameObject>(); 
@@ -97,6 +104,18 @@ public class Ladder : MonoBehaviour
             GenerateLadder();
         }
     }
+
+    private bool DetectPlayerOnTop()
+    {
+        detectionPoint = topPlatform.transform.position + new Vector3(0, topPlatform.size.y / 2f, 0);
+        
+        Collider2D playerCollider = Physics2D.OverlapCircle(
+            detectionPoint,
+            detectionRadius,
+            playerLayer);
+
+        return playerCollider != null;
+    }
     
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -106,10 +125,21 @@ public class Ladder : MonoBehaviour
 
             float vertical = player.VerticalInput();
 
-            if (Mathf.Abs(vertical) > 0 && !player.IsOnLadder)
+            if (!player.IsOnLadder)
             {
-                player.ChangeState(new Climb());
-                topPlatform.isTrigger = true;
+                if (DetectPlayerOnTop())
+                {
+                    if (vertical < 0)
+                    {
+                        topPlatform.isTrigger = true;
+                        player.ChangeState(new Climb());
+                    }
+                }
+                else if (Mathf.Abs(vertical) > 0)
+                {
+                    topPlatform.isTrigger = false;
+                    player.ChangeState(new Climb());
+                }
             }
         }
     }
@@ -127,5 +157,11 @@ public class Ladder : MonoBehaviour
             
             topPlatform.isTrigger = false;
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(detectionPoint, detectionRadius);
     }
 }

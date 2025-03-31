@@ -173,7 +173,8 @@ public class PlayerController : MonoBehaviour
     public void SpriteFlipX(float x)
     {
         if (x == 0) return;
-        transform.localScale = new Vector3((x < 0 ? -1 : 1), 1, 1);
+        transform.localScale = new Vector3((x < 0 ? -1.2f : 1.2f), 
+                                                        transform.localScale.y, transform.localScale.z);
     }
 
     void OnGUI()
