@@ -120,7 +120,7 @@ public class PlayerController : MonoBehaviour
         {
             if (movement.HitBelowObject.TryGetComponent<PlatformBase>(out var platform))
             {
-                //기능 추가 예정
+                platform.UpdateCollision(gameObject);
             }
         }
     }
