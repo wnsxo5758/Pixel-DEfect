@@ -25,7 +25,7 @@ public class ButtonBase : MonoBehaviour
     private Sprite inActiveSprite; // 비활성화시
 
     private SpriteRenderer sprite;
-    private AudioSource audio;
+    protected AudioSource audio;
     private void Awake()
     {
         sprite  = GetComponentInChildren<SpriteRenderer>();
@@ -33,7 +33,7 @@ public class ButtonBase : MonoBehaviour
         UpdateSprite();
     }
 
-    private void UpdateSprite()
+    protected void UpdateSprite()
     {
         if(sprite != null)
         {
@@ -45,17 +45,16 @@ public class ButtonBase : MonoBehaviour
     {
         if(isActiving == false)
         {
-            isActive = !isActive; // 누르면 활성화
             StartCoroutine(nameof(ButtonActive));
-            UpdateSprite(); // 버튼 스프라이트 변경
-            audio.Play();  // 효과음 
         }
     }
 
-    private IEnumerator ButtonActive()
+    protected virtual IEnumerator ButtonActive()
     {
         isActiving = true; // 작동시작
-
+        isActive = !isActive; // 누르면 활성화
+        UpdateSprite(); // 버튼 스프라이트 변경
+        audio.Play();  // 효과음 
         if (connectedObjects != null) // 작동되는 오브젝트가 있다면
         {
             foreach (var obj in connectedObjects)
