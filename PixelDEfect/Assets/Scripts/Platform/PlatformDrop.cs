@@ -15,12 +15,14 @@ public class PlatformDrop : PlatformBase
     private Vector3 originPos;
     private Animator animator;
     private AudioSource audio;
+    private SpriteRenderer sprite;
     private void Awake()
     {
         boxCollider2D = GetComponent<BoxCollider2D>();
         rigid = GetComponent<Rigidbody2D>();
         audio = GetComponent<AudioSource>();
         animator = GetComponentInChildren<Animator>();
+        sprite = GetComponentInChildren<SpriteRenderer>();
         originPos = transform.position;
     }
 
@@ -49,7 +51,7 @@ public class PlatformDrop : PlatformBase
     private IEnumerator OnShake()
     {
         audio.Play();
-        animator.SetTrigger("Warning");
+        animator.SetBool("Warning",true);
         float percent = 0;
         float shakeAngle = 5;
         float shakeSpeed = 10;
@@ -71,16 +73,53 @@ public class PlatformDrop : PlatformBase
     {
         boxCollider2D.enabled = false;
         rigid.isKinematic = false;
+        rigid.gravityScale = 1;
+        StartCoroutine(nameof(FadeOut));
     }
 
     private IEnumerator OnRespawn()
     {
         yield return new WaitForSeconds(respawnTime);
+        animator.SetBool("Warning", false);
         IsHit = false;
         transform.position = originPos;
         boxCollider2D.enabled = true;
         rigid.isKinematic = true;
         rigid.velocity = Vector2.zero;
+        StartCoroutine(nameof(FadeIn));
 
+    }
+
+    private IEnumerator FadeOut()
+    {
+        float duration = 1f; // 사라지는 시간
+        float elapsed = 0;
+        Color startColor = sprite.color;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1, 0, elapsed / duration);
+            sprite.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            yield return null;
+        }
+
+        sprite.color = new Color(startColor.r, startColor.g, startColor.b, 0);
+    }
+    private IEnumerator FadeIn()
+    {
+        float duration = 1f; // 나타나는 시간
+        float elapsed = 0;
+        Color startColor = sprite.color;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(0, 1, elapsed / duration);
+            sprite.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            yield return null;
+        }
+
+        sprite.color = new Color(startColor.r, startColor.g, startColor.b, 1);
     }
 }
