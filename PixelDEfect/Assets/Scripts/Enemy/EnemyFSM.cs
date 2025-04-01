@@ -5,9 +5,6 @@ using UnityEngine;
 public enum EnemyState { None = -1, Idle = 0, Wander, Pursuit, Attack, Dead }
 public abstract class EnemyFSM : MonoBehaviour
 {
-
-
-
     [Header("기본 설정")]
     [SerializeField]
     private int currentHp; // 현재 체력
@@ -49,6 +46,10 @@ public abstract class EnemyFSM : MonoBehaviour
     [SerializeField]
     protected Transform target;
 
+    private Vector2 dir;
+    private bool isChange;
+    public bool IsFacingRight => isFacingRight;
+
     protected MovementRigidbody2D movement;
     protected EnemyAnimator animator;
     protected AudioSource audio;
@@ -63,12 +64,6 @@ public abstract class EnemyFSM : MonoBehaviour
     {
         SetUp();
     }
-
-    private Vector2 dir;
-
-    private bool isChange;
-
-    public bool IsFacingRight => isFacingRight;
 
 
     public void ChangeFacing()

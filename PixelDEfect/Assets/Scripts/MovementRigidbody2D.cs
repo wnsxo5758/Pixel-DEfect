@@ -19,7 +19,11 @@ public class MovementRigidbody2D : MonoBehaviour
     private float moveSpeed; // 현재 움직이는 속도
     private float initialSpeed; // 초기 속도
     private bool weightlessness = false;
-    
+
+    public float MoveSpeed => moveSpeed;
+    public float RunSpeed => runSpeed;
+
+
     private Vector2 collisionSize; // 바닥 검사 size
     private Vector2 footPos; // 발 위치
 

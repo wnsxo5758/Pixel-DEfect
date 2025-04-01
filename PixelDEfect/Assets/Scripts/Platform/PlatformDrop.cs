@@ -71,9 +71,9 @@ public class PlatformDrop : PlatformBase
 
     private void OnDrop()
     {
-        boxCollider2D.enabled = false;
         rigid.isKinematic = false;
         rigid.gravityScale = 1;
+        boxCollider2D.enabled = false;
         StartCoroutine(nameof(FadeOut));
     }
 
