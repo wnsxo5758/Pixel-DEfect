@@ -243,6 +243,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topPlatform: {fileID: 393864073085075909}
-  ladderLength: 1
   ladderSegmentPrefab: {fileID: 4612177874313785215, guid: 8a3caaa04a73ba647b78584eb4853114, type: 3}
   segmentHeight: 3.2
+  ladderLength: 1
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  detectionRadius: 0.5

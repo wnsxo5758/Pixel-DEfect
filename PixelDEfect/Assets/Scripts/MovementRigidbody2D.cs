@@ -11,6 +11,7 @@ public class MovementRigidbody2D : MonoBehaviour
     [Header("움직임")] 
     [SerializeField] private float walkSpeed; // 걷기 속도
     [SerializeField] private float runSpeed; // 달리기 속도
+    [SerializeField] private float crawlSpeed; // 기어가기 속도
     [SerializeField] private float climbSpeed; // 사다리 속도
     [SerializeField] private float jumpForce; // 점프력
     [SerializeField] private float lowGravityScale; // 약한 중력 (높은 점프시)
@@ -52,14 +53,6 @@ public class MovementRigidbody2D : MonoBehaviour
         UpdateCollision();
         JumpHeight();
     }
-
-    public void MoveTo(float x)
-    {
-        moveSpeed = Mathf.Abs(x) != 1 ? walkSpeed : runSpeed;
-        if (x != 0) x = Mathf.Sign(x);
-        rigid.velocity = new Vector2(x * moveSpeed, rigid.velocity.y);
-    }
-
     private void UpdateCollision()
     {
         Bounds bounds = collider.bounds;
@@ -71,7 +64,14 @@ public class MovementRigidbody2D : MonoBehaviour
 
         HitBelowObject = Physics2D.OverlapBox(footPos, collisionSize, 0, belowCollisionLayer);
     }
-
+    
+    public void MoveTo(float x)
+    {
+        moveSpeed = Mathf.Abs(x) != 1 ? walkSpeed : runSpeed;
+        if (x != 0) x = Mathf.Sign(x);
+        rigid.velocity = new Vector2(x * moveSpeed, rigid.velocity.y);
+    }
+    
     public void Jump() //점프
     {
         if (IsGrounded)
@@ -94,6 +94,12 @@ public class MovementRigidbody2D : MonoBehaviour
                 rigid.gravityScale = highGravityScale;
             }
         }
+    }
+
+    public void Crawl(float x) // 기어가기
+    {
+        if (x != 0) x = Mathf.Sign(x);
+        rigid.velocity = new Vector2(x * crawlSpeed, rigid.velocity.y);
     }
     
     public void Climb(float y)

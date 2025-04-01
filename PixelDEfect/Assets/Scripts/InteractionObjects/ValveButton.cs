@@ -35,11 +35,13 @@ public class ValveButton : ButtonBase
         else if(isPressing)
         {
             if(currentPressTime < pressTimeRequired)
-            currentPressTime += Time.deltaTime;
+                currentPressTime += Time.deltaTime;
             else isPressing = false;
         }
-
     }
+    
+    
+    
     protected override IEnumerator ButtonActive() // 버튼을  누른경우
     {
         isActiving = true; // 작동시작

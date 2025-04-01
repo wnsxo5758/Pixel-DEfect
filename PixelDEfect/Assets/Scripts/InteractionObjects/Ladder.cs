@@ -7,7 +7,7 @@ public class Ladder : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private BoxCollider2D topPlatform;
     [SerializeField] private GameObject ladderSegmentPrefab;
-    [SerializeField] private float segmentHeight = 1f;
+    [SerializeField] private float segmentHeight;
     [SerializeField] private int ladderLength = 1;
     
     [Header("TopPlatform")]
@@ -17,6 +17,7 @@ public class Ladder : MonoBehaviour
     private Vector3 detectionPoint = Vector3.zero;
     
     private BoxCollider2D ladderCollider;
+    private float ladderHeight;
     private readonly List<GameObject> ladderSegments = new List<GameObject>(); 
 
     private void Awake()
@@ -36,6 +37,7 @@ public class Ladder : MonoBehaviour
 
     private void Start()
     {
+        ladderHeight = ladderCollider.size.y;
         GenerateLadder();
     }
     
@@ -55,8 +57,9 @@ public class Ladder : MonoBehaviour
 
         if (ladderCollider != null)
         {
-            ladderCollider.size = new Vector2(ladderCollider.size.x, segmentHeight * ladderLength);
-            ladderCollider.offset = new Vector2(0, -segmentHeight * ladderLength / 2f + segmentHeight / 2f);
+            ladderCollider.size = new Vector2(ladderCollider.size.x, ladderHeight + segmentHeight * (ladderLength - 1));
+            ladderCollider.offset = new Vector2(ladderCollider.offset.x, 
+                                    ladderHeight / 2f - (ladderHeight + segmentHeight * (ladderLength - 1)) / 2f);
         }
 
         // 사다리 스프라이트가 없고 프리팹이 지정된 경우에만 세그먼트 생성

@@ -69,6 +69,9 @@ namespace PlayerStates
             movement = player.GetComponent<MovementRigidbody2D>();
             animator = player.GetComponentInChildren<PlayerAnimator>();
             movement.Jump();
+            
+            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
+            InputManager.Instance.OnHoldPressed -= player.OnHold;
         }
 
         public override void Execute(PlayerController player)
@@ -79,7 +82,7 @@ namespace PlayerStates
             
             if (movement.IsGrounded && movement.Velocity.y <= 0.01f)
             {
-                player.RevertToPreviousState();
+                player.ChangeState(new Idle());
             }
             
             player.UpdateMove(input);
@@ -88,10 +91,69 @@ namespace PlayerStates
         
         public override void Exit(PlayerController player)
         {
-            
+            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
+            InputManager.Instance.OnHoldPressed += player.OnHold;
         }
     }
+    
+    public class Crawl : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private BoxCollider2D boxCollider;
+        private Vector2 originalColliderSize;
+        private Vector2 originalColliderOffset;
+        private Vector2 crouchColliderSize;
+        private float colliderSizeFactor = 0.65f;
+        
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            boxCollider = player.GetComponent<BoxCollider2D>();
+            
+            animator.SetCrouchAnim(player.IsCrouching);
+            
+            originalColliderSize = boxCollider.size;
+            originalColliderOffset = boxCollider.offset;
+            
+            crouchColliderSize = new Vector2(originalColliderSize.x,originalColliderSize.y * colliderSizeFactor);
+            boxCollider.size = crouchColliderSize;
 
+            float offsetY = (originalColliderSize.y - crouchColliderSize.y) / 2;
+            boxCollider.offset = new Vector2(boxCollider.offset.x, boxCollider.offset.y - offsetY);
+            
+            InputManager.Instance.OnCrouchReleased += player.UnCrouch;
+            InputManager.Instance.OnHoldPressed -= player.OnHold;
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            float input = player.HorizontalInput();
+            
+            animator.CrawlAnim(input);
+            
+            player.UpdateMove(input);
+            player.SpriteFlipX(input);
+
+            // 키 입력 X 상태에서 일어서기 가능할 때
+            if (!InputManager.Instance.IsCrouchKeyPressed() && player.HasSpaceAbove())
+            {
+                player.UnCrouch();
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            boxCollider.size = originalColliderSize;
+            boxCollider.offset = originalColliderOffset;
+            
+            player.IsCrouching = false;
+            animator.SetCrouchAnim(player.IsCrouching);
+            
+            InputManager.Instance.OnCrouchReleased -= player.UnCrouch;
+            InputManager.Instance.OnHoldPressed += player.OnHold;
+        }
+    }
+    
     public class Hold : State<PlayerController>
     {
         private PlayerAnimator animator;
@@ -103,8 +165,9 @@ namespace PlayerStates
             animator.EnterHoldAnim(player.transform.localScale.x);
             playerInteraction.ConnectObject();
             
-            // 점프 비활성화
+            // 입력 비활성화
             InputManager.Instance.OnJumpPressed -= player.OnJump;
+            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
         }
 
         public override void Execute(PlayerController player)
@@ -125,6 +188,7 @@ namespace PlayerStates
             
             // 점프 활성화
             InputManager.Instance.OnJumpPressed += player.OnJump;
+            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
         }
     }
 
@@ -139,8 +203,10 @@ namespace PlayerStates
             animator = player.GetComponentInChildren<PlayerAnimator>();
             
             // 입력 관리
-            InputManager.Instance.OnJumpPressed -= player.OnJump;
             InputManager.Instance.OnLadderJumpPressed += player.OnLadderJump;
+            InputManager.Instance.OnJumpPressed -= player.OnJump;
+            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
+            InputManager.Instance.OnHoldPressed -= player.OnHold;
             
             player.IsOnLadder = true;
             
@@ -160,8 +226,10 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
-            InputManager.Instance.OnJumpPressed += player.OnJump;
             InputManager.Instance.OnLadderJumpPressed -= player.OnLadderJump;
+            InputManager.Instance.OnJumpPressed += player.OnJump;
+            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
+            InputManager.Instance.OnHoldPressed += player.OnHold;
             
             player.IsOnLadder = false;
             
@@ -169,6 +237,7 @@ namespace PlayerStates
             animator.SetClimbAnim(player.IsOnLadder);
         }
     }
+    
     public class StateGlobal : State<PlayerController>
     {
         

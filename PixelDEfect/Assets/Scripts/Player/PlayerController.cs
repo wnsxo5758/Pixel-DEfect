@@ -1,23 +1,23 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using PlayerStates;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    private StageData stageData;
-    
-    private int currentSkillNumber; //선택된 스킬 넘버
+    [Header("스테이지")]
+    [SerializeField] private StageData stageData;
+
+    [Header("웅크리기")] 
+    [SerializeField] private float crouchCheckDistance = 0.5f;
+    [SerializeField] private LayerMask aboveLayer;
     
     private MovementRigidbody2D movement;
     private PlayerHp playerHp;
     private PlayerAttack playerAttack;
     private PlayerInteraction playerInteraction;
     private PlayerStateMachine<PlayerController> stateMachine;
-
+    
     public bool IsOnLadder { get; set; } = false; //사다리 
+    public bool IsCrouching { get; set; } = false; //웅크리기
 
     private void Awake()
     {
@@ -30,10 +30,11 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         stateMachine = new PlayerStateMachine<PlayerController>();
-        stateMachine.Setup(this, new PlayerStates.Idle());
-        stateMachine.SetGlobalState(new PlayerStates.StateGlobal());
+        stateMachine.Setup(this, new Idle());
+        stateMachine.SetGlobalState(new StateGlobal());
         
         InputManager.Instance.OnJumpPressed += OnJump;
+        InputManager.Instance.OnCrouchPressed += OnCrouch;
         InputManager.Instance.OnHoldPressed += OnHold;
     }
     
@@ -48,7 +49,7 @@ public class PlayerController : MonoBehaviour
         float x = InputManager.Instance.HorizontalInput;
         float offset = 0.5f + InputManager.Instance.SprintInput * 0.5f;
 
-        if (playerInteraction.IsConnected)
+        if (playerInteraction.IsConnected || IsCrouching)
         {
             offset = 0.5f;
         }
@@ -65,9 +66,9 @@ public class PlayerController : MonoBehaviour
     
     public void OnJump() // 점프 입력
     {
-        if (movement.IsGrounded)
+        if (movement.IsGrounded && HasSpaceAbove())
         {
-            ChangeState(new PlayerStates.Jump());
+            ChangeState(new Jump());
         }
         
         /* 롱점프 구현 시
@@ -82,11 +83,29 @@ public class PlayerController : MonoBehaviour
         */
     }
 
+    public void OnCrouch() // 웅크리기 입력
+    {
+        if (!IsCrouching)
+        {
+            IsCrouching = true;
+            ChangeState(new Crawl());
+        }
+    }
+
+    public void UnCrouch() // 웅크리기 해제
+    {
+        if (IsCrouching && HasSpaceAbove())
+        {
+            IsCrouching = false;
+            ChangeState(new Idle());
+        }
+    }
+
     public void OnHold() // 홀드 입력
     {
         if (playerInteraction.CheckHold())
         {
-            ChangeState(new PlayerStates.Hold());
+            ChangeState(new Hold());
         }
         else
         {
@@ -102,17 +121,36 @@ public class PlayerController : MonoBehaviour
         if (IsOnLadder)
         {
             movement.LadderJump(HorizontalInput());
-            ChangeState(new PlayerStates.Idle());
+            ChangeState(new Idle());
         }
     }
     
     public void UpdateMove(float x) // 이동
     {
-        movement.MoveTo(x);
+        if (IsCrouching)
+        {
+            movement.Crawl(x);
+        }
+        else
+        {
+            movement.MoveTo(x);
+        }
 
         float xPos = Mathf.Clamp(transform.position.x, stageData.PlayerLimitMinX, stageData.PlayerLimitMaxX);
         transform.position = new Vector2(xPos, transform.position.y);
-    } 
+    }
+
+    public bool HasSpaceAbove() // 웅크리기 상태에서 머리 위에 충분한 공간이 있는지 확인
+    {
+        Vector3 rayOrigin = transform.position + new Vector3(0, 1f, 0);
+        
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up, 
+                            crouchCheckDistance, aboveLayer);
+        
+        Debug.DrawRay(rayOrigin, Vector2.up * crouchCheckDistance, Color.green);
+
+        return hit.collider == null;
+    }
     
     public void UpdateBelowCollision() // 바닥이 플랫폼인지 확인
     {
@@ -125,41 +163,6 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    /*
-    public void UpdateAttack() // 공격
-    {
-        if (Input.GetKeyDown(meleeAttack))
-        {
-            playerAttack.MeleeAttack();
-        }
-        else if (Input.GetKeyDown(magicAttack))
-        {
-            playerAttack.MagicAttack(currentSkillNumber);
-        }
-    }
-    
-
-    public void HealPlayer()
-    {
-        if (Input.GetKeyDown(healKeyCode))
-        {
-            playerHp.IncreaseHp();
-        }
-    }
-    
-    public void UpdateSkillNumber()
-    {
-        if (Input.GetKeyDown(selectMagicBack)) // 이전 마법 설정
-        {
-
-        }
-        else if (Input.GetKeyDown(selectMagicFront)) // 다음 마법 설정
-        {
-
-        }
-    }
-    */
-
     public void ChangeState(State<PlayerController> newState)
     {
         stateMachine.ChangeState(newState);
@@ -182,43 +185,4 @@ public class PlayerController : MonoBehaviour
         GUI.Label(new Rect(1000, 50, 300, 20),
             "State: " + stateMachine.CurrentState.GetType().Name);
     }
-    
-    /* private void UpdateInteract(float x)
-    {
-        if (x != 0)
-        {
-            rayDirection = new Vector2(Mathf.Sign(x), 0f);
-        }
-        
-        RaycastHit2D hitInfo = Physics2D.Raycast(rayPoint.position, rayDirection
-            , rayDistance);
-
-        if (hitInfo.collider != null && hitInfo.collider.gameObject.layer == layerIndex)
-        {
-            if (Input.GetKeyDown(interactKeyCode) && grabbedObject == null) // 그랩 가능 상태
-            {
-                grabbedObject = hitInfo.collider.gameObject;
-                grabbedObject.GetComponent<Rigidbody2D>().isKinematic = true;
-                grabbedObject.transform.position = grabPoint.position;
-                grabbedObject.transform.SetParent(transform);
-            }
-            else if (Input.GetKeyDown(interactKeyCode)) // 내려 놓기
-            {
-                grabbedObject.GetComponent<Rigidbody2D>().isKinematic = false;
-                grabbedObject.transform.SetParent(null);
-                grabbedObject = null;
-            }
-            else if (Input.GetKeyDown(throwKeyCode)) // 던지기
-            {
-                Vector2 throwDir = rayDirection + new Vector2(0, 1f);
-                grabbedObject.GetComponent<Rigidbody2D>().isKinematic = false;
-                grabbedObject.transform.SetParent(null);
-                grabbedObject.GetComponent<Rigidbody2D>().AddForce(throwDir * throwPower, ForceMode2D.Impulse);
-                grabbedObject = null;
-            }
-        }
-        
-        Debug.DrawRay(rayPoint.position,  rayDirection * rayDistance);
-    }
-    */
 }

@@ -10,12 +10,15 @@ public class InputManager : MonoBehaviour
     [SerializeField] private KeyCode holdKey = KeyCode.F;
     [SerializeField] private KeyCode interactKey = KeyCode.G;
     [SerializeField] private KeyCode healKey = KeyCode.E;
+    [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
     
     public float HorizontalInput => Input.GetAxisRaw("Horizontal");
     public float VerticalInput => Input.GetAxisRaw("Vertical");
     public float SprintInput => Input.GetAxisRaw("Sprint");
 
     public event Action OnJumpPressed;
+    public event Action OnCrouchPressed;
+    public event Action OnCrouchReleased;
     public event Action OnHoldPressed;
     public event Action OnInteractPressed;
     public event Action OnHealPressed;
@@ -46,6 +49,12 @@ public class InputManager : MonoBehaviour
         if (Input.GetKeyDown(jumpKey))
             OnJumpPressed?.Invoke();
         
+        // 웅크리기 입력
+        if(IsCrouchKeyPressed())
+            OnCrouchPressed?.Invoke();
+        if(Input.GetKeyUp(crouchKey))
+            OnCrouchReleased?.Invoke();
+            
         // 끌기 입력
         if (Input.GetKeyDown(holdKey))
             OnHoldPressed?.Invoke();
@@ -56,6 +65,7 @@ public class InputManager : MonoBehaviour
         
         if (Input.GetKeyDown(healKey))
             OnHealPressed?.Invoke();
+        
     }
     
     private void CheckKeyCombinations()
@@ -67,4 +77,6 @@ public class InputManager : MonoBehaviour
                 OnLadderJumpPressed?.Invoke();
         }
     }
+    
+    public bool IsCrouchKeyPressed() => Input.GetKey(crouchKey);
 }

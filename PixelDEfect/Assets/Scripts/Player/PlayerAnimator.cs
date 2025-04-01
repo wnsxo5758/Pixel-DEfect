@@ -11,6 +11,7 @@ public class PlayerAnimator : MonoBehaviour
     private static readonly int IsAttack = Animator.StringToHash("IsAttack");
     private static readonly int IsConnected = Animator.StringToHash("IsConnected");
     private static readonly int IsClimbing = Animator.StringToHash("IsClimbing");
+    private static readonly int IsCrouching = Animator.StringToHash("IsCrouching");
 
     private Animator animator; // 애니메이션 
     private MovementRigidbody2D movement; // 움직임
@@ -40,6 +41,16 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool(IsJump, !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
     }
 
+    public void SetCrouchAnim(bool isCrouching)
+    {
+        animator.SetBool(IsCrouching, isCrouching);
+    }
+    
+    public void CrawlAnim(float x)
+    {
+        animator.SetFloat(VelocityX, Mathf.Abs(x));
+    }
+    
     public void EnterHoldAnim(float dir)
     {
         animator.SetBool(IsConnected, playerInteraction.IsConnected);

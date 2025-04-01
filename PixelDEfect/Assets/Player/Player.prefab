@@ -161,9 +161,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5592127285762298269}
   - component: {fileID: 6439055279093694464}
+  - component: {fileID: 4007137665156849514}
   - component: {fileID: 3685542010041859694}
   - component: {fileID: 5783198869496049011}
-  - component: {fileID: 4007137665156849514}
   - component: {fileID: 658921088476211807}
   - component: {fileID: 8312166533425255970}
   - component: {fileID: 869267657480675355}
@@ -217,43 +217,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &3685542010041859694
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8759166575710960654}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24fc209b9b7c82e4c9c807474d1b7f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  groundCheckLayer:
-    serializedVersion: 2
-    m_Bits: 9224
-  belowCollisionLayer:
-    serializedVersion: 2
-    m_Bits: 8192
-  walkSpeed: 6
-  runSpeed: 8
-  climbSpeed: 6
-  jumpForce: 40
-  lowGravityScale: 10
-  highGravityScale: 10
---- !u!114 &5783198869496049011
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8759166575710960654}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 720105a477bf12f419bebbeb8a7ee865, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stageData: {fileID: 11400000, guid: f050f4c803de5b941ba6ce1bedac6443, type: 2}
 --- !u!61 &4007137665156849514
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -299,6 +262,48 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 1.25}
   m_EdgeRadius: 0
+--- !u!114 &3685542010041859694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8759166575710960654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24fc209b9b7c82e4c9c807474d1b7f38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundCheckLayer:
+    serializedVersion: 2
+    m_Bits: 9224
+  belowCollisionLayer:
+    serializedVersion: 2
+    m_Bits: 8192
+  walkSpeed: 6
+  runSpeed: 8
+  crawlSpeed: 0
+  climbSpeed: 6
+  jumpForce: 40
+  lowGravityScale: 10
+  highGravityScale: 10
+--- !u!114 &5783198869496049011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8759166575710960654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 720105a477bf12f419bebbeb8a7ee865, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageData: {fileID: 11400000, guid: f050f4c803de5b941ba6ce1bedac6443, type: 2}
+  crouchCheckDistance: 0.5
+  aboveLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &658921088476211807
 MonoBehaviour:
   m_ObjectHideFlags: 0
