@@ -12,6 +12,8 @@ public class LaserTrap : InteractableObject
     private LaserBeam laserPrefab; // 레이저 프리팹
     [SerializeField]
     private float maxLaserLength; // 최대 레이저 길이
+    [SerializeField]
+    private Transform laserPos; // 레이저가 시작되는 위치
 
     private LaserBeam currentLaser;
     public override void Trigger()
@@ -40,7 +42,7 @@ public class LaserTrap : InteractableObject
             if (currentLaser == null)
             {
                 currentLaser = Instantiate(laserPrefab, transform.position, Quaternion.identity);
-                currentLaser.SetSource(this.transform);
+                currentLaser.SetSource(laserPos);
             }
         }
         else if (isActive == false) // 비활성화한 경우
@@ -48,6 +50,7 @@ public class LaserTrap : InteractableObject
             Destroy(currentLaser);
             if(currentLaser != null)
             {
+                Destroy(currentLaser.gameObject);
                 currentLaser = null;
             }
 
@@ -58,7 +61,7 @@ public class LaserTrap : InteractableObject
     {
         if (currentLaser == null) return;
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, maxLaserLength);
+        RaycastHit2D hit = Physics2D.Raycast(laserPos.position, Vector2.down, maxLaserLength, groundLayer);
         float laserLength = hit.collider != null ? hit.distance : maxLaserLength;
 
         currentLaser.SetLength(laserLength);

@@ -34,7 +34,7 @@ public class BulletBase : MonoBehaviour
         {
             if (collision.CompareTag("Enemy"))
             {
-                collision.GetComponent<EnemyFSM>().TakeDamage(damage);
+                collision.GetComponent<EnemyFSM>().DecreaseHp(damage);
             }
         }
         else

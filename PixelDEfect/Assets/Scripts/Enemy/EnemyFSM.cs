@@ -262,7 +262,7 @@ public abstract class EnemyFSM : MonoBehaviour
 
 
     }
-    public void TakeDamage(int _damage)
+    public void DecreaseHp(int _damage)
     {
         if (currentHp > 0)
         {

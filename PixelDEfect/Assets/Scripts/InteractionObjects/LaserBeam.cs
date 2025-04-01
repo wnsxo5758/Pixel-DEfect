@@ -27,4 +27,16 @@ public class LaserBeam : MonoBehaviour
         beamTransform.position = source.position + Vector3.down * (length / 2);
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.CompareTag("Player"))
+        {
+            collision.GetComponent<PlayerHp>().DecreaseHp(damage);
+        }
+        else if(collision.CompareTag("Enemy"))
+        {
+            collision.GetComponent<EnemyFSM>().DecreaseHp(damage);
+        }
+    }
+
 }
