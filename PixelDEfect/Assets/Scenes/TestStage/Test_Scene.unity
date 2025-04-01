@@ -10930,9 +10930,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5489070145048377897, guid: f7bab1f2f9d6cad4fbde0cd0e9ad6d0a, type: 3}
+      propertyPath: connectedObjects.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5489070145048377897, guid: f7bab1f2f9d6cad4fbde0cd0e9ad6d0a, type: 3}
       propertyPath: connectedObjects.Array.data[0]
       value: 
       objectReference: {fileID: 147826034}
+    - target: {fileID: 5489070145048377897, guid: f7bab1f2f9d6cad4fbde0cd0e9ad6d0a, type: 3}
+      propertyPath: connectedObjects.Array.data[1]
+      value: 
+      objectReference: {fileID: 1625946299}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
