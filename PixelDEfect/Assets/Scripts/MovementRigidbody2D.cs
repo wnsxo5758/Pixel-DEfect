@@ -53,6 +53,7 @@ public class MovementRigidbody2D : MonoBehaviour
         UpdateCollision();
         JumpHeight();
     }
+    
     private void UpdateCollision()
     {
         Bounds bounds = collider.bounds;

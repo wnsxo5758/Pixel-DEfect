@@ -222,6 +222,12 @@ namespace PlayerStates
             movement.Climb(vertical);
             //애니메이션
             animator.ClimbAnim(vertical);
+
+            if (player.IsOnLadder)
+            {
+                if (movement.IsGrounded && vertical < 0f)
+                    player.ChangeState(new Idle());
+            }
         }
 
         public override void Exit(PlayerController player)

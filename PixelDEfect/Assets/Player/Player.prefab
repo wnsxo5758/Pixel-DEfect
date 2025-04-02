@@ -282,9 +282,9 @@ MonoBehaviour:
     m_Bits: 8192
   walkSpeed: 6
   runSpeed: 8
-  crawlSpeed: 0
+  crawlSpeed: 3
   climbSpeed: 6
-  jumpForce: 40
+  jumpForce: 30
   lowGravityScale: 10
   highGravityScale: 10
 --- !u!114 &5783198869496049011
@@ -303,7 +303,7 @@ MonoBehaviour:
   crouchCheckDistance: 0.5
   aboveLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 9736
 --- !u!114 &658921088476211807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,7 +353,7 @@ MonoBehaviour:
   rayDistance: 0.75
   interactableLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   interactPoint: {fileID: 953488845849280580}
   springFrequency: 0
   springDamping: 0.9

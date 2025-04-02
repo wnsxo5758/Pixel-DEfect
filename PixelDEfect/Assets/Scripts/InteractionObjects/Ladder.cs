@@ -59,7 +59,7 @@ public class Ladder : MonoBehaviour
         {
             ladderCollider.size = new Vector2(ladderCollider.size.x, ladderHeight + segmentHeight * (ladderLength - 1));
             ladderCollider.offset = new Vector2(ladderCollider.offset.x, 
-                                    ladderHeight / 2f - (ladderHeight + segmentHeight * (ladderLength - 1)) / 2f);
+                                    ladderHeight - (ladderHeight + segmentHeight * (ladderLength - 1)) / 2f);
         }
 
         // 사다리 스프라이트가 없고 프리팹이 지정된 경우에만 세그먼트 생성
@@ -68,10 +68,9 @@ public class Ladder : MonoBehaviour
             for (int i = 1; i < ladderLength; i++)
             {
                 Vector3 segmentPosition = transform.position + new Vector3(0, -i * segmentHeight, 0);
-                
                 GameObject segment = Instantiate(ladderSegmentPrefab, segmentPosition, Quaternion.identity);
                 segment.transform.SetParent(transform);
-                
+                segment.transform.localScale = Vector3.one;
                 ladderSegments.Add(segment);
             }
         }
@@ -119,6 +118,11 @@ public class Ladder : MonoBehaviour
 
         return playerCollider != null;
     }
+
+    private float PlayerFlipX(float x)
+    {
+        return transform.localScale.x < 0 ? - 1f : 1f;
+    }
     
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -135,12 +139,22 @@ public class Ladder : MonoBehaviour
                     if (vertical < 0)
                     {
                         topPlatform.isTrigger = true;
+                        
+                        player.transform.localScale =
+                            new Vector3(PlayerFlipX(player.transform.localScale.x) * Mathf.Abs(player.transform.localScale.x),
+                                player.transform.localScale.y, player.transform.localScale.z);
+                        
                         player.ChangeState(new Climb());
                     }
                 }
                 else if (Mathf.Abs(vertical) > 0)
                 {
                     topPlatform.isTrigger = false;
+                    
+                    player.transform.localScale =
+                        new Vector3(PlayerFlipX(player.transform.localScale.x) * Mathf.Abs(player.transform.localScale.x),
+                            player.transform.localScale.y, player.transform.localScale.z);
+                    
                     player.ChangeState(new Climb());
                 }
             }

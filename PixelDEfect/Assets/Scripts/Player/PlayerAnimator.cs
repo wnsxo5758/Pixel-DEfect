@@ -71,6 +71,6 @@ public class PlayerAnimator : MonoBehaviour
     
     public void ClimbAnim(float y)
     {
-        animator.SetFloat(VelocityY, y);
+        animator.SetFloat(VelocityY, Mathf.Abs(y));
     }
 }
