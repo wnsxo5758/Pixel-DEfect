@@ -45,7 +45,6 @@ public class ValveButton : ButtonBase
     protected override IEnumerator ButtonActive() // 버튼을  누른경우
     {
         isActiving = true; // 작동시작
-        UpdateSprite(); // 버튼 스프라이트 변경
         audio.Play();  // 효과음 
         if (connectedObjects != null) // 작동되는 오브젝트가 있다면
         {
