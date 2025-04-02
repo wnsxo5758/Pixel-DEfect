@@ -176,8 +176,8 @@ MonoBehaviour:
   belowCollisionLayer:
     serializedVersion: 2
     m_Bits: 0
-  walkSpeed: 6
-  runSpeed: 8
+  walkSpeed: 2
+  runSpeed: 2
   crawlSpeed: 0
   climbSpeed: 0
   jumpForce: 0
