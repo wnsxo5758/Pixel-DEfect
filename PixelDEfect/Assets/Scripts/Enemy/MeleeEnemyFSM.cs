@@ -41,6 +41,7 @@ public class MeleeEnemyFSM : EnemyFSM
         attackCollider.enabled = false;
         while (currentCoolTime > 0)
         {
+            animator.isAttack = false;
             currentCoolTime -= Time.deltaTime;
             yield return null;
         }

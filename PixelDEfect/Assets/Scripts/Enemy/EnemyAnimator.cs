@@ -22,11 +22,15 @@ public class EnemyAnimator : MonoBehaviour
         {
             SpriteFlipX(x);
         }
-        animator.SetBool("isJump", !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
-        if (isAttack)
+        if(isAttack)
         {
-            animator.SetTrigger("Attack");
+            animator.SetBool("isAttack", true);
         }
+        else if(!isAttack)
+        {
+            animator.SetBool("isAttack", false);
+        }
+        animator.SetBool("isJump", !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
         if (movement.IsGrounded) // 땅에 있는 경우
         {
             animator.SetFloat("velocityX", Mathf.Abs(x)); // X값에 따라 이동 상태 변환
@@ -35,6 +39,10 @@ public class EnemyAnimator : MonoBehaviour
         {
             animator.SetFloat("velocityY", movement.Velocity.y);  // Y 값에 따라 상태 변경
         }
+    }
+    public void Attack()
+    {
+        animator.SetBool("isAttack", true);
     }
 
     public void Death()
