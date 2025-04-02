@@ -17,6 +17,8 @@ public class PressMachine: InteractableObject
     private PressHead pressHead; // 프레스 머리
     [SerializeField]
     private LayerMask groundLayer; // 바닥 감지 레이어
+    [SerializeField]
+    private Transform column; // 프레스 기둥
 
     private Vector3 originPos;
     private Vector3 targetPos;
@@ -28,6 +30,7 @@ public class PressMachine: InteractableObject
     {
         originPos = pressHead.transform.position;
         DetectGround();
+        UpdateColumn();
         if (isActive)
         {
             StartCoroutine(nameof(PressRoutine));
@@ -61,6 +64,14 @@ public class PressMachine: InteractableObject
         }
     }
 
+    private void UpdateColumn()
+    {
+        if (column == null) return;
+        Vector3 midPoint = (pressHead.transform.position + originPos) / 2;
+        column.position = midPoint;
+        float distance = Vector3.Distance(pressHead.transform.position, originPos);
+        column.localScale = new Vector3(column.localScale.x, distance, column.localScale.z);
+    }
     private IEnumerator PressRoutine()
     {
         while (isActive)
@@ -73,6 +84,7 @@ public class PressMachine: InteractableObject
             while (Vector3.Distance(pressHead.transform.position, targetPos) > 0.1f)
             {
                 pressHead.transform.position = Vector3.MoveTowards(pressHead.transform.position, targetPos, pressSpeed * Time.deltaTime);
+                UpdateColumn();
                 yield return null;
             }
 
@@ -81,6 +93,7 @@ public class PressMachine: InteractableObject
             while (Vector3.Distance(pressHead.transform.position, originPos) > 0.1f)
             {
                 pressHead.transform.position = Vector3.MoveTowards(pressHead.transform.position, originPos, pressSpeed * Time.deltaTime);
+                UpdateColumn();
                 yield return null;
             }
             pressHead.SetPressing(false);
