@@ -90,4 +90,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c0224364984b6149a53555b989dfddd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnEnemy: {fileID: 6748386313971197094}
+  spawnEnemy: {fileID: 2967437566215161168, guid: 40fe08ea02e345749a3ee99f2ef6f593, type: 3}
