@@ -206,10 +206,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5423826675070193008}
+  - component: {fileID: 264865876853410974}
   - component: {fileID: 8783172983372004794}
   - component: {fileID: 7780708080636744580}
   - component: {fileID: 2750067034534348279}
-  - component: {fileID: 264865876853410974}
   - component: {fileID: 7007306622329820370}
   m_Layer: 6
   m_Name: MeleeEnemy_Test
@@ -235,6 +235,31 @@ Transform:
   - {fileID: 2954664385936646666}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &264865876853410974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6854075360855922371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24fc209b9b7c82e4c9c807474d1b7f38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundCheckLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  belowCollisionLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  walkSpeed: 6
+  runSpeed: 8
+  crawlSpeed: 0
+  climbSpeed: 0
+  jumpForce: 0
+  lowGravityScale: 10
+  highGravityScale: 10
 --- !u!114 &8783172983372004794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,30 +365,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &264865876853410974
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6854075360855922371}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24fc209b9b7c82e4c9c807474d1b7f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  groundCheckLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  belowCollisionLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  walkSpeed: 6
-  runSpeed: 8
-  climbSpeed: 0
-  jumpForce: 0
-  lowGravityScale: 10
-  highGravityScale: 10
 --- !u!82 &7007306622329820370
 AudioSource:
   m_ObjectHideFlags: 0
