@@ -19,6 +19,7 @@ public class PlayerInteraction : MonoBehaviour
     
     private ButtonBase button; //가까운 버튼
     private DoorBase door; // 가까운 문
+    [SerializeField]
     private Transform respawnPoint; // 리스폰 포인트(장애물에 죽을 경우)
 
     private MovementRigidbody2D movement;

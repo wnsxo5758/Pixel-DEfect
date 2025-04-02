@@ -20,8 +20,8 @@ public class ObstacleBase : MonoBehaviour
 
         if (isInstantDeath)
         {
-            collision.GetComponent<PlayerHp>().DecreaseHp(damage);
             collision.GetComponent<PlayerInteraction>().MoveToSpawnPoint();
+            collision.GetComponent<PlayerHp>().DecreaseHp(damage);
         }
         else if (continuousDamage)
         {

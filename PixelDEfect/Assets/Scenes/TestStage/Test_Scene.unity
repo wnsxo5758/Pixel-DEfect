@@ -221,6 +221,10 @@ PrefabInstance:
       value: Obstacle_Test (1)
       objectReference: {fileID: 0}
     - target: {fileID: 5662428642116525426, guid: 029fa10463c76c9489c543d8864d08ae, type: 3}
+      propertyPath: canDestory
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5662428642116525426, guid: 029fa10463c76c9489c543d8864d08ae, type: 3}
       propertyPath: isInstantDeath
       value: 1
       objectReference: {fileID: 0}
