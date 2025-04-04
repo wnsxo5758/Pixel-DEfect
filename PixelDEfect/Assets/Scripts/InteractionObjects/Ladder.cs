@@ -143,7 +143,6 @@ public class Ladder : MonoBehaviour
                         player.transform.localScale =
                             new Vector3(PlayerFlipX(player.transform.localScale.x) * Mathf.Abs(player.transform.localScale.x),
                                 player.transform.localScale.y, player.transform.localScale.z);
-                        player.transform.position = detectionPoint;
                         player.ChangeState(new Climb());
                     }
                 }
