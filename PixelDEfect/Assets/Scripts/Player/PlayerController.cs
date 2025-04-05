@@ -172,6 +172,11 @@ public class PlayerController : MonoBehaviour
     {
         stateMachine.RevertToPreviousState();
     }
+
+    public State<PlayerController> GetCurrentState()
+    {
+        return stateMachine.CurrentState;
+    }
     
     public void SpriteFlipX(float x)
     {

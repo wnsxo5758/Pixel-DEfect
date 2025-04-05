@@ -4,61 +4,104 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    [SerializeField]
-    private int meleeDamage;//±ÙÁ¢ °ø°İ
-    [SerializeField]
-    private float meleeRange; // ±ÙÁ¢ °ø°İ ¹üÀ§
-    [SerializeField]
-    private float coolTime; // ±ÙÁ¢ °ø°İ ÄğÅ¸ÀÓ
-    [SerializeField]
-    private float attackTime;
+    [Header("Weapon")]
+    [SerializeField] private Transform weaponHolder;
+    
+    private WeaponBase currentWeapon;
+    private PlayerController playerController;
+    private bool isAttacking;
 
-    private bool isMelee = false; // ±ÙÁ¢ °ø°İ ÁßÀÎ°¡? 
-
-    public int Damage;
-
-    public bool IsMelee => isMelee;
-
-    private void Update()
+    private void Awake()
     {
-        coolTime += Time.deltaTime;
-    }
+        playerController = GetComponent<PlayerController>();
 
-    public void MeleeAttack()
-    {
-        if (coolTime < attackTime) return;
-
-        if (coolTime >= attackTime && !isMelee)
+        if (weaponHolder == null)
         {
-            StartCoroutine(nameof(Melee));
+            GameObject holder = new GameObject("WeaponHolder");
+            holder.transform.SetParent(transform);
+            holder.transform.localPosition = new Vector3(0.5f, 0, 0); // ì† ìœ„ì¹˜ ì¡°ì • í•„ìš”
+            weaponHolder = holder.transform;
         }
     }
 
-    private IEnumerator Melee()
+    private void Start()
     {
-        coolTime = 0;
-        isMelee = true;
-        yield return new WaitForSeconds(1f);
-        isMelee = false;
-
+        
     }
 
-
-    private void MeleeCoolTime()
+    // ì´ë²¤íŠ¸ êµ¬ë… í•´ì œ
+    private void OnDestroy()
     {
-
+        // if (InputManager.Instance != null)
+        // {
+        //     InputManager.Instance.OnAttackPressed -= OnAttack;
+        // }
     }
 
-    public void MagicAttack(int _number)
+    public void EquipWeapon(WeaponBase weapon)
     {
+        if (currentWeapon != null)
+        {
+            UnEquipWeapon();
+        }
 
+        currentWeapon = weapon;
+        currentWeapon.Equip(weaponHolder);
+
+        InputManager.Instance.OnAttackPressed += OnAttack;
+
+        // í”Œë ˆì´ì–´ ì• ë‹ˆë©”ì´ì…˜ ë³€ê²½
     }
-    private void SkillCoolTime(float _time) // ½ºÅ³ ÄğÅ¸ÀÓ ½ºÅ³¸¶´Ù Äğ Å¸ÀÓÀÌ ´Ù¸£±â ¶§¹®¿¡ ÆÄ¶ó¹ÌÅÍ »ç¿ë
+
+    public void UnEquipWeapon()
     {
-
+        if (currentWeapon != null)
+        {
+            currentWeapon.UnEquip();
+            currentWeapon = null;
+            
+            // í”Œë ˆì´ì–´ ì• ë‹ˆë©”ì´ì…˜ ë³µì›
+        }
+    }
+    
+    // ê³µê²© ì…ë ¥ ì²˜ë¦¬
+    private void OnAttack()
+    {
+        if (currentWeapon != null && currentWeapon.CanAttack && !isAttacking)
+        {
+            if (CanPlayerAttack())
+            {
+                Vector2 attackDirection = GetAttackDirection();
+                currentWeapon.Attack(attackDirection);
+            }
+        }
     }
 
+    // ê³µê²© í”Œë˜ê·¸ ë¦¬ì…‹
+    private void ResetAttackFlag()
+    {
+        isAttacking = false;
+    }
+    
+    // í”Œë ˆì´ì–´ê°€ ê³µê²© ê°€ëŠ¥í•œ ìƒíƒœì¸ì§€ í™•ì¸
+    private bool CanPlayerAttack()
+    {
+        var currentState = playerController.GetCurrentState();
 
+        if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || 
+            currentState is PlayerStates.Crawl)
+        {
+            return false;
+        }
 
+        return true;
+    }
 
+    // ê³µê²© ë°©í–¥ ê³„ì‚°
+    private Vector2 GetAttackDirection()
+    {
+        Vector2 direction = new Vector2(transform.localScale.x, 0);
+
+        return direction;
+    }
 }

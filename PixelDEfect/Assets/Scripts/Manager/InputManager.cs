@@ -9,8 +9,12 @@ public class InputManager : MonoBehaviour
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode holdKey = KeyCode.F;
     [SerializeField] private KeyCode interactKey = KeyCode.G;
-    [SerializeField] private KeyCode healKey = KeyCode.E;
     [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
+    [SerializeField] private KeyCode pickupKey = KeyCode.F;
+    [SerializeField] private KeyCode attackKey = KeyCode.D;
+
+    private bool canPickup = false;
+    private bool canHold = false;
     
     public float HorizontalInput => Input.GetAxisRaw("Horizontal");
     public float VerticalInput => Input.GetAxisRaw("Vertical");
@@ -21,8 +25,9 @@ public class InputManager : MonoBehaviour
     public event Action OnCrouchReleased;
     public event Action OnHoldPressed;
     public event Action OnInteractPressed;
-    public event Action OnHealPressed;
     public event Action OnLadderJumpPressed;
+    public event Action OnPickupPressed;
+    public event Action OnAttackPressed;
 
     private void Awake()
     {
@@ -56,16 +61,19 @@ public class InputManager : MonoBehaviour
             OnCrouchReleased?.Invoke();
             
         // 끌기 입력
-        if (Input.GetKeyDown(holdKey))
+        if (Input.GetKeyDown(holdKey) && canHold)
             OnHoldPressed?.Invoke();
         
         // 상호작용 입력
         if (Input.GetKeyDown(interactKey))
             OnInteractPressed?.Invoke();
-        
-        if (Input.GetKeyDown(healKey))
-            OnHealPressed?.Invoke();
-        
+
+        // 공격 입력
+        if (Input.GetKeyDown(pickupKey) && canPickup)
+            OnPickupPressed?.Invoke();
+        if (Input.GetKeyDown(attackKey))
+            OnAttackPressed?.Invoke();
+
     }
     
     private void CheckKeyCombinations()
@@ -79,4 +87,7 @@ public class InputManager : MonoBehaviour
     }
     
     public bool IsCrouchKeyPressed() => Input.GetKey(crouchKey);
+    
+    public void SetCanPickup(bool value) => canPickup = value;
+    public void SetCanHold(bool value) => canHold = value;
 }

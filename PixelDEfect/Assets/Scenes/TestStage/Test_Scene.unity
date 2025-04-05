@@ -49091,8 +49091,9 @@ MonoBehaviour:
   jumpKey: 32
   holdKey: 102
   interactKey: 103
-  healKey: 101
   crouchKey: 306
+  pickupKey: 102
+  attackKey: 100
 --- !u!4 &1141360396
 Transform:
   m_ObjectHideFlags: 0
