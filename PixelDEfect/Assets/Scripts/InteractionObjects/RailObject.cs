@@ -24,7 +24,7 @@ public class RailObject : InteractableObject
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        Debug.Log("충돌 중: " + collision.gameObject.name);
+        Debug.Log("레일과 충돌 중 : " + collision.gameObject.name);
         if (!isActive) return;
 
         if (!collision.collider.CompareTag("Player") && !collision.collider.CompareTag("Enemy")) return;

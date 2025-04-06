@@ -81,7 +81,6 @@ public abstract class EnemyFSM : MonoBehaviour
     {
         isChange = true;
         isFacingRight = !isFacingRight;
-        Debug.Log("돌았다!!!");
         yield return new WaitForSeconds(1f);
         isChange = false;
     }
@@ -94,7 +93,6 @@ public abstract class EnemyFSM : MonoBehaviour
         {
             if (!isChange)
             {
-                Debug.Log($"벽 감지 : + {hit.collider.name}");
                 ChangeFacing();
             }
             return true;
