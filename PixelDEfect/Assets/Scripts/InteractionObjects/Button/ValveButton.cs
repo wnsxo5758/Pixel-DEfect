@@ -31,16 +31,28 @@ public class ValveButton : ButtonBase
                 currentPressTime -= Time.deltaTime;
             }
         }
-        // 벨브를 누르는 중인 경우
-        else if(isPressing)
-        {
-            if(currentPressTime < pressTimeRequired)
-                currentPressTime += Time.deltaTime;
-            else isPressing = false;
-        }
     }
     
-    
+    public void Pressing()
+    {
+        StartCoroutine(nameof(PullingValve));
+    }
+    private void NotPressing()
+    {
+        StopCoroutine(nameof(PullingValve));
+    }
+    protected IEnumerator PullingValve()
+    {
+        if(isPressing == false)
+        {
+            isPressing = true;
+            if (currentPressTime < pressTimeRequired)
+                currentPressTime += Time.deltaTime;
+            else isPressing = false;
+            yield return null;
+        }
+
+    }
     
     protected override IEnumerator ButtonActive() // 버튼을  누른경우
     {
