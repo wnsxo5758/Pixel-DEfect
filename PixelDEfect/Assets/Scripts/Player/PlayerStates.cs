@@ -157,6 +157,7 @@ namespace PlayerStates
     {
         private PlayerAnimator animator;
         private PlayerInteraction playerInteraction;
+        
         public override void Enter(PlayerController player)
         {
             animator = player.GetComponentInChildren<PlayerAnimator>();

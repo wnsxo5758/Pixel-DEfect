@@ -131,10 +131,7 @@ public class MovementRigidbody2D : MonoBehaviour
     {
         Gizmos.color = Color.red;
         
-        if(IsGrounded)
-            Gizmos.color = Color.green;
-        else 
-            Gizmos.color = Color.red;
+        Gizmos.color = IsGrounded ? Color.green : Color.red;
         
         Gizmos.DrawWireCube(footPos, collisionSize);
     }

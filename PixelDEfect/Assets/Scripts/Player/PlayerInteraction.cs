@@ -23,11 +23,17 @@ public class PlayerInteraction : MonoBehaviour
     private Transform respawnPoint; // 리스폰 포인트(장애물에 죽을 경우)
 
     private MovementRigidbody2D movement;
+    private PlayerController player;
 
-    private void Start()
+    private void Awake()
     {
         movement = GetComponent<MovementRigidbody2D>();
+        player = GetComponent<PlayerController>();
         springJoint = gameObject.AddComponent<SpringJoint2D>();
+    }
+    
+    private void Start()
+    {
         springJoint.anchor = interactPoint.localPosition;
         springJoint.enabled = false;
         springJoint.autoConfigureDistance = true;
@@ -44,6 +50,7 @@ public class PlayerInteraction : MonoBehaviour
     private void Update()
     {
         DetectHoldableObject();
+        CheckGround();
     }
 
     // 상호작용 입력
@@ -71,14 +78,7 @@ public class PlayerInteraction : MonoBehaviour
                             direction, rayDistance, interactableLayer);
         Debug.DrawRay(interactPoint.position, direction * rayDistance, Color.red);
 
-        if (hit.collider != null)
-        {
-            detectedObject = hit.collider.gameObject;
-        }
-        else
-        {
-            detectedObject = null;
-        }
+        detectedObject = hit.collider != null ? hit.collider.gameObject : null;
     }
 
     // 홀드 체크
@@ -118,6 +118,21 @@ public class PlayerInteraction : MonoBehaviour
         objectRb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         objectRb = null;
         movement.InteractSpeed = 1;
+    }
+
+    // 홀드 시 바닥 체크
+    private void CheckGround()
+    {
+        if (!detectedObject) return;
+        
+        if (IsConnected)
+        {
+            bool objectIsGround = detectedObject.GetComponent<HoldObject>().IsGrounded;
+            if (!movement.IsGrounded || !objectIsGround)
+            {
+                player.RevertToPreviousState();
+            }
+        }
     }
     
     // GUI 디버그 표시

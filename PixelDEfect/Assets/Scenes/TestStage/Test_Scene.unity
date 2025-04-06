@@ -48848,8 +48848,8 @@ BuoyancyEffector2D:
   m_ColliderMask:
     serializedVersion: 2
     m_Bits: 1024
-  m_SurfaceLevel: 1
-  m_Density: 5
+  m_SurfaceLevel: 0.9
+  m_Density: 10
   m_LinearDrag: 5
   m_AngularDrag: 5
   m_FlowAngle: 0
@@ -49544,6 +49544,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1294696510 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6326456131935108557, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
+  m_PrefabInstance: {fileID: 1953925959}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1294696511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1294696510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7d1cb16bd7c4c242a2928f8f931cdaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8200
 --- !u!1 &1348068640
 GameObject:
   m_ObjectHideFlags: 0
@@ -50382,7 +50402,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6326456131935108557, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1294696511}
   m_SourcePrefab: {fileID: 100100000, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
 --- !u!1001 &1968763974
 PrefabInstance:

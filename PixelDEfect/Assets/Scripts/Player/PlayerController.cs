@@ -36,6 +36,8 @@ public class PlayerController : MonoBehaviour
         InputManager.Instance.OnJumpPressed += OnJump;
         InputManager.Instance.OnCrouchPressed += OnCrouch;
         InputManager.Instance.OnHoldPressed += OnHold;
+        
+        InputManager.Instance.SetCanHold(true);
     }
     
     private void Update()
