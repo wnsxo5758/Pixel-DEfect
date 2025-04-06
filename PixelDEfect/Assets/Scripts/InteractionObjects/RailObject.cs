@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class RailObject : InteractableObject
@@ -19,26 +18,25 @@ public class RailObject : InteractableObject
         // 방향전환
         if(canChangeDir)
         {
-            if(isActive)
-            {
-                moveDir = Vector2.left;
-            }
-            else
-            {
-                moveDir = Vector2.right;
-            }
+            moveDir *= -1f;
         }
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
-        //방향전환이 불가능하고, isActive가 false라면
-        if (!canChangeDir && !isActive ) return;
+        Debug.Log("충돌 중: " + collision.gameObject.name);
+        if (!isActive) return;
 
-        Rigidbody2D rigid = collision.attachedRigidbody;
-        if(rigid != null)
+        if (!collision.collider.CompareTag("Player") && !collision.collider.CompareTag("Enemy")) return;
+
+        Rigidbody2D rigid = collision.rigidbody;
+        if (rigid != null)
         {
-            rigid.AddForce(moveDir.normalized * speed, ForceMode2D.Force);
+            Vector2 newVelocity = rigid.velocity;
+            newVelocity.x = moveDir.normalized.x * speed;
+            rigid.velocity = newVelocity;
         }
+
     }
+
 }
