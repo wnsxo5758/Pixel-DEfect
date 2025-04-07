@@ -70,6 +70,8 @@ public class PlayerHp : MonoBehaviour
             Debug.Log("플레이어 사망");
             currentHp = 0;
             isDead = true;
+            GameManager manager = FindObjectOfType<GameManager>();
+            manager.RestartGame();
         }
     }
     public void IncreaseHp()  // 체력 회복
