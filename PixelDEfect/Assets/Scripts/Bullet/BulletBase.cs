@@ -16,6 +16,7 @@ public class BulletBase : MonoBehaviour
     MovementRigidbody2D movement;
     protected AudioSource audio;
     protected Animator animator;
+    private MemoryPool memoryPool;
     private void Awake()
     {
         movement = GetComponent<MovementRigidbody2D>();
@@ -23,8 +24,9 @@ public class BulletBase : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
     }
 
-    public virtual void SetUp(float x)
+    public virtual void SetUp(float x, MemoryPool _memoryPool)
     {
+        this.memoryPool = _memoryPool;
         movement.MoveTo(x);
     }
 
@@ -57,7 +59,7 @@ public class BulletBase : MonoBehaviour
         //PlaySound(hitSound);
         //yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         yield return null;
-        Destroy(gameObject);
+        memoryPool.DeactivatePoolItems(gameObject);
     }
 
     private void PlaySound(AudioClip _clip)
