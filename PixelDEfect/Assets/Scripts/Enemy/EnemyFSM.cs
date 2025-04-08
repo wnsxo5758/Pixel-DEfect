@@ -53,11 +53,19 @@ public abstract class EnemyFSM : MonoBehaviour
     protected MovementRigidbody2D movement;
     protected EnemyAnimator animator;
     protected AudioSource audio;
+    protected SpriteRenderer renderer;
+    private Color originalColor;
     private void Awake()
     {
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
         audio = GetComponent<AudioSource>();
+
+        renderer = GetComponentInChildren<SpriteRenderer>(); // EnemyAnimator와 같은 자식 오브젝트라면
+        if (renderer != null)
+        {
+            originalColor = renderer.color;
+        }
     }
 
     private void Start()
@@ -266,10 +274,21 @@ public abstract class EnemyFSM : MonoBehaviour
         {
             currentHp -= _damage;
             PlaySound(hitClip);
+            StartCoroutine(FlashEffact(0.2f));
             if (currentHp <= 0)
             {
                 Debug.Log($"{gameObject.name}가 사망");
             }
+        }
+    }
+
+    private IEnumerator FlashEffact(float duration)
+    {
+        if(renderer != null)
+        {
+            renderer.color = Color.white;
+            yield return new WaitForSeconds(duration);
+            renderer.color = originalColor;
         }
     }
     public void IncreaseHp(int _amount)
@@ -283,7 +302,7 @@ public abstract class EnemyFSM : MonoBehaviour
             }
         }
     }
-    private void PlaySound(AudioClip clip)
+    protected void PlaySound(AudioClip clip)
     {
         audio.Stop();
         audio.clip = clip;

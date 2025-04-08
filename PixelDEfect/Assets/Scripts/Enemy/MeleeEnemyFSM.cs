@@ -14,6 +14,7 @@ public class MeleeEnemyFSM : EnemyFSM
     [SerializeField]
     private Collider2D attackCollider; // 공격할곳
 
+    private bool isAttacking;
     protected override IEnumerator Attack() 
     {
         //이동을 멈춤
@@ -32,9 +33,11 @@ public class MeleeEnemyFSM : EnemyFSM
 
     private IEnumerator MeleeAttack()
     {
-        if (currentCoolTime > 0) yield break;
+        if (isAttacking  ||currentCoolTime > 0) yield break;
 
+        isAttacking = true;
         currentCoolTime = coolTime;
+        PlaySound(attackClip);
         attackCollider.enabled = true;
         Debug.Log($"{gameObject.name}이 공격 시도");
         yield return new WaitForSeconds(0.3f);
@@ -45,7 +48,8 @@ public class MeleeEnemyFSM : EnemyFSM
             currentCoolTime -= Time.deltaTime;
             yield return null;
         }
-        
+
+        isAttacking = false;
 
         
     }
