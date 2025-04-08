@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class InteractableDoor : InteractableObject
 {
+
+    private Animator animator;
+
+    private void Awake()
+    {
+        animator = GetComponentInChildren<Animator>();
+    }
     public override void Trigger()
     {
         isActive = !isActive;
@@ -14,11 +21,11 @@ public class InteractableDoor : InteractableObject
     {
         if(isActive == true) 
         {
-            gameObject.SetActive(false);
+            animator.SetBool("isActive", true);
         }
         else if (isActive == false)
         {
-            gameObject.SetActive(true);
+            animator.SetBool("isActive", false);
         }
     }
 }
