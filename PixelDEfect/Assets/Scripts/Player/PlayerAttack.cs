@@ -4,82 +4,137 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    [Header("Weapon")]
-    [SerializeField] private Transform weaponHolder;
+    [Header("무기 감지")]
+    [SerializeField] private float weaponDetectionRadius = 1f;
+    [SerializeField] private LayerMask weaponLayer;
     
     private WeaponBase currentWeapon;
     private PlayerController playerController;
+    private PlayerAnimator playerAnimator;
     private bool isAttacking;
+    private WeaponPickup nearbyWeapon;
+    private bool hasWeapon = false;
 
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
-
-        if (weaponHolder == null)
-        {
-            GameObject holder = new GameObject("WeaponHolder");
-            holder.transform.SetParent(transform);
-            holder.transform.localPosition = new Vector3(0.5f, 0, 0); // 손 위치 조정 필요
-            weaponHolder = holder.transform;
-        }
+        playerAnimator = GetComponentInChildren<PlayerAnimator>();
     }
 
     private void Start()
     {
-        
+        InputManager.Instance.OnPickupPressed += OnPickupWeapon;
     }
 
-    // 이벤트 구독 해제
-    private void OnDestroy()
+    private void Update()
     {
-        // if (InputManager.Instance != null)
-        // {
-        //     InputManager.Instance.OnAttackPressed -= OnAttack;
-        // }
+        DetectNearbyWeapon();
+    }
+    
+    // 무기 감지 메소드
+    private void DetectNearbyWeapon()
+    {
+        Collider2D weaponCollider = Physics2D.OverlapCircle(transform.position, weaponDetectionRadius,
+                                                            weaponLayer);
+
+        if (weaponCollider != null)
+        {
+            WeaponPickup pickup = weaponCollider.GetComponent<WeaponPickup>();
+
+            if (pickup != null)
+            {
+                nearbyWeapon = pickup;
+                InputManager.Instance.SetCanPickup(true);
+            }
+        }
+        else
+        {
+            nearbyWeapon = null;
+            InputManager.Instance.SetCanPickup(false);
+        }
     }
 
-    public void EquipWeapon(WeaponBase weapon)
+    private void OnPickupWeapon()
+    {
+        if (nearbyWeapon != null)
+        {
+            WeaponBase weaponData = nearbyWeapon.GetWeaponData();
+
+            if (weaponData != null)
+            {
+                Debug.Log("Pickup");
+                EquipWeapon(weaponData);
+                Destroy(nearbyWeapon.gameObject);
+            }
+        }
+    }
+    
+    public void EquipWeapon(WeaponBase weaponData)
     {
         if (currentWeapon != null)
         {
             UnEquipWeapon();
         }
 
-        currentWeapon = weapon;
-        currentWeapon.Equip(weaponHolder);
-
+        currentWeapon = weaponData;
+        hasWeapon = true;
+        
         InputManager.Instance.OnAttackPressed += OnAttack;
 
-        // 플레이어 애니메이션 변경
+        // 무기 장착 상태 애니메이션 변경
+        
+        // GUI에 무기 정보 표시
     }
 
     public void UnEquipWeapon()
     {
         if (currentWeapon != null)
         {
-            currentWeapon.UnEquip();
             currentWeapon = null;
-            
-            // 플레이어 애니메이션 복원
+            hasWeapon = false;
+
+            InputManager.Instance.OnAttackPressed -= OnAttack;
+
+            // 무기 해제 상태 애니메이션 변경
         }
     }
     
     // 공격 입력 처리
     private void OnAttack()
     {
-        if (currentWeapon != null && currentWeapon.CanAttack && !isAttacking)
+        if (currentWeapon != null && !isAttacking)
         {
             if (CanPlayerAttack())
             {
-                Vector2 attackDirection = GetAttackDirection();
-                currentWeapon.Attack(attackDirection);
+                isAttacking = true;
+                
+                PlayerAttackAnimation();
+                
+                PerformAttack();
+
+                StartCoroutine(AttackCooldownTimer());
             }
         }
     }
 
-    // 공격 플래그 리셋
-    private void ResetAttackFlag()
+    // 공격 애니메이션 재생
+    private void PlayerAttackAnimation()
     {
+        
+    }
+
+    // 공격 수행
+    private void PerformAttack()
+    {
+        Vector2 attackDirection = GetAttackDirection();
+        
+        currentWeapon.Attack(transform.position, attackDirection);
+    }
+    
+    // 공격 쿨타임 코루틴
+    private IEnumerator AttackCooldownTimer()
+    {
+        yield return new WaitForSeconds(currentWeapon.AttackCooldown);
         isAttacking = false;
     }
     
@@ -101,7 +156,40 @@ public class PlayerAttack : MonoBehaviour
     private Vector2 GetAttackDirection()
     {
         Vector2 direction = new Vector2(transform.localScale.x, 0);
-
         return direction;
+    }
+
+    // 무기 소지 여부 (외부 접근용)
+    public bool HasWeapon()
+    {
+        return hasWeapon;
+    }
+
+    // 현재 장착된 무기 정보 (외부 접근용)
+    public WeaponBase GetCurrentWeapon()
+    {
+        return currentWeapon;
+    }
+    
+    // 이벤트 구독 해제
+    private void OnDestroy()
+    {
+        // if (InputManager.Instance != null)
+        // {
+        //     InputManager.Instance.OnAttackPressed -= OnAttack;
+        // }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, weaponDetectionRadius);
+    }
+
+    void OnGUI()
+    {
+        if(currentWeapon != null)
+            GUI.Label(new Rect(1000, 70, 300, 20),
+                currentWeapon.WeaponName);
     }
 }

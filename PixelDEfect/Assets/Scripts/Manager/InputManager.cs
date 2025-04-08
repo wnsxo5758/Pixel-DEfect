@@ -25,6 +25,8 @@ public class InputManager : MonoBehaviour
     public event Action OnCrouchReleased;
     public event Action OnHoldPressed;
     public event Action OnInteractPressed;
+    public event Action OnValvePressed;
+    public event Action OnValveReleased;
     public event Action OnLadderJumpPressed;
     public event Action OnPickupPressed;
     public event Action OnAttackPressed;
@@ -67,6 +69,13 @@ public class InputManager : MonoBehaviour
         // 상호작용 입력
         if (Input.GetKeyDown(interactKey))
             OnInteractPressed?.Invoke();
+        
+        // 밸브 입력
+        if (Input.GetKey(interactKey))
+            OnValvePressed?.Invoke();
+        if (Input.GetKeyUp(interactKey))
+            OnValveReleased?.Invoke();
+            
 
         // 공격 입력
         if (Input.GetKeyDown(pickupKey) && canPickup)

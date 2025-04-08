@@ -19,6 +19,7 @@ public class PlayerInteraction : MonoBehaviour
     
     private ButtonBase button; //가까운 버튼
     private DoorBase door; // 가까운 문
+    private ValveButton valve; // 밸브
     [SerializeField]
     private Transform respawnPoint; // 리스폰 포인트(장애물에 죽을 경우)
 
@@ -45,6 +46,8 @@ public class PlayerInteraction : MonoBehaviour
         interactableLayer = LayerMask.GetMask("Objects");
 
         InputManager.Instance.OnInteractPressed += OnInteract;
+        InputManager.Instance.OnValvePressed += OnValveButton;
+        InputManager.Instance.OnValveReleased += OnValveButtonReleased;
     }
     
     private void Update()
@@ -67,6 +70,22 @@ public class PlayerInteraction : MonoBehaviour
             
             door.ActiveDoor(gameObject);
             Debug.Log("문을 사용");
+        }
+    }
+
+    void OnValveButton()
+    {
+        if (valve != null)
+        {
+            if(!valve.isPressing) valve.isPressing = true;
+        }
+    }
+
+    void OnValveButtonReleased()
+    {
+        if (valve != null)
+        {
+            if(valve.isPressing) valve.isPressing = false;
         }
     }
     
@@ -156,6 +175,10 @@ public class PlayerInteraction : MonoBehaviour
         {
             door = collision.GetComponent<DoorBase>();
         }
+        else if (collision.CompareTag("Valve"))
+        {
+            valve = collision.GetComponent<ValveButton>();
+        }
         else if (collision.CompareTag("SpawnPoint"))
         {
             respawnPoint = collision.transform;
@@ -171,6 +194,10 @@ public class PlayerInteraction : MonoBehaviour
         else if(collision.CompareTag("Door"))
         {
             door = null;
+        }
+        else if (collision.CompareTag("Valve"))
+        {
+            valve = null;
         }
     }
 
