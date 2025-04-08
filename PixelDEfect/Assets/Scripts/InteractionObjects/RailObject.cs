@@ -12,14 +12,23 @@ public class RailObject : InteractableObject
     [SerializeField]
     private float speed; // 움직이는 속도
 
+    private Animator animator;
+
     public override void Trigger()
     {
         isActive = !isActive;
+        animator.SetBool("isActive", isActive);
         // 방향전환
         if(canChangeDir)
         {
             moveDir *= -1f;
         }
+    }
+
+    private void Awake()
+    {
+        animator.SetBool("isActive", isActive);
+        animator = GetComponentInChildren<Animator>();
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -32,9 +41,7 @@ public class RailObject : InteractableObject
         Rigidbody2D rigid = collision.rigidbody;
         if (rigid != null)
         {
-            Vector2 newVelocity = rigid.velocity;
-            newVelocity.x = moveDir.normalized.x * speed;
-            rigid.velocity = newVelocity;
+            rigid.AddForce(moveDir.normalized * speed, ForceMode2D.Impulse);
         }
 
     }
