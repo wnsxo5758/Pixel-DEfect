@@ -192,4 +192,12 @@ public class PlayerController : MonoBehaviour
         GUI.Label(new Rect(1000, 50, 300, 20),
             "State: " + stateMachine.CurrentState.GetType().Name);
     }
+
+    public void OnDestroy()
+    {
+        InputManager.Instance.OnJumpPressed -= OnJump;
+        InputManager.Instance.OnCrouchPressed -= OnCrouch;
+        InputManager.Instance.OnCrouchReleased -= UnCrouch;
+        InputManager.Instance.OnHoldPressed -= OnHold;
+    }
 }
