@@ -48,3 +48,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Container
+    uniqueID: 2049517233
+    locked: 0
+  - name: Player
+    uniqueID: 3913867149
+    locked: 0
+  - name: Water
+    uniqueID: 2255715281
+    locked: 0
+  - name: Tile
+    uniqueID: 2097843821
+    locked: 0
+  - name: Ladder
+    uniqueID: 507350669
+    locked: 0
+  - name: Pipe
+    uniqueID: 1660302305
+    locked: 0
