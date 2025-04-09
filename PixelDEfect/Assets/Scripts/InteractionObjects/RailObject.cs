@@ -16,20 +16,32 @@ public class RailObject : InteractableObject
 
     public override void Trigger()
     {
-        isActive = !isActive;
-        animator.SetBool("isActive", isActive);
-        // 방향전환
+
         if(canChangeDir)
         {
             moveDir *= -1f;
+            bool right = moveDir.x > 0f;
+            animator.SetBool("isRight", right);
+        }
+        else
+        {
+            isActive = !isActive;
+            animator.SetBool("isActive", isActive);
+            // 방향전환
         }
     }
 
     private void Awake()
     {
-        animator.SetBool("isActive", isActive);
+
         animator = GetComponentInChildren<Animator>();
+
+        animator.SetBool("isActive", isActive);
+        bool right = moveDir.x > 0f;
+        animator.SetBool("isRight", right);
     }
+
+
 
     private void OnCollisionStay2D(Collision2D collision)
     {
