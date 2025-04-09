@@ -9,6 +9,7 @@ TagManager:
   - Button
   - Door
   - SpawnPoint
+  - Valve
   layers:
   - Default
   - TransparentFX
