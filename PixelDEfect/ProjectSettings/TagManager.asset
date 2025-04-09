@@ -10,6 +10,7 @@ TagManager:
   - Door
   - SpawnPoint
   - Valve
+  - DieInstantly
   layers:
   - Default
   - TransparentFX
