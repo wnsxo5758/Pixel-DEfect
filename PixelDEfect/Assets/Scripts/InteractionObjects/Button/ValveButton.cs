@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.U2D;
 
 public class ValveButton : ButtonBase
 {
@@ -26,6 +27,7 @@ public class ValveButton : ButtonBase
             {
                 Debug.Log($"밸브 작동 중 : {currentPressTime}");
                 currentPressTime += Time.deltaTime;
+                RotateValve(1);
             }
 
             else if(currentPressTime >= pressTimeRequired && isActiving == false)
@@ -42,6 +44,7 @@ public class ValveButton : ButtonBase
                 //시간이 지날수록 누른 시간이 떨어진다.
                 currentPressTime -= Time.deltaTime;
                 Debug.Log($"밸브 떨어지는 중 : {currentPressTime}");
+                RotateValve(-1);
             }
         }
     }
@@ -60,5 +63,14 @@ public class ValveButton : ButtonBase
             }
         }
         yield return null; // 1초 대기, 나중에 수치 수정
+    }
+
+    private void RotateValve(int dir)
+    {
+        float rotateSpeed = 360f / pressTimeRequired;
+
+        float deltaRotation = rotateSpeed * Time.deltaTime * dir;
+
+        sprite.transform.Rotate(Vector3.forward, deltaRotation);
     }
 }

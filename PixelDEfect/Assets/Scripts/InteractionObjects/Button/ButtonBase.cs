@@ -24,7 +24,7 @@ public class ButtonBase : MonoBehaviour
     [SerializeField]
     private Sprite inActiveSprite; // 비활성화시
 
-    private SpriteRenderer sprite;
+    protected SpriteRenderer sprite;
     protected AudioSource audio;
     private void Awake()
     {
