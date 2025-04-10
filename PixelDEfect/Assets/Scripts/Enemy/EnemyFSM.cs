@@ -202,7 +202,7 @@ public abstract class EnemyFSM : MonoBehaviour
         }
         else if (distance <= distanceToDetect) // 감지 범위에 들어온 경우
         {
-            Debug.Log($"{gameObject.name}은 플레이어 감지했다! : {enemyState}");
+            // Debug.Log($"{gameObject.name}은 플레이어 감지했다! : {enemyState}");
             ChangeState(EnemyState.Pursuit);
 
         }

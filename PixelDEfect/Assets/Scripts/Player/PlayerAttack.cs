@@ -141,7 +141,10 @@ public class PlayerAttack : MonoBehaviour
         InputManager.Instance.OnAttackPressed += OnAttack;
 
         // 무기 장착 상태 애니메이션 변경
-        
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetHasWeapon(true);
+        }
         // GUI에 무기 정보 표시
     }
 
@@ -155,6 +158,10 @@ public class PlayerAttack : MonoBehaviour
             InputManager.Instance.OnAttackPressed -= OnAttack;
 
             // 무기 해제 상태 애니메이션 변경
+            if (playerAnimator != null)
+            {
+                playerAnimator.SetHasWeapon(false);
+            }
         }
     }
     
@@ -175,8 +182,6 @@ public class PlayerAttack : MonoBehaviour
                 isAttacking = true;
                 
                 MeleeAttackAnimation();
-                
-                PerformMeleeAttack();
 
                 StartCoroutine(AttackCooldownTimer());
             }
@@ -186,11 +191,14 @@ public class PlayerAttack : MonoBehaviour
     // 공격 애니메이션 재생
     private void MeleeAttackAnimation()
     {
-        
+        if (playerAnimator != null)
+        {
+            playerAnimator.TriggerAttackAnim();
+        }
     }
 
     // 근접 공격 수행
-    private void PerformMeleeAttack()
+    public void PerformMeleeAttack()
     {
         UpdateAttackColliderDirection(transform.localScale.x);
         

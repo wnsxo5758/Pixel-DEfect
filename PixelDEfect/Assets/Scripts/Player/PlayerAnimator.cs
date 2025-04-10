@@ -12,6 +12,10 @@ public class PlayerAnimator : MonoBehaviour
     private static readonly int IsConnected = Animator.StringToHash("IsConnected");
     private static readonly int IsClimbing = Animator.StringToHash("IsClimbing");
     private static readonly int IsCrouching = Animator.StringToHash("IsCrouching");
+    
+    // 공격 애니메이션
+    private static readonly int HasWeapon = Animator.StringToHash("HasWeapon");
+    private static readonly int Attack = Animator.StringToHash("Attack");
 
     private Animator animator; // 애니메이션 
     private MovementRigidbody2D movement; // 움직임
@@ -72,5 +76,21 @@ public class PlayerAnimator : MonoBehaviour
     public void ClimbAnim(float y)
     {
         animator.SetFloat(VelocityY, Mathf.Abs(y));
+    }
+
+    public void SetHasWeapon(bool hasWeapon)
+    {
+        animator.SetBool(HasWeapon, hasWeapon);
+    }
+
+    public void TriggerAttackAnim()
+    {
+        animator.SetTrigger(Attack);
+    }
+
+    // 공격 타이밍 이벤트
+    private void HandleAttackEvent()
+    {
+        attack.PerformMeleeAttack();
     }
 }
