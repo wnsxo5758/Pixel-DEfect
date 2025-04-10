@@ -13,6 +13,7 @@ TagManager:
   - DieInstantly
   - ImpactNormal
   - ImpactObstacle
+  - Objects
   layers:
   - Default
   - TransparentFX

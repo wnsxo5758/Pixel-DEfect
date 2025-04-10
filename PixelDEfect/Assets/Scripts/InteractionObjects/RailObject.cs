@@ -48,7 +48,7 @@ public class RailObject : InteractableObject
         Debug.Log("레일과 충돌 중 : " + collision.gameObject.name);
         if (!isActive) return;
 
-        if (!collision.collider.CompareTag("Player") && !collision.collider.CompareTag("Enemy")) return;
+        if (!collision.collider.CompareTag("Player") && !collision.collider.CompareTag("Enemy") && !collision.collider.CompareTag("Objects")) return;
 
         Rigidbody2D rigid = collision.rigidbody;
         if (rigid != null)
