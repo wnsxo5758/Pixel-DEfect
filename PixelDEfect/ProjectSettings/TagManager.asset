@@ -11,6 +11,8 @@ TagManager:
   - SpawnPoint
   - Valve
   - DieInstantly
+  - ImpactNormal
+  - ImpactObstacle
   layers:
   - Default
   - TransparentFX

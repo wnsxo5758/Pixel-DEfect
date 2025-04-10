@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public enum ImpactType { Normal = 0, Obstacle, }
 public class ImpactMemoryPool : MonoBehaviour
@@ -20,9 +19,16 @@ public class ImpactMemoryPool : MonoBehaviour
         }
     }
 
-    public void SpawnImpact()
+    public void SpawnImpact(RaycastHit2D hit)
     {
-
+        if(hit.transform.CompareTag("ImpactNormal"))
+        {
+            OnSpawnImpact(ImpactType.Normal, hit.point, Quaternion.LookRotation(hit.normal));
+        }
+        else if(hit.transform.CompareTag("ImpactObstacle"))
+        {
+            OnSpawnImpact(ImpactType.Obstacle, hit.point, Quaternion.LookRotation(hit.normal));
+        }
     }
 
 
