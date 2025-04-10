@@ -47,4 +47,18 @@ public class CutsceneTrigger : MonoBehaviour
         foreach (var cam in cutsceneVCams)
             cam.Priority = 10;
     }
+
+    public void ForcePlay()
+    {
+        if (hasPlayed) return;
+
+        hasPlayed = true;
+
+        foreach (var cam in cutsceneVCams)
+            cam.Priority = 20;
+
+        playerVCam.Priority = 10;
+
+        timelineDirector.Play();
+    }
 }
