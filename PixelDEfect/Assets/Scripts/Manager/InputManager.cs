@@ -11,7 +11,7 @@ public class InputManager : MonoBehaviour
     [SerializeField] private KeyCode interactKey = KeyCode.G;
     [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
     [SerializeField] private KeyCode pickupKey = KeyCode.F;
-    [SerializeField] private KeyCode attackKey = KeyCode.D;
+    [SerializeField] private KeyCode meleeAttackKey = KeyCode.Z;
 
     private bool canPickup = false;
     private bool canHold = false;
@@ -80,7 +80,7 @@ public class InputManager : MonoBehaviour
         // 공격 입력
         if (Input.GetKeyDown(pickupKey) && canPickup)
             OnPickupPressed?.Invoke();
-        if (Input.GetKeyDown(attackKey))
+        if (Input.GetKeyDown(meleeAttackKey))
             OnAttackPressed?.Invoke();
 
     }
