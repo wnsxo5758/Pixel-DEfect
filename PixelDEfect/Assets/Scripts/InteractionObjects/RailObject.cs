@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class RailObject : InteractableObject
 {
-
+    [Header("레일 설정")]
     [SerializeField]
     private Vector2 moveDir = Vector2.right; // 기본적으로 오른쪽
     [SerializeField]
     private bool canChangeDir;
     [SerializeField]
     private float speed; // 움직이는 속도
+    [SerializeField]
+    private LayerMask railTargetLayer;
 
     private Animator animator;
 
@@ -45,17 +47,13 @@ public class RailObject : InteractableObject
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        Debug.Log("레일과 충돌 중 : " + collision.gameObject.name);
+        if (((1 << collision.gameObject.layer) & railTargetLayer) == 0) return;
         if (!isActive) return;
 
-        if (!collision.collider.CompareTag("Player") && !collision.collider.CompareTag("Enemy") && !collision.collider.CompareTag("Objects")) return;
+        Vector2 railVelocity = moveDir.normalized * speed * Time.fixedDeltaTime;
 
-        Rigidbody2D rigid = collision.rigidbody;
-        if (rigid != null)
-        {
-            rigid.AddForce(moveDir.normalized * speed, ForceMode2D.Impulse);
-        }
-
+        // Rigidbody 여부에 관계없이 동일하게 위치 이동
+        collision.transform.Translate(railVelocity);
     }
 
 }

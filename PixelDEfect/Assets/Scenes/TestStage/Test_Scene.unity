@@ -48516,7 +48516,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8286222837853438137, guid: 4c816dd7d81a9b44b87a243461247d15, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.14
+      value: 23.68
       objectReference: {fileID: 0}
     - target: {fileID: 8286222837853438137, guid: 4c816dd7d81a9b44b87a243461247d15, type: 3}
       propertyPath: m_LocalPosition.y
@@ -49706,7 +49706,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.55
+      value: 9.08
       objectReference: {fileID: 0}
     - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
       propertyPath: m_LocalPosition.y
@@ -50548,7 +50548,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6494732561532769704, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -19.03
+      value: 3.23
       objectReference: {fileID: 0}
     - target: {fileID: 6494732561532769704, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
       propertyPath: m_LocalPosition.y
@@ -50588,7 +50588,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8212538770150572543, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
       propertyPath: m_Mass
-      value: 2
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8212538770150572543, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
       propertyPath: m_Constraints
@@ -51700,8 +51700,20 @@ PrefabInstance:
       value: RailObject
       objectReference: {fileID: 0}
     - target: {fileID: 2775744983754716656, guid: 582af04ea91e0f449adba6cdfce863d4, type: 3}
+      propertyPath: speed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2775744983754716656, guid: 582af04ea91e0f449adba6cdfce863d4, type: 3}
       propertyPath: isActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2775744983754716656, guid: 582af04ea91e0f449adba6cdfce863d4, type: 3}
+      propertyPath: railTargetLayer.m_Bits
+      value: 1216
+      objectReference: {fileID: 0}
+    - target: {fileID: 6867787693107482527, guid: 582af04ea91e0f449adba6cdfce863d4, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6867787693107482527, guid: 582af04ea91e0f449adba6cdfce863d4, type: 3}
       propertyPath: m_LocalPosition.x
