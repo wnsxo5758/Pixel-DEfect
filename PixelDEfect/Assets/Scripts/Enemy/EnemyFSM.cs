@@ -169,7 +169,6 @@ public abstract class EnemyFSM : MonoBehaviour
             CheckWall();
             if (currentTime >= maxTime)
             {
-                Debug.Log($"{gameObject.name}은 조금 쉬기로 했다");
                 ChangeState(EnemyState.Idle);
             }
             CalculateDistanceToTargetAndSelectState();
@@ -222,8 +221,6 @@ public abstract class EnemyFSM : MonoBehaviour
     }
     protected virtual IEnumerator Pursuit() // 추적
     {
-        Debug.Log($"{gameObject.name}은 플레이어를 향해 이동중");
-
         float speed;
 
         while (true)
@@ -245,9 +242,20 @@ public abstract class EnemyFSM : MonoBehaviour
     }
     protected virtual IEnumerator Dead() // 사망
     {
-
+        PlaySound(deadClip);
+        movement.MoveTo(0);
+        if(TryGetComponent(out Rigidbody2D rigid))
+        {
+            rigid.bodyType = RigidbodyType2D.Static;
+        }
+        Collider2D[] collider = GetComponentsInChildren<Collider2D>();
+        foreach(var col in collider)
+        {
+            col.enabled = false;
+        }
         animator.Death(); // 적 사망 애니메이션 
-        yield return null;
+        yield return new WaitForSeconds(animator.DeathAnimLength);
+        gameObject.SetActive(false);
     }
     protected abstract IEnumerator Attack(); // 하위 객체에서 공격 구현
 
@@ -277,7 +285,7 @@ public abstract class EnemyFSM : MonoBehaviour
             StartCoroutine(FlashEffact(0.2f));
             if (currentHp <= 0)
             {
-                Debug.Log($"{gameObject.name}가 사망");
+                ChangeState(EnemyState.Dead);
             }
         }
     }

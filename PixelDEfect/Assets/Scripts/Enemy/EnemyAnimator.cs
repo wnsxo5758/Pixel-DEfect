@@ -8,6 +8,8 @@ public class EnemyAnimator : MonoBehaviour
     private MovementRigidbody2D movement; // 움직임
     public bool isAttack;
     private bool isDeath; // 사망시
+    private float deathAnimLength;
+    public float DeathAnimLength => deathAnimLength;
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -16,7 +18,7 @@ public class EnemyAnimator : MonoBehaviour
 
     public void UpdateAnimation(float x)
     {
-        if (isDeath == true) return;  // 사망시 애니메이션 작동 X
+        if (isDeath) return;  // 사망시 애니메이션 작동 X
 
         if (x != 0)
         {
@@ -48,6 +50,7 @@ public class EnemyAnimator : MonoBehaviour
     public void Death()
     {
         animator.SetTrigger("isDead"); // 사망시 값 설정
+        deathAnimLength = animator.GetCurrentAnimatorStateInfo(0).length;
         isDeath = true;
     }
 
