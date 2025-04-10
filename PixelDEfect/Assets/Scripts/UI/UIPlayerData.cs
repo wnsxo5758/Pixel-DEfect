@@ -7,7 +7,7 @@ public class UIPlayerData : MonoBehaviour
 {
     [Header("체력")]
     [SerializeField]
-    private Image[] hpImages; // 체력 이미지
+    private GameObject[] hpBars; // 체력 이미지
 
     [Header("코인")]
     [SerializeField]
@@ -19,9 +19,28 @@ public class UIPlayerData : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI textMedicKit; // 플레이어가 가진 구급약 수
 
-    public void SetHp(int index, bool isActive) // 체력 업데이트
+    public void SetHpAll(int currentHp)
     {
-        hpImages[index].color = isActive == true ? Color.white : Color.black;
+        Debug.Log("체력 UI 작동");
+        for (int i = 0; i < hpBars.Length; i++)
+        {
+            Animator anim = hpBars[i].GetComponent<Animator>();
+
+            if (anim == null) continue;
+
+            if (i < currentHp)
+            {
+                Debug.Log("체력 UI 애니메이션작동");
+                anim.ResetTrigger("Damage");
+                anim.SetTrigger("Heal");
+            }
+            else
+            {
+                Debug.Log("체력 UI 애니메이션작동");
+                anim.ResetTrigger("Heal");
+                anim.SetTrigger("Damage");
+            }
+        }
     }
 
     public void SetCoin(int _Count) // 코인 업데이트

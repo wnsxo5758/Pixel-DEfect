@@ -45,15 +45,18 @@ public class PlayerHp : MonoBehaviour
         originColor = spriteRenderer.color;
     }
 
-    public void DecreaseHp(int damage) // 체력 피해
+    public void DecreaseHp(int damage)
     {
-        if (isInvincibility == true || isDead) return; // 무적이라면 데미지X
+        if (isInvincibility == true || isDead) return;
+
         currentHp -= damage;
+        currentHp = Mathf.Max(currentHp, 0); // 음수 방지
+
         Debug.Log($"플레이어가 {damage}만큼의 데미지를 받아서 현재 체력 {currentHp}");
         OnInvincibility(1.5f);
-        uiPlayer.SetHp(currentHp, false);
-        CheckDead();
 
+        uiPlayer.SetHpAll(currentHp); // 여기서 전체 갱신
+        CheckDead();
     }
 
     public void GetMedicKit()
@@ -97,11 +100,13 @@ public class PlayerHp : MonoBehaviour
 
         yield return new WaitForSeconds(healTime);
         currentHp += healAmount;
+        currentHp = Mathf.Min(currentHp, maxHp); // 최대 체력 넘지 않도록
         currentMedickit--;
-        Debug.Log($"체력 회복됨 현재 체력 :{currentHp}, 남은 회복약 : {currentMedickit}");
-        isHealing = false;
-        uiPlayer.SetHp(currentHp - 1, true);
 
+        Debug.Log($"체력 회복됨 현재 체력 :{currentHp}, 남은 회복약 : {currentMedickit}");
+
+        uiPlayer.SetHpAll(currentHp); // 전체 갱신
+        isHealing = false;
     }
 
 
