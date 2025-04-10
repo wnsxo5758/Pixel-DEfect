@@ -48,8 +48,13 @@ public class ValveButton : ButtonBase
             }
         }
     }
-    
-    
+
+    public float GetPressRatio()
+    {
+        return Mathf.Clamp01(currentPressTime / pressTimeRequired);
+    }
+
+
     protected override IEnumerator ButtonActive() // 버튼을  누른경우
     {
         isActiving = true; // 작동시작
