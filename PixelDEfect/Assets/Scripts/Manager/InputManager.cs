@@ -9,7 +9,7 @@ public class InputManager : MonoBehaviour
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode holdKey = KeyCode.F;
     [SerializeField] private KeyCode interactKey = KeyCode.G;
-    [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
+    [SerializeField] private KeyCode crouchKey = KeyCode.DownArrow;
     [SerializeField] private KeyCode pickupKey = KeyCode.F;
     [SerializeField] private KeyCode meleeAttackKey = KeyCode.Z;
 
@@ -29,7 +29,7 @@ public class InputManager : MonoBehaviour
     public event Action OnValveReleased;
     public event Action OnLadderJumpPressed;
     public event Action OnPickupPressed;
-    public event Action OnAttackPressed;
+    public event Action OnMeleeAttackPressed;
 
     private void Awake()
     {
@@ -81,7 +81,7 @@ public class InputManager : MonoBehaviour
         if (Input.GetKeyDown(pickupKey) && canPickup)
             OnPickupPressed?.Invoke();
         if (Input.GetKeyDown(meleeAttackKey))
-            OnAttackPressed?.Invoke();
+            OnMeleeAttackPressed?.Invoke();
 
     }
     

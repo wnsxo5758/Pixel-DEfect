@@ -241,6 +241,30 @@ namespace PlayerStates
             movement.EnableGravity();
         }
     }
+
+    public class Attack : State<PlayerController>
+    {
+        public override void Enter(PlayerController player)
+        {
+            InputManager.Instance.OnJumpPressed -= player.OnJump;
+            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
+            InputManager.Instance.OnHoldPressed -= player.OnHold;
+            
+            player.UpdateMove(0f);
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            InputManager.Instance.OnJumpPressed += player.OnJump;
+            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
+            InputManager.Instance.OnHoldPressed += player.OnHold;
+        }
+    }
     
     public class StateGlobal : State<PlayerController>
     {

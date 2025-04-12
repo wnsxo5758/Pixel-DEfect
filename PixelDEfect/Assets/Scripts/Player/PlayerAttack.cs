@@ -42,6 +42,7 @@ public class PlayerAttack : MonoBehaviour
         InitializeAttackCollider();
     }
 
+    // 공격 콜라이더 초기화
     private void InitializeAttackCollider()
     {
         if (attackCollider == null)
@@ -138,7 +139,7 @@ public class PlayerAttack : MonoBehaviour
             UpdateAttackColliderDirection(transform.localScale.x);
         }
         
-        InputManager.Instance.OnAttackPressed += OnAttack;
+        InputManager.Instance.OnMeleeAttackPressed += OnMeleeAttack;
 
         // 무기 장착 상태 애니메이션 변경
         if (playerAnimator != null)
@@ -155,7 +156,7 @@ public class PlayerAttack : MonoBehaviour
             currentWeapon = null;
             hasWeapon = false;
 
-            InputManager.Instance.OnAttackPressed -= OnAttack;
+            InputManager.Instance.OnMeleeAttackPressed -= OnMeleeAttack;
 
             // 무기 해제 상태 애니메이션 변경
             if (playerAnimator != null)
@@ -173,7 +174,7 @@ public class PlayerAttack : MonoBehaviour
     }
     
     // 공격 입력 처리
-    private void OnAttack()
+    private void OnMeleeAttack()
     {
         if (currentWeapon != null && !isAttacking)
         {
@@ -182,8 +183,9 @@ public class PlayerAttack : MonoBehaviour
                 isAttacking = true;
                 
                 MeleeAttackAnimation();
-
                 StartCoroutine(AttackCooldownTimer());
+                
+                playerController.ChangeState(new PlayerStates.Attack());
             }
         }
     }
@@ -194,6 +196,15 @@ public class PlayerAttack : MonoBehaviour
         if (playerAnimator != null)
         {
             playerAnimator.TriggerAttackAnim();
+        }
+    }
+
+    // 공격 애니메이션 종료 시 Idle 상태로 변경
+    public void FinishedAttackAnim()
+    {
+        if (currentWeapon != null && isAttacking)
+        {
+            playerController.ChangeState(new PlayerStates.Idle());
         }
     }
 
@@ -250,7 +261,7 @@ public class PlayerAttack : MonoBehaviour
         var currentState = playerController.GetCurrentState();
 
         if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || 
-            currentState is PlayerStates.Crawl)
+            currentState is PlayerStates.Crawl || currentState is PlayerStates.Jump)
         {
             return false;
         }
@@ -276,7 +287,7 @@ public class PlayerAttack : MonoBehaviour
         if (InputManager.Instance != null)
         {
             InputManager.Instance.OnPickupPressed -= OnPickupWeapon;
-            InputManager.Instance.OnAttackPressed -= OnAttack;
+            InputManager.Instance.OnMeleeAttackPressed -= OnMeleeAttack;
         }
     }
 

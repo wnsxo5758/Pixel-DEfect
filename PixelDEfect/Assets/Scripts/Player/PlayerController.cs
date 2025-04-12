@@ -16,8 +16,8 @@ public class PlayerController : MonoBehaviour
     private PlayerInteraction playerInteraction;
     private PlayerStateMachine<PlayerController> stateMachine;
     
-    public bool IsOnLadder { get; set; } = false; //사다리 
-    public bool IsCrouching { get; set; } = false; //웅크리기
+    public bool IsOnLadder { get; set; } //사다리 
+    public bool IsCrouching { get; set; } //웅크리기
 
     private void Awake()
     {
