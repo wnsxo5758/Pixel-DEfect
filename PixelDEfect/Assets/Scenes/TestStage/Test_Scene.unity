@@ -49729,7 +49729,7 @@ MonoBehaviour:
   jumpKey: 32
   holdKey: 102
   interactKey: 103
-  crouchKey: 306
+  crouchKey: 274
   pickupKey: 102
   meleeAttackKey: 122
 --- !u!4 &1141360396
