@@ -93,4 +93,9 @@ public class PlayerAnimator : MonoBehaviour
     {
         attack.PerformMeleeAttack();
     }
+
+    private void FinishedAttackEvent()
+    {
+        attack.FinishedAttackAnim();
+    }
 }

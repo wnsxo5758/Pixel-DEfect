@@ -208,10 +208,8 @@ namespace PlayerStates
             InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
             InputManager.Instance.OnHoldPressed -= player.OnHold;
             
-            player.IsOnLadder = true;
-            
-            movement.DisableGravity();
             animator.SetClimbAnim(player.IsOnLadder);
+            movement.DisableGravity();
         }
         
         public override void Execute(PlayerController player)
@@ -239,8 +237,32 @@ namespace PlayerStates
             
             player.IsOnLadder = false;
             
-            movement.EnableGravity();
             animator.SetClimbAnim(player.IsOnLadder);
+            movement.EnableGravity();
+        }
+    }
+
+    public class Attack : State<PlayerController>
+    {
+        public override void Enter(PlayerController player)
+        {
+            InputManager.Instance.OnJumpPressed -= player.OnJump;
+            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
+            InputManager.Instance.OnHoldPressed -= player.OnHold;
+            
+            player.UpdateMove(0f);
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            InputManager.Instance.OnJumpPressed += player.OnJump;
+            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
+            InputManager.Instance.OnHoldPressed += player.OnHold;
         }
     }
     

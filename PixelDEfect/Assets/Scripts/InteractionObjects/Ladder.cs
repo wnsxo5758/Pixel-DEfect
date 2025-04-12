@@ -129,31 +129,33 @@ public class Ladder : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             PlayerController player = collision.GetComponent<PlayerController>();
-
             float vertical = player.VerticalInput();
 
             if (!player.IsOnLadder)
             {
                 if (DetectPlayerOnTop())
                 {
-                    if (vertical < 0)
+                    if (vertical < 0f)
                     {
                         topPlatform.isTrigger = true;
                         
                         player.transform.localScale =
                             new Vector3(PlayerFlipX(player.transform.localScale.x) * Mathf.Abs(player.transform.localScale.x),
                                 player.transform.localScale.y, player.transform.localScale.z);
+                        
+                        player.IsOnLadder = true;
                         player.ChangeState(new Climb());
                     }
                 }
-                else if (Mathf.Abs(vertical) > 0)
+                else if (Mathf.Abs(vertical) > 0f)
                 {
                     topPlatform.isTrigger = false;
                     
                     player.transform.localScale =
                         new Vector3(PlayerFlipX(player.transform.localScale.x) * Mathf.Abs(player.transform.localScale.x),
                             player.transform.localScale.y, player.transform.localScale.z);
-                    
+
+                    player.IsOnLadder = true;
                     player.ChangeState(new Climb());
                 }
             }
