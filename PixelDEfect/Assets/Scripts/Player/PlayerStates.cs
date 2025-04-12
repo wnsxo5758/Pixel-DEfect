@@ -208,10 +208,8 @@ namespace PlayerStates
             InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
             InputManager.Instance.OnHoldPressed -= player.OnHold;
             
-            player.IsOnLadder = true;
-            
-            movement.DisableGravity();
             animator.SetClimbAnim(player.IsOnLadder);
+            movement.DisableGravity();
         }
         
         public override void Execute(PlayerController player)
@@ -239,8 +237,8 @@ namespace PlayerStates
             
             player.IsOnLadder = false;
             
-            movement.EnableGravity();
             animator.SetClimbAnim(player.IsOnLadder);
+            movement.EnableGravity();
         }
     }
     
