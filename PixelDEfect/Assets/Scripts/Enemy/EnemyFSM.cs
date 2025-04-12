@@ -254,7 +254,7 @@ public abstract class EnemyFSM : MonoBehaviour
             col.enabled = false;
         }
         animator.Death(); // 적 사망 애니메이션 
-        yield return new WaitForSeconds(animator.DeathAnimLength);
+        yield return new WaitForSeconds((animator.DeathAnimLength+1f));
         gameObject.SetActive(false);
     }
     protected abstract IEnumerator Attack(); // 하위 객체에서 공격 구현
