@@ -9,10 +9,14 @@ public class ValveButton : ButtonBase
     [Header("벨브 설정")]
     [SerializeField]
     private float pressTimeRequired; //필요한 요구치
-
     [SerializeField]
     private float currentPressTime; // 현재 누른 시간
     public bool isPressing; // 벨브를 누르고 있는가
+    [Header("밸브 효과음")]
+    [SerializeField]
+    private AudioClip rotateClip; // 돌아갈때의 효과음
+    [SerializeField]
+    private AudioClip rewindClip; // 되돌아갈때의 효과음
 
     private Collider2D colllider;
     private void Start()
@@ -28,10 +32,12 @@ public class ValveButton : ButtonBase
                 Debug.Log($"밸브 작동 중 : {currentPressTime}");
                 currentPressTime += Time.deltaTime;
                 RotateValve(1);
+                LoopAudioPlay(rotateClip);
             }
 
             else if(currentPressTime >= pressTimeRequired && isActiving == false)
             {
+                LoopAudioStop();
                 StartCoroutine(nameof(ButtonActive));
             }
             
@@ -45,6 +51,11 @@ public class ValveButton : ButtonBase
                 currentPressTime -= Time.deltaTime;
                 Debug.Log($"밸브 떨어지는 중 : {currentPressTime}");
                 RotateValve(-1);
+                LoopAudioPlay(rewindClip);
+            }
+            else
+            {
+                LoopAudioStop();
             }
         }
     }
@@ -77,5 +88,27 @@ public class ValveButton : ButtonBase
         float deltaRotation = rotateSpeed * Time.deltaTime * dir;
 
         sprite.transform.Rotate(Vector3.forward, deltaRotation);
+    }
+
+    private void LoopAudioPlay(AudioClip _clip)
+    {
+        if (audio == null) return;
+        if (audio.clip != _clip)
+        {
+            audio.clip = _clip;
+            audio.Play();
+        }
+        else if(! audio.isPlaying)
+        {
+            audio.Play();
+        }
+    }
+
+    private void LoopAudioStop()
+    {
+        if(audio != null && audio.isPlaying)
+        {
+            audio.Stop();   
+        }
     }
 }

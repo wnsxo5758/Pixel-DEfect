@@ -383,6 +383,8 @@ MonoBehaviour:
   pressTimeRequired: 3
   currentPressTime: 0
   isPressing: 0
+  rotateClip: {fileID: 0}
+  rewindClip: {fileID: 0}
 --- !u!82 &416150759
 AudioSource:
   m_ObjectHideFlags: 0
@@ -50528,6 +50530,8 @@ MonoBehaviour:
   pressTimeRequired: 3
   currentPressTime: 0
   isPressing: 0
+  rotateClip: {fileID: 8300000, guid: f844a034654644548a582424df3ad217, type: 3}
+  rewindClip: {fileID: 8300000, guid: 36a627d0e7bda2c49bda6b604b9e731b, type: 3}
 --- !u!82 &1685164394
 AudioSource:
   m_ObjectHideFlags: 0
