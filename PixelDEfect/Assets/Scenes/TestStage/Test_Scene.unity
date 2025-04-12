@@ -51904,54 +51904,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: enemyLayer.m_Bits
-      value: 64
-      objectReference: {fileID: 0}
-    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: weaponLayer.m_Bits
-      value: 16384
-      objectReference: {fileID: 0}
-    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: attackPolygonPoints.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: attackPolygonPoints.Array.data[1].x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: attackPolygonPoints.Array.data[1].y
-      value: 1.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: attackPolygonPoints.Array.data[2].x
-      value: 0.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: attackPolygonPoints.Array.data[2].y
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: attackPolygonPoints.Array.data[3].x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: attackPolygonPoints.Array.data[3].y
-      value: -0.6
-      objectReference: {fileID: 0}
-    - target: {fileID: 3685542010041859694, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: jumpForce
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 3685542010041859694, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: crawlSpeed
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 4007137665156849514, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: m_AutoTiling
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5592127285762298269, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.8824437
@@ -51991,10 +51943,6 @@ PrefabInstance:
     - target: {fileID: 5592127285762298269, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5783198869496049011, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: aboveLayer.m_Bits
-      value: 9736
       objectReference: {fileID: 0}
     - target: {fileID: 8312166533425255970, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
       propertyPath: uiPlayer

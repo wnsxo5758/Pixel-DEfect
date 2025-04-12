@@ -316,11 +316,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba317ef02f609241b7d877efd32f605, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meleeDamage: 0
-  meleeRange: 0
-  coolTime: 0
-  attackTime: 0
-  Damage: 0
+  weaponDetectionRadius: 1
+  weaponLayer:
+    serializedVersion: 2
+    m_Bits: 16384
+  attackOffset: {x: 0, y: 0.6}
+  attackCollider: {fileID: 0}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  attackPolygonPoints:
+  - {x: 0, y: 0}
+  - {x: 0, y: 1.1}
+  - {x: 0.75, y: 0.8}
+  - {x: 1, y: -0.6}
+  throwForce: 15
+  thrownWeaponPrefab: {fileID: 0}
 --- !u!114 &8312166533425255970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -358,3 +369,4 @@ MonoBehaviour:
   springFrequency: 0
   springDamping: 0.9
   springDistance: 1.1
+  respawnPoint: {fileID: 0}
