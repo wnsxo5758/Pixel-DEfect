@@ -16,7 +16,7 @@ public class MovementRigidbody2D : MonoBehaviour
     [SerializeField] private float jumpForce; // 점프력
     [SerializeField] private float lowGravityScale; // 약한 중력 (높은 점프시)
     [SerializeField] private float highGravityScale; // 강한 중력 (일반 점프시)
-   
+
     private float moveSpeed; // 현재 움직이는 속도
     private float initialSpeed; // 초기 속도
     private bool weightlessness = false;
@@ -46,6 +46,7 @@ public class MovementRigidbody2D : MonoBehaviour
         moveSpeed = walkSpeed;
         rigid = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
+        
     }
 
     private void Update()
