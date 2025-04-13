@@ -54497,55 +54497,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!1 &1282668064
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1282668066}
-  - component: {fileID: 1282668065}
-  m_Layer: 0
-  m_Name: AudioManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1282668065
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1282668064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6aa39fb2f624b9e4d822b677777450c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bgmClip: {fileID: 0}
-  bgmVolume: 0
-  sfxClips: []
-  sfxVolume: 0
-  channels: 0
---- !u!4 &1282668066
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1282668064}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.7417694, y: -1.4285684, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1294696510 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6326456131935108557, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
@@ -62179,7 +62130,6 @@ SceneRoots:
   - {fileID: 2150016614329601314}
   - {fileID: 2032050284}
   - {fileID: 1896312720}
-  - {fileID: 1282668066}
   - {fileID: 3254464895340110622}
   - {fileID: 959844550}
   - {fileID: 480936581}

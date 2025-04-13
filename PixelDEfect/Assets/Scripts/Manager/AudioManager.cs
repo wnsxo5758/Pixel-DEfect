@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Sfx { Dead, Hit, Melee, Range, Select, }
+public enum Sfx { Dead, Hit, Run, Walk, Melee, Jump,Land } // 
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
@@ -22,6 +22,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField]
     private int channels;
     int channelIndex;
+
 
     AudioSource[] sfxPlayers;
 
@@ -75,7 +76,10 @@ public class AudioManager : MonoBehaviour
             sfxPlayers[loopIndex].Play();
             break;
         }
+    }
 
+    public void PlaySfxLoop(Sfx sfx)
+    {
 
     }
 }
