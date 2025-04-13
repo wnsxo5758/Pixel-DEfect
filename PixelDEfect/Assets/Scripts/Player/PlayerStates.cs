@@ -67,7 +67,6 @@ namespace PlayerStates
         {
             movement = player.GetComponent<MovementRigidbody2D>();
             animator = player.GetComponentInChildren<PlayerAnimator>();
-            movement.Jump();
             
             InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
             InputManager.Instance.OnHoldPressed -= player.OnHold;
@@ -265,7 +264,7 @@ namespace PlayerStates
             InputManager.Instance.OnHoldPressed += player.OnHold;
         }
     }
-    
+
     public class StateGlobal : State<PlayerController>
     {
         

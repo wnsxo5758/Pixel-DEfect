@@ -36,12 +36,19 @@ public class PlayerController : MonoBehaviour
         InputManager.Instance.OnJumpPressed += OnJump;
         InputManager.Instance.OnCrouchPressed += OnCrouch;
         InputManager.Instance.OnHoldPressed += OnHold;
+
+        if (playerHp != null)
+        {
+            playerHp.OnPlayerDeath += OnPlayerDeath;
+        }
         
         InputManager.Instance.SetCanHold(true);
     }
     
     private void Update()
     {
+        if (playerHp != null && playerHp.IsDead) return;
+        
         stateMachine.Execute();
     }
 
@@ -65,11 +72,14 @@ public class PlayerController : MonoBehaviour
 
         return y;
     }
-    
+
     public void OnJump() // 점프 입력
     {
-        if (movement.IsGrounded && HasSpaceAbove())
+        if (movement.IsGrounded)
         {
+            if (IsCrouching && !HasSpaceAbove()) return;
+            
+            movement.Jump();
             ChangeState(new Jump());
         }
         
@@ -87,7 +97,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnCrouch() // 웅크리기 입력
     {
-        if (!IsCrouching)
+        if (movement.IsGrounded && !IsCrouching)
         {
             IsCrouching = true;
             ChangeState(new Crawl());
@@ -123,7 +133,7 @@ public class PlayerController : MonoBehaviour
         if (IsOnLadder)
         {
             movement.LadderJump(HorizontalInput());
-            ChangeState(new Idle());
+            ChangeState(new Jump());
         }
     }
     
@@ -165,6 +175,46 @@ public class PlayerController : MonoBehaviour
         }
     }
     
+    private void OnPlayerDeath()
+    {
+        DisablePlayerControl();
+    }
+    
+    private void DisablePlayerControl()
+    {
+        // 물리 이동 정지
+        if (movement != null)
+        {
+            movement.DisableRigidbody();
+        }
+        
+        // 다른 컴포넌트 비활성화
+        if (playerAttack != null)
+        {
+            playerAttack.enabled = false;
+        }
+        
+        if (playerInteraction != null)
+        {
+            playerInteraction.enabled = false;
+        }
+
+        // 입력 이벤트 해제
+        UnSubscribeInputEvents();
+    }
+
+    private void UnSubscribeInputEvents()
+    {
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.OnJumpPressed -= OnJump;
+            InputManager.Instance.OnHoldPressed -= OnHold;
+            InputManager.Instance.OnCrouchPressed -= OnCrouch;
+            InputManager.Instance.OnCrouchReleased -= UnCrouch;
+            InputManager.Instance.OnLadderJumpPressed -= OnLadderJump;
+        }
+    }
+    
     public void ChangeState(State<PlayerController> newState)
     {
         stateMachine.ChangeState(newState);
@@ -195,9 +245,17 @@ public class PlayerController : MonoBehaviour
 
     public void OnDestroy()
     {
-        InputManager.Instance.OnJumpPressed -= OnJump;
-        InputManager.Instance.OnCrouchPressed -= OnCrouch;
-        InputManager.Instance.OnCrouchReleased -= UnCrouch;
-        InputManager.Instance.OnHoldPressed -= OnHold;
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.OnJumpPressed -= OnJump;
+            InputManager.Instance.OnCrouchPressed -= OnCrouch;
+            InputManager.Instance.OnHoldPressed -= OnHold;
+            InputManager.Instance.OnCrouchReleased -= UnCrouch;
+        }
+
+        if (playerHp != null)
+        {
+            playerHp.OnPlayerDeath -= OnPlayerDeath;
+        }
     }
 }

@@ -5,21 +5,22 @@ using UnityEngine;
 
 public class PlayerAnimator : MonoBehaviour
 {
-    private static readonly int VelocityX = Animator.StringToHash("VelocityX");
-    private static readonly int VelocityY = Animator.StringToHash("VelocityY");
-    private static readonly int IsJump = Animator.StringToHash("IsJump");
-    private static readonly int IsAttack = Animator.StringToHash("IsAttack");
-    private static readonly int IsConnected = Animator.StringToHash("IsConnected");
-    private static readonly int IsClimbing = Animator.StringToHash("IsClimbing");
-    private static readonly int IsCrouching = Animator.StringToHash("IsCrouching");
+    private readonly int velocityX = Animator.StringToHash("VelocityX");
+    private readonly int velocityY = Animator.StringToHash("VelocityY");
+    private readonly int isJump = Animator.StringToHash("IsJump");
+    private readonly int isAttack = Animator.StringToHash("IsAttack");
+    private readonly int isConnected = Animator.StringToHash("IsConnected");
+    private readonly int isClimbing = Animator.StringToHash("IsClimbing");
+    private readonly int isCrouching = Animator.StringToHash("IsCrouching");
+    private readonly int death = Animator.StringToHash("Death");
     
     // 공격 애니메이션
-    private static readonly int HasWeapon = Animator.StringToHash("HasWeapon");
-    private static readonly int Attack = Animator.StringToHash("Attack");
+    private readonly int hasWeapon = Animator.StringToHash("HasWeapon");
+    private readonly int attack = Animator.StringToHash("Attack");
 
     private Animator animator; // 애니메이션 
     private MovementRigidbody2D movement; // 움직임
-    private PlayerAttack attack; // 플레이어 공격
+    private PlayerAttack playerAttack; // 플레이어 공격
     private PlayerInteraction playerInteraction; // 상호작용
 
     private float pnpDirection;
@@ -27,7 +28,7 @@ public class PlayerAnimator : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         movement = GetComponentInParent<MovementRigidbody2D>();
-        attack = GetComponentInParent<PlayerAttack>();
+        playerAttack = GetComponentInParent<PlayerAttack>();
         playerInteraction = GetComponentInParent<PlayerInteraction>();
     }
     
@@ -35,67 +36,82 @@ public class PlayerAnimator : MonoBehaviour
     {
         if (movement.IsGrounded)
         {
-            animator.SetFloat(VelocityX, Mathf.Abs(x)); // X 값에 따라 변경
+            animator.SetFloat(velocityX, Mathf.Abs(x)); // X 값에 따라 변경
         }
         else
         {
-            animator.SetFloat(VelocityY, movement.Velocity.y); // Y 값에 따라 변경 -> y가 작으면 공중에서 내려가는 모션, 높으면 올라가는 모션
+            animator.SetFloat(velocityY, movement.Velocity.y); // Y 값에 따라 변경 -> y가 작으면 공중에서 내려가는 모션, 높으면 올라가는 모션
         }
         
-        animator.SetBool(IsJump, !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
+        animator.SetBool(isJump, !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
     }
 
     public void SetCrouchAnim(bool isCrouching)
     {
-        animator.SetBool(IsCrouching, isCrouching);
+        animator.SetBool(this.isCrouching, isCrouching);
     }
     
     public void CrawlAnim(float x)
     {
-        animator.SetFloat(VelocityX, Mathf.Abs(x));
+        animator.SetFloat(velocityX, Mathf.Abs(x));
     }
     
     public void EnterHoldAnim(float dir)
     {
-        animator.SetBool(IsConnected, playerInteraction.IsConnected);
+        animator.SetBool(isConnected, playerInteraction.IsConnected);
         pnpDirection = dir;
     }
     
     public void PushAndPullAnim(float x)
     {
-        animator.SetFloat(VelocityX, pnpDirection * x);
+        animator.SetFloat(velocityX, pnpDirection * x);
         
-        animator.SetBool(IsConnected, playerInteraction.IsConnected);
+        animator.SetBool(isConnected, playerInteraction.IsConnected);
     }
 
     public void SetClimbAnim(bool isOnLadder)
     {
-        animator.SetBool(IsClimbing, isOnLadder);
+        animator.SetBool(isClimbing, isOnLadder);
     }
     
     public void ClimbAnim(float y)
     {
-        animator.SetFloat(VelocityY, Mathf.Abs(y));
+        animator.SetFloat(velocityY, Mathf.Abs(y));
     }
 
     public void SetHasWeapon(bool hasWeapon)
     {
-        animator.SetBool(HasWeapon, hasWeapon);
+        animator.SetBool(this.hasWeapon, hasWeapon);
     }
 
     public void TriggerAttackAnim()
     {
-        animator.SetTrigger(Attack);
+        animator.SetTrigger(attack);
     }
 
+    public void TriggerDeathAnim()
+    {
+        animator.SetTrigger(death);
+    }
+
+    
     // 공격 타이밍 이벤트
     private void HandleAttackEvent()
     {
-        attack.PerformMeleeAttack();
+        playerAttack.PerformMeleeAttack();
     }
 
     private void FinishedAttackEvent()
     {
-        attack.FinishedAttackAnim();
+        playerAttack.FinishedAttackAnim();
+    }
+
+    private void RestartGameEvent()
+    {
+        GameManager gameManager = FindObjectOfType<GameManager>();
+        if (gameManager != null)
+        {
+            gameManager.RestartGame();
+        }
     }
 }

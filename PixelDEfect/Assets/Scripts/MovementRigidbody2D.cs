@@ -127,6 +127,11 @@ public class MovementRigidbody2D : MonoBehaviour
         rigid.gravityScale = highGravityScale;
         weightlessness = false;
     }
+
+    public void DisableRigidbody()
+    {
+        rigid.velocity = Vector2.zero;
+    }
     
     void OnDrawGizmos()
     {

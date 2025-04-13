@@ -1,118 +1,95 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerHp : MonoBehaviour
 {
-    [SerializeField]
-    private int maxHp = 3; // 최대 체력
-    private int currentHp; // 현재 체력
-    private bool isDead;
+    [Header("체력 설정")]
+    [SerializeField] private int maxHp = 3; // 최대 체력
+    [SerializeField] private int currentHp; // 현재 체력
+    [SerializeField] private float healTime = 0; // 회복 시간
+    [SerializeField] private float invincibilityTime = 0; // 무적시간
+    
     [Header("회복약 관련")]
     [SerializeField]
-    private int maxMedickit = 3; // 최대 회복약
-    private int currentMedickit; // 현재 회복약
+    private int maxMedicKit = 3; // 최대 회복약
+    private int currentMedicKit; // 현재 회복약
     private int healAmount = 1; //회복약 사용시 회복양
 
-
-    public int CurrentMedicKit
-    {
-        set
-        {
-            Mathf.Clamp(value, 0, maxHp);
-        }
-        get => currentMedickit;
-    }
-    [SerializeField]
-    private float healTime = 0; // 회복 시간
-    private bool isHealing = false; // 회복 중인가?
-
-    [SerializeField]
-    private float invincibilityTime = 0; // 무적시간
-    private bool isInvincibility = false; // 무적인가
-
+    [Header("UI")]
+    [SerializeField] private UIPlayerData uiPlayer;
+    
+    private PlayerController player;
+    private PlayerAnimator playerAnimator;
     private SpriteRenderer spriteRenderer; // 피격시 색상 변경을 위한 스프라이트 렌더러
     private Color originColor; //플레이어 초기 색상
-    [SerializeField]
-    private UIPlayerData uiPlayer;
+    
+    private bool isDead = false;
+    private bool isHealing = false; // 회복 중인가?
+    private bool isInvincibility = false; // 무적인가
 
-
+    public event Action OnPlayerDeath;
+    public int CurrentHp => currentHp;
+    public bool IsDead => isDead;
+    public int CurrentMedicKit
+    {
+        set => Mathf.Clamp(value, 0, maxHp);
+        get => currentMedicKit;
+    }
+    
     private void Awake()
     {
-        currentMedickit = maxMedickit;
+        currentMedicKit = maxMedicKit;
         currentHp = maxHp;
+        player = GetComponent<PlayerController>();
+        playerAnimator = GetComponentInChildren<PlayerAnimator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         originColor = spriteRenderer.color;
     }
 
     public void DecreaseHp(int damage)
     {
-        if (isInvincibility == true || isDead) return;
+        if (isInvincibility || isDead) return;
 
         currentHp -= damage;
         currentHp = Mathf.Max(currentHp, 0); // 음수 방지
 
-        Debug.Log($"플레이어가 {damage}만큼의 데미지를 받아서 현재 체력 {currentHp}");
-        OnInvincibility(1.5f);
+        if (currentHp <= 0)
+        {
+            Debug.Log("플레이어 사망");
+
+            Die();
+        }
+        else
+        {
+            Debug.Log($"플레이어가 {damage}만큼의 데미지를 받아서 현재 체력 {currentHp}");
+            OnInvincibility(1.5f);
+        }
 
         uiPlayer.SetHpAll(currentHp); // 여기서 전체 갱신
-        CheckDead();
     }
 
     public void GetMedicKit()
     {
-        if (currentMedickit >= maxMedickit) return;
-        currentMedickit++;
-        Debug.Log($"구급약 흭득, 현재 구급약 {currentMedickit}");
+        if (currentMedicKit >= maxMedicKit) return;
+        currentMedicKit++;
+        Debug.Log($"구급약 획득, 현재 구급약 {currentMedicKit}");
 
     }
-    private void CheckDead() // 사망 확인
+    
+    private void Die()
     {
-        if (currentHp <= 0)
-        {
-            Debug.Log("플레이어 사망");
-            currentHp = 0;
-            isDead = true;
-            GameManager manager = FindObjectOfType<GameManager>();
-            manager.RestartGame();
-        }
-    }
-    public void IncreaseHp()  // 체력 회복
-    {
-        if (currentHp == maxHp || currentMedickit <= 0 || isHealing == true)
-        {
-            Debug.Log($"체력 회복 불가, 현재 체력 : {currentHp} , 현재 구급약 {currentMedickit} , 회복 중 {isHealing}");
-            return; // 체력이 이미 최대치이거나, 회복약이 없거나, 체력 회복 중이라면 return;
-        }
-        else
-        {
+        isDead = true;
+        currentHp = 0;
 
-            if (currentHp < maxHp) // 체력이 최대체력이 아닐 경우
-            {
-                StartCoroutine(nameof(PlayerHeal));
-            }
-        }
+        playerAnimator.TriggerDeathAnim();
+        OnPlayerDeath?.Invoke();
     }
 
-    private IEnumerator PlayerHeal()
-    {
-        isHealing = true;
-
-        yield return new WaitForSeconds(healTime);
-        currentHp += healAmount;
-        currentHp = Mathf.Min(currentHp, maxHp); // 최대 체력 넘지 않도록
-        currentMedickit--;
-
-        Debug.Log($"체력 회복됨 현재 체력 :{currentHp}, 남은 회복약 : {currentMedickit}");
-
-        uiPlayer.SetHpAll(currentHp); // 전체 갱신
-        isHealing = false;
-    }
-
-
+    
     public void OnInvincibility(float time) // 무적상태
     {
-        if (isInvincibility == true)
+        if (isInvincibility)
         {
             invincibilityTime += time;
         }
@@ -141,6 +118,36 @@ public class PlayerHp : MonoBehaviour
         spriteRenderer.color = originColor;
         isInvincibility = false;
     }
+    
+    public void IncreaseHp()  // 체력 회복
+    {
+        if (currentHp == maxHp || currentMedicKit <= 0 || isHealing)
+        {
+            Debug.Log($"체력 회복 불가, 현재 체력 : {currentHp} , 현재 구급약 {currentMedicKit} , 회복 중 {isHealing}");
+            return; // 체력이 이미 최대치이거나, 회복약이 없거나, 체력 회복 중이라면 return;
+        }
+        else
+        {
 
+            if (currentHp < maxHp) // 체력이 최대체력이 아닐 경우
+            {
+                StartCoroutine(nameof(PlayerHeal));
+            }
+        }
+    }
+    
+    private IEnumerator PlayerHeal()
+    {
+        isHealing = true;
 
+        yield return new WaitForSeconds(healTime);
+        currentHp += healAmount;
+        currentHp = Mathf.Min(currentHp, maxHp); // 최대 체력 넘지 않도록
+        currentMedicKit--;
+
+        Debug.Log($"체력 회복됨 현재 체력 :{currentHp}, 남은 회복약 : {currentMedicKit}");
+
+        uiPlayer.SetHpAll(currentHp); // 전체 갱신
+        isHealing = false;
+    }
 }
