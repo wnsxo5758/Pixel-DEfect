@@ -10,7 +10,7 @@ public class Press : MonoBehaviour
     private ImpactMemoryPool impactMemoryPool;
     private AudioSource audio;
 
-
+    private Animator animator;
     private bool isCoroutineRunning;
     private bool isHit;
     private void Awake()
@@ -18,15 +18,22 @@ public class Press : MonoBehaviour
         impactMemoryPool = GetComponent<ImpactMemoryPool>();
         hitTrigger= GetComponent<Collider2D>();
         audio = GetComponent<AudioSource>();
+        animator = GetComponentInParent<Animator>();
+    }
+
+    private void Start()
+    {
+        StartCoroutine(PressRoutine());
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (isHit|| isCoroutineRunning) return;
+        if (isHit) return;
         if(other.CompareTag("ImpactNormal") || other.CompareTag("ImpactObstacle"))
         {
             Debug.Log("바닥에 충돌됨");
             isHit = true; 
+
             Vector2 hitPoint = other.ClosestPoint(hitTrigger.transform.position);
             Quaternion rot = Quaternion.identity;
 
@@ -38,17 +45,45 @@ public class Press : MonoBehaviour
                 audio.Play();
             }
 
-            StartCoroutine(ParticleDelay());
+            StartCoroutine(ResetHit());
         }
-
     }
 
 
-    private IEnumerator ParticleDelay()
+    private IEnumerator ResetHit()
     {
-        isCoroutineRunning = true;
-        yield return new WaitForSeconds(delayTime);
+        yield return new WaitForSeconds(0.5f); // 너무 짧으면 연속 충돌 발생, 필요에 따라 조절
         isHit = false;
-        isCoroutineRunning = false;
+    }
+
+
+
+    private IEnumerator PressRoutine()
+    {
+        while (true)
+        {
+            if (animator != null)
+            {
+                // 1. bool을 true로 설정
+                animator.SetBool("isPressing", true);
+
+                // 2. 애니메이션 상태가 "Press"로 전환될 때까지 대기
+                yield return new WaitUntil(() =>
+                {
+                    AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+                    return stateInfo.IsName("Press");
+                });
+
+                // 3. 애니메이션 길이만큼 대기
+                AnimatorStateInfo pressState = animator.GetCurrentAnimatorStateInfo(0);
+                yield return new WaitForSeconds(pressState.length);
+
+                // 4. 애니메이션 끝나고 false로 끔
+                animator.SetBool("isPressing", false);
+            }
+
+            // 5. 딜레이 후 다시 루프
+            yield return new WaitForSeconds(delayTime);
+        }
     }
 }
