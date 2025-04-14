@@ -61478,6 +61478,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
+      propertyPath: throwForce
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
+      propertyPath: throwUpwardForce
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 658921088476211807, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
       propertyPath: pickupLayer.m_Bits
       value: 65536
       objectReference: {fileID: 0}
