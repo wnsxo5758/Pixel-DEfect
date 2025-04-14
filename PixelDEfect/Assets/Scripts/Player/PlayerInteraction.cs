@@ -43,7 +43,7 @@ public class PlayerInteraction : MonoBehaviour
         springJoint.distance = springDistance;
         
         IsConnected = false;
-        interactableLayer = LayerMask.GetMask("Objects");
+        interactableLayer = LayerMask.GetMask("Object");
 
         InputManager.Instance.OnInteractPressed += OnInteract;
         InputManager.Instance.OnValvePressed += OnValveButton;
