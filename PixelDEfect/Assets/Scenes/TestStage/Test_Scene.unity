@@ -54809,6 +54809,22 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -1941615681, guid: 08f2d98cf431a1a48afcfbcd8bb23587, type: 3}
+    - target: {fileID: 1218423083802113059, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1218423083802113059, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1218423083802113059, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1218423083802113059, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.08
@@ -54860,6 +54876,18 @@ PrefabInstance:
     - target: {fileID: 4581915079527951143, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
       propertyPath: m_TagString
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 9126916183087485128, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: hitTime
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9126916183087485128, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: durationHit
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9126916183087485128, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: distanceToAttack
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

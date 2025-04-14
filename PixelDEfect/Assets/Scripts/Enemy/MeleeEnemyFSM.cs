@@ -29,8 +29,6 @@ public class MeleeEnemyFSM : EnemyFSM
             yield return null;
         }
     }
-
-
     private IEnumerator MeleeAttack()
     {
         if (isAttacking  ||currentCoolTime > 0) yield break;
@@ -48,13 +46,8 @@ public class MeleeEnemyFSM : EnemyFSM
             currentCoolTime -= Time.deltaTime;
             yield return null;
         }
-
         isAttacking = false;
-
-        
     }
-      
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.CompareTag("Player"))

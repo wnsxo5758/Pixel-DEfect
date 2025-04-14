@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EnemyState { None = -1, Idle = 0, Wander, Pursuit, Attack, Dead }
+public enum EnemyState { None = -1, Idle = 0, Wander, Pursuit, Attack, Dead , Hit}
 public abstract class EnemyFSM : MonoBehaviour
 {
     [Header("기본 설정")]
@@ -30,6 +30,14 @@ public abstract class EnemyFSM : MonoBehaviour
     protected AudioClip deadClip; // 사망시 효과음 
     [SerializeField]
     protected AudioClip attackClip; // 공격 효과음
+
+    [Header("피격관련")]
+    [SerializeField]
+    private float hitTime; // 피격후 대기 시간
+    [SerializeField]
+    private float durationHit; // 피격후 색전환시간
+
+    private bool isHit;
 
     [Header("사망시 보상")]
     [SerializeField]
@@ -62,10 +70,7 @@ public abstract class EnemyFSM : MonoBehaviour
         audio = GetComponent<AudioSource>();
 
         renderer = GetComponentInChildren<SpriteRenderer>(); // EnemyAnimator와 같은 자식 오브젝트라면
-        if (renderer != null)
-        {
-            originalColor = renderer.color;
-        }
+
     }
 
     private void Start()
@@ -111,6 +116,10 @@ public abstract class EnemyFSM : MonoBehaviour
 
     private void SetUp()
     {
+        if (renderer != null)
+        {
+            originalColor = renderer.color;
+        }
         currentHp = maxHp;
         if (target == null)
         {
@@ -176,6 +185,40 @@ public abstract class EnemyFSM : MonoBehaviour
         }
     }
 
+    protected virtual IEnumerator Hit()
+    {
+        if (isHit) yield break;
+        isHit = true;
+
+        float halfDuration = durationHit / 2f;
+
+        // 점점 붉은색으로 변경
+        float t = 0f;
+        while (t < halfDuration)
+        {
+            t += Time.deltaTime;
+            float lerpValue = t / halfDuration;
+            renderer.color = Color.Lerp(originalColor, Color.red, lerpValue);
+            yield return null;
+        }
+
+        // 점점 원래 색으로 복원
+        t = 0f;
+        while (t < halfDuration)
+        {
+            t += Time.deltaTime;
+            float lerpValue = t / halfDuration;
+            renderer.color = Color.Lerp(Color.red, originalColor, lerpValue);
+            yield return null;
+        }
+
+        renderer.color = originalColor; // 혹시 보간 오류 방지
+
+        yield return new WaitForSeconds(hitTime);
+        isHit = false;
+
+        CalculateDistanceToTargetAndSelectState();
+    }
 
     protected void LookRotationToTarget() //플레이어 감지시 플레이어 방향으로 전환
     {
@@ -282,21 +325,12 @@ public abstract class EnemyFSM : MonoBehaviour
         {
             currentHp -= _damage;
             PlaySound(hitClip);
-            StartCoroutine(FlashEffact(0.2f));
+            ChangeState(EnemyState.Hit);
             if (currentHp <= 0)
             {
+
                 ChangeState(EnemyState.Dead);
             }
-        }
-    }
-
-    private IEnumerator FlashEffact(float duration)
-    {
-        if(renderer != null)
-        {
-            renderer.color = Color.white;
-            yield return new WaitForSeconds(duration);
-            renderer.color = originalColor;
         }
     }
     public void IncreaseHp(int _amount)
