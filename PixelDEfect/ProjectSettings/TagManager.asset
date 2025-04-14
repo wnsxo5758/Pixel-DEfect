@@ -31,7 +31,11 @@ TagManager:
   - Platform
   - Weapon
   - Ladder
+<<<<<<< Updated upstream
   - DieInstantly
+=======
+  - Pickup
+>>>>>>> Stashed changes
   - 
   - 
   - 

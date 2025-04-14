@@ -6,6 +6,7 @@ public class PlayerAttack : MonoBehaviour
 {
     [Header("무기 감지")]
     [SerializeField] private float weaponDetectionRadius = 1f;
+    [SerializeField] private LayerMask pickupLayer;
     [SerializeField] private LayerMask weaponLayer;
 
     [Header("근접 공격 설정")] 
@@ -22,16 +23,20 @@ public class PlayerAttack : MonoBehaviour
 
     [Header("원거리 공격 설정")] 
     [SerializeField] private float throwForce = 15f;
+    [SerializeField] private float throwUpwardForce = 5f;
     [SerializeField] private GameObject thrownWeaponPrefab;
+    [SerializeField] private float throwCooldown = 1f;
     
     private WeaponBase currentWeapon;
     private PlayerController playerController;
     private PlayerAnimator playerAnimator;
     private WeaponPickup nearbyWeapon;
+    private ThrownWeapon nearbyThrownWeapon;
     private GameObject attackColliderObject;
     
     private bool isAttacking = false;
     private bool hasWeapon = false;
+    private bool canThrow = true;
 
     private void Awake()
     {
@@ -77,39 +82,88 @@ public class PlayerAttack : MonoBehaviour
     private void Update()
     {
         DetectNearbyWeapon();
-
-        if (attackColliderObject != null && attackColliderObject.activeSelf)
-        {
-            UpdateAttackColliderDirection(transform.localScale.x);
-        }
+        DetectNearbyThrownWeapon();
     }
     
     // 무기 감지 메소드
     private void DetectNearbyWeapon()
     {
-        Collider2D weaponCollider = Physics2D.OverlapCircle(transform.position + (Vector3)attackOffset, 
-            weaponDetectionRadius, weaponLayer);
+        Collider2D pickupCollider = Physics2D.OverlapCircle(transform.position + (Vector3)attackOffset, 
+            weaponDetectionRadius, pickupLayer);
 
-        if (weaponCollider != null)
+        if (pickupCollider != null)
         {
-            WeaponPickup pickup = weaponCollider.GetComponent<WeaponPickup>();
+            WeaponPickup pickup = pickupCollider.GetComponent<WeaponPickup>();
 
             if (pickup != null)
             {
                 nearbyWeapon = pickup;
                 InputManager.Instance.SetCanPickup(true);
+                InputManager.Instance.SetCanHold(false);
             }
         }
         else
         {
             nearbyWeapon = null;
-            InputManager.Instance.SetCanPickup(false);
+
+            if (nearbyThrownWeapon == null)
+            {
+                InputManager.Instance.SetCanPickup(false);
+                InputManager.Instance.SetCanHold(true);
+            }
         }
     }
 
+    // 던져진 무기 감지 메소드
+    private void DetectNearbyThrownWeapon()
+    {
+        Collider2D weaponCollider = Physics2D.OverlapCircle(transform.position + (Vector3)attackOffset,
+            weaponDetectionRadius, weaponLayer);
+
+        if (weaponCollider != null)
+        {
+            ThrownWeapon thrownWeapon = weaponCollider.GetComponent<ThrownWeapon>();
+
+            Debug.Log(thrownWeapon.IsStuck());
+            if (thrownWeapon != null && thrownWeapon.IsStuck())
+            {
+                nearbyThrownWeapon = thrownWeapon;
+                InputManager.Instance.SetCanPickup(true);
+                InputManager.Instance.SetCanHold(false);
+            }
+        }
+        else
+        {
+            nearbyThrownWeapon = null;
+
+            if (nearbyWeapon == null)
+            {
+                InputManager.Instance.SetCanPickup(false);
+                InputManager.Instance.SetCanHold(true);
+            }
+        }
+    }
+    
     // 무기 픽업 메소드
     private void OnPickupWeapon()
     {
+        // 던져진 무기 픽업
+        if (nearbyThrownWeapon != null)
+        {
+            WeaponBase weaponData = nearbyThrownWeapon.GetWeaponData();
+            
+            // 적에게 박힌 무기라면 추가 데미지 적용
+            float extraDamage = nearbyThrownWeapon.PullOutFromEnemy();
+
+            if (weaponData != null)
+            {
+                EquipWeapon(weaponData);
+                Destroy(nearbyThrownWeapon.gameObject);
+                return;
+            }
+        }
+        
+        // 일반 무기 픽업
         if (nearbyWeapon != null)
         {
             WeaponBase weaponData = nearbyWeapon.GetWeaponData();
@@ -117,13 +171,15 @@ public class PlayerAttack : MonoBehaviour
             if (weaponData != null)
             {
                 Debug.Log("Pickup");
+
+                thrownWeaponPrefab = nearbyWeapon.GetWeaponPrefab();
                 EquipWeapon(weaponData);
                 Destroy(nearbyWeapon.gameObject);
             }
         }
     }
     
-    public void EquipWeapon(WeaponBase weaponData)
+    private void EquipWeapon(WeaponBase weaponData)
     {
         if (currentWeapon != null)
         {
@@ -136,10 +192,10 @@ public class PlayerAttack : MonoBehaviour
         if (attackColliderObject != null)
         {
             attackColliderObject.SetActive(true);
-            UpdateAttackColliderDirection(transform.localScale.x);
         }
         
         InputManager.Instance.OnMeleeAttackPressed += OnMeleeAttack;
+        InputManager.Instance.OnThrowWeaponPressed += OnThrowWeapon;
 
         // 무기 장착 상태 애니메이션 변경
         if (playerAnimator != null)
@@ -149,7 +205,7 @@ public class PlayerAttack : MonoBehaviour
         // GUI에 무기 정보 표시
     }
 
-    public void UnEquipWeapon()
+    private void UnEquipWeapon()
     {
         if (currentWeapon != null)
         {
@@ -157,6 +213,7 @@ public class PlayerAttack : MonoBehaviour
             hasWeapon = false;
 
             InputManager.Instance.OnMeleeAttackPressed -= OnMeleeAttack;
+            InputManager.Instance.OnThrowWeaponPressed -= OnThrowWeapon;
 
             // 무기 해제 상태 애니메이션 변경
             if (playerAnimator != null)
@@ -171,6 +228,14 @@ public class PlayerAttack : MonoBehaviour
     {
         yield return new WaitForSeconds(currentWeapon.AttackCooldown);
         isAttacking = false;
+    }
+    
+    // 던지기 쿨타임 코루틴
+    private IEnumerator ThrowCooldownTimer()
+    {
+        canThrow = false;
+        yield return new WaitForSeconds(throwCooldown);
+        canThrow = true;
     }
     
     // 공격 입력 처리
@@ -190,7 +255,34 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
-    // 공격 애니메이션 재생
+    // 무기 던지기 입력 처리
+    private void OnThrowWeapon()
+    {
+        if (hasWeapon && !isAttacking && canThrow && CanPlayerAttack())
+        {
+            ThrowWeapon();
+        }
+    }
+
+    // 무기 던지기 메소드
+    private void ThrowWeapon()
+    {
+        if (currentWeapon == null || !hasWeapon) return;
+        
+        playerController.ChangeState(new PlayerStates.Attack());
+        
+        // 던지기 애니메이션 재생
+        if (playerAnimator != null)
+        {
+            playerAnimator.TriggerThrowAnim();
+        }
+        
+        ExecuteThrow();
+        
+        StartCoroutine(ThrowCooldownTimer());
+    }
+    
+    // 근접 공격 애니메이션 재생
     private void MeleeAttackAnimation()
     {
         if (playerAnimator != null)
@@ -199,8 +291,8 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
-    // 공격 애니메이션 종료 시 Idle 상태로 변경
-    public void FinishedAttackAnim()
+    // 근접 공격 애니메이션 종료 시 Idle 상태로 변경
+    public void FinishedMeleeAttackAnim()
     {
         if (currentWeapon != null && isAttacking)
         {
@@ -208,32 +300,46 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
+    // 던지기 공격 애니메이션 종료 시 Idle 상태로 변경
+    public void FinishedThrowAnim()
+    {
+        playerController.ChangeState(new PlayerStates.Idle());
+    }
+
     // 근접 공격 수행
     public void PerformMeleeAttack()
     {
-        UpdateAttackColliderDirection(transform.localScale.x);
-        
         HandleAttackCollision();
         
         Debug.Log("Melee Attack");
     }
 
-    // 공격 콜라이더 방향 조정
-    private void UpdateAttackColliderDirection(float direction)
+    // 무기 던지기 수행
+    private void ExecuteThrow()
     {
-        Vector2[] flippedPoints = new Vector2[attackPolygonPoints.Length];
-
-        for (int i = 0; i < attackPolygonPoints.Length; i++)
+        // 던져진 무기 생성
+        if (thrownWeaponPrefab != null && currentWeapon != null)
         {
-            flippedPoints[i] = new Vector2(
-                attackPolygonPoints[i].x * direction,
-                attackPolygonPoints[i].y);
+            Vector2 direction = new Vector2(transform.localScale.x, 0).normalized;
+            Vector2 spawnPosition = (Vector2)transform.position + attackOffset + direction * 1f;
+            
+            GameObject thrownWeaponObj = Instantiate(thrownWeaponPrefab, spawnPosition, Quaternion.identity);
+            ThrownWeapon thrownWeapon = thrownWeaponObj.GetComponent<ThrownWeapon>();
+
+            if (thrownWeapon != null)
+            {
+                // 던지는 힘 계산 (포물선)
+                Vector2 throwForceVector = direction * throwForce + Vector2.up * throwUpwardForce;
+                
+                thrownWeapon.Initialize(currentWeapon, throwForceVector, direction);
+                
+                UnEquipWeapon();
+                
+                Debug.Log("Weapon thrown");
+            }
         }
-        
-        attackCollider.SetPath(0, flippedPoints);
     }
 
-    // 적 감지 및 공격 처리
     private void HandleAttackCollision()
     {
         ContactFilter2D filter = new ContactFilter2D();
@@ -288,6 +394,7 @@ public class PlayerAttack : MonoBehaviour
         {
             InputManager.Instance.OnPickupPressed -= OnPickupWeapon;
             InputManager.Instance.OnMeleeAttackPressed -= OnMeleeAttack;
+            InputManager.Instance.OnThrowWeaponPressed -= OnThrowWeapon;
         }
     }
 
@@ -300,17 +407,8 @@ public class PlayerAttack : MonoBehaviour
         if (attackCollider != null)
         {
             Gizmos.color = Color.magenta;
-
-            if (Application.isPlaying && attackColliderObject.activeSelf)
-            {
-                Vector2[] points = attackCollider.GetPath(0);
-                for (int i = 0; i < points.Length; i++)
-                {
-                    Vector2 start = attackCollider.transform.position + (Vector3)points[i];
-                    Vector2 end = attackCollider.transform.position + (Vector3)points[(i + 1) % points.Length];
-                    Gizmos.DrawLine(start, end);
-                }
-            }
+            Bounds bounds = attackCollider.bounds;
+            Gizmos.DrawWireCube(bounds.center, bounds.size);
         }
     }
 

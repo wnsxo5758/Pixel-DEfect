@@ -70,4 +70,16 @@ public class WeaponPickup : MonoBehaviour
 
         return weaponData;
     }
+    
+    // 무기 프리팹 전달
+    public GameObject GetWeaponPrefab()
+    {
+        if (weaponPrefab == null)
+        {
+            Debug.Log("Weapon prefab is null");
+            return null;
+        }
+
+        return weaponPrefab;
+    }
 }

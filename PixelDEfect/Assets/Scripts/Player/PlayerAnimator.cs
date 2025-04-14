@@ -17,6 +17,7 @@ public class PlayerAnimator : MonoBehaviour
     // 공격 애니메이션
     private readonly int hasWeapon = Animator.StringToHash("HasWeapon");
     private readonly int attack = Animator.StringToHash("Attack");
+    private readonly int throwWeapon = Animator.StringToHash("Throw");
 
     private Animator animator; // 애니메이션 
     private MovementRigidbody2D movement; // 움직임
@@ -46,9 +47,9 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool(isJump, !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
     }
 
-    public void SetCrouchAnim(bool isCrouching)
+    public void SetCrouchAnim(bool crouching)
     {
-        animator.SetBool(this.isCrouching, isCrouching);
+        animator.SetBool(isCrouching, crouching);
     }
     
     public void CrawlAnim(float x)
@@ -79,9 +80,9 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetFloat(velocityY, Mathf.Abs(y));
     }
 
-    public void SetHasWeapon(bool hasWeapon)
+    public void SetHasWeapon(bool weapon)
     {
-        animator.SetBool(this.hasWeapon, hasWeapon);
+        animator.SetBool(hasWeapon, weapon);
     }
 
     public void TriggerAttackAnim()
@@ -94,18 +95,27 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetTrigger(death);
     }
 
-    
+    public void TriggerThrowAnim()
+    {
+        animator.SetTrigger(throwWeapon);
+    }
+
     // 공격 타이밍 이벤트
     private void HandleAttackEvent()
     {
         playerAttack.PerformMeleeAttack();
     }
 
-    private void FinishedAttackEvent()
+    private void FinishedMeleeAttackEvent()
     {
-        playerAttack.FinishedAttackAnim();
+        playerAttack.FinishedMeleeAttackAnim();
     }
 
+    private void FinishedThrowWeaponEvent()
+    {
+        playerAttack.FinishedThrowAnim();
+    }
+    
     private void RestartGameEvent()
     {
         GameManager gameManager = FindObjectOfType<GameManager>();

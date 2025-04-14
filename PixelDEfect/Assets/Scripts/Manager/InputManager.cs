@@ -12,6 +12,7 @@ public class InputManager : MonoBehaviour
     [SerializeField] private KeyCode crouchKey = KeyCode.DownArrow;
     [SerializeField] private KeyCode pickupKey = KeyCode.F;
     [SerializeField] private KeyCode meleeAttackKey = KeyCode.Z;
+    [SerializeField] private KeyCode throwWeaponKey = KeyCode.X;
 
     private bool canPickup = false;
     private bool canHold = false;
@@ -30,6 +31,7 @@ public class InputManager : MonoBehaviour
     public event Action OnLadderJumpPressed;
     public event Action OnPickupPressed;
     public event Action OnMeleeAttackPressed;
+    public event Action OnThrowWeaponPressed;
 
     private void Awake()
     {
@@ -83,6 +85,9 @@ public class InputManager : MonoBehaviour
         if (Input.GetKeyDown(meleeAttackKey))
             OnMeleeAttackPressed?.Invoke();
 
+        // 무기 던지기 입력
+        if (Input.GetKeyDown(throwWeaponKey))
+            OnThrowWeaponPressed?.Invoke();
     }
     
     private void CheckKeyCombinations()
