@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 1524162497080907105}
   - component: {fileID: 2876361848923216229}
   - component: {fileID: 595872436356512614}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Snake
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -207,6 +207,8 @@ MonoBehaviour:
   hitClip: {fileID: 0}
   deadClip: {fileID: 0}
   attackClip: {fileID: 0}
+  hitTime: 0
+  durationHit: 0
   coins: {fileID: 0}
   amount: 0
   waitTime: 0

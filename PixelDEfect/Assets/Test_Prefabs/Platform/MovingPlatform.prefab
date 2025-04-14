@@ -118,7 +118,7 @@ GameObject:
   - component: {fileID: 316210198450912679}
   - component: {fileID: 2107783662130216938}
   - component: {fileID: 1323199757922363539}
-  m_Layer: 13
+  m_Layer: 6
   m_Name: MovingPlatform
   m_TagString: Untagged
   m_Icon: {fileID: 0}

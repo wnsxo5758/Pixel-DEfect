@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 1766897273259281953}
   - component: {fileID: 4166891151023149339}
   - component: {fileID: 612015726946934503}
-  m_Layer: 11
+  m_Layer: 10
   m_Name: Button
   m_TagString: Button
   m_Icon: {fileID: 0}
@@ -134,6 +134,8 @@ MonoBehaviour:
   canRange: 0
   isActive: 0
   isActiving: 0
+  isCount: 0
+  timeToLimit: 0
   connectedObjects: []
   activeSprite: {fileID: -1086677487, guid: 835902135269a34438b054acf1924349, type: 3}
   inActiveSprite: {fileID: -155366678, guid: 835902135269a34438b054acf1924349, type: 3}

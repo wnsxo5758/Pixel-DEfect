@@ -118,7 +118,7 @@ GameObject:
   - component: {fileID: 2775744983754716656}
   - component: {fileID: 786964374588467544}
   - component: {fileID: 6042115950641262031}
-  m_Layer: 13
+  m_Layer: 6
   m_Name: RailObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,6 +157,9 @@ MonoBehaviour:
   moveDir: {x: 1, y: 0}
   canChangeDir: 1
   speed: 0.5
+  railTargetLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!61 &786964374588467544
 BoxCollider2D:
   m_ObjectHideFlags: 0

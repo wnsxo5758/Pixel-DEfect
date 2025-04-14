@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 5489070145048377897}
   - component: {fileID: 7510999702026920713}
   - component: {fileID: 4587308727507504917}
-  m_Layer: 11
+  m_Layer: 10
   m_Name: TimeLimitButton
   m_TagString: Button
   m_Icon: {fileID: 0}

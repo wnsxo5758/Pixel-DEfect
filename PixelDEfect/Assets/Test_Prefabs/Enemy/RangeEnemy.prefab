@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7688235137960203238}
   - component: {fileID: 7104747299796861130}
   - component: {fileID: 3877109849732641761}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RangeEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,6 +87,8 @@ MonoBehaviour:
   hitClip: {fileID: 0}
   deadClip: {fileID: 0}
   attackClip: {fileID: 0}
+  hitTime: 0
+  durationHit: 0
   coins: {fileID: 0}
   amount: 0
   waitTime: 0

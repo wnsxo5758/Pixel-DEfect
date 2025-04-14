@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 5664297446217813043}
   - component: {fileID: 7183529848662430293}
   - component: {fileID: 5619514385047068055}
-  m_Layer: 11
+  m_Layer: 10
   m_Name: ValveTest
   m_TagString: Button
   m_Icon: {fileID: 0}
@@ -284,3 +284,5 @@ MonoBehaviour:
   pressTimeRequired: 5
   currentPressTime: 0
   isPressing: 0
+  rotateClip: {fileID: 0}
+  rewindClip: {fileID: 0}

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1184152259305884193}
   - component: {fileID: 242329074218310868}
-  m_Layer: 9
+  m_Layer: 14
   m_Name: ReturnPoint
   m_TagString: Untagged
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}

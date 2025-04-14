@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7053186833936468898}
   - component: {fileID: 4165892048848371028}
   - component: {fileID: 5662428642116525426}
-  m_Layer: 8
+  m_Layer: 12
   m_Name: Obstacle_Test
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
@@ -92,6 +92,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isInstantDeath: 0
+  continuousDamage: 0
   damage: 1
   canDestory: 1
 --- !u!1 &6590882156025725889

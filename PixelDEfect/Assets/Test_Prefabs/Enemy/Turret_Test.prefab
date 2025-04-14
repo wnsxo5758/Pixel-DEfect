@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 1343070760056808179}
   - component: {fileID: 4798280066781900172}
   - component: {fileID: 8011899860177676949}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Turret_Test
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,6 +90,8 @@ MonoBehaviour:
   hitClip: {fileID: 0}
   deadClip: {fileID: 0}
   attackClip: {fileID: 8300000, guid: 6f8ca4ef428bd124eb8631c375e33d99, type: 3}
+  hitTime: 0
+  durationHit: 0
   coins: {fileID: 0}
   amount: 0
   waitTime: 0
