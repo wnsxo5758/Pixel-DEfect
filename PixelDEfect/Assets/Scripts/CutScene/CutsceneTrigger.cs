@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using UnityEngine.Playables;
 using Cinemachine;
 
@@ -17,6 +18,9 @@ public class CutsceneTrigger : MonoBehaviour
     private Rigidbody2D playerRb;
     private Animator playerAnimator;
     RuntimeAnimatorController originalAnimator;
+
+    private bool isPaused = false;
+    private bool waitingForInput = false;
 
     public void DisablePlayerControl()
     {
@@ -107,5 +111,44 @@ public class CutsceneTrigger : MonoBehaviour
         playerVCam.Priority = 10;
 
         timelineDirector.Play();
+    }
+
+    // ======================ÄÆ¾À ¸ØÃß±â======================
+    private Coroutine _startFreezeCoroutine;
+
+    public void PauseTimelineExactly()
+    {
+        isPaused = true;
+        timelineDirector.Pause();
+        timelineDirector.time = timelineDirector.time;
+        timelineDirector.Evaluate();
+        _startFreezeCoroutine = StartCoroutine(FreezeTimeline());
+    }
+
+    public void ResumeTimeline()
+    {
+        isPaused = false;
+        if (_startFreezeCoroutine != null)
+            StopCoroutine(_startFreezeCoroutine);
+
+        timelineDirector.Play();
+    }
+
+    private IEnumerator FreezeTimeline()
+    {
+        while (isPaused)
+        {
+            timelineDirector.time = timelineDirector.time;
+            timelineDirector.Evaluate();
+            yield return null;
+        }
+    }
+
+    void Update()
+    {
+        if (isPaused && Input.GetKeyDown(KeyCode.F))
+        {
+            ResumeTimeline();
+        }
     }
 }
