@@ -33,7 +33,6 @@ public class Press : MonoBehaviour
         {
             if(isPressingActive)
             {
-                Debug.Log("프레스가 플레이어와 충돌");
                 PlayerHp playerHp = other.GetComponent<PlayerHp>();
                 if (playerHp != null)
                 {
@@ -42,7 +41,7 @@ public class Press : MonoBehaviour
             }
 
         }
-        if(other.CompareTag("ImpactNormal") || other.CompareTag("ImpactObstacle"))
+        else if(other.CompareTag("ImpactNormal") || other.CompareTag("ImpactObstacle"))
         {
             Debug.Log("바닥에 충돌됨");
             isHit = true; 
@@ -57,8 +56,6 @@ public class Press : MonoBehaviour
             {
                 audioSource.Play();
             }
-
-
 
             StartCoroutine(ResetHit());
         }
