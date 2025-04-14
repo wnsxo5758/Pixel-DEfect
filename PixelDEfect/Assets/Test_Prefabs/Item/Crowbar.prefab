@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5938293825472741200}
   - component: {fileID: -803724360229322164}
   - component: {fileID: 1604338784081723911}
-  m_Layer: 14
+  m_Layer: 16
   m_Name: Crowbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -99,7 +99,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.3
+  m_Mass: 0.4
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -146,4 +146,4 @@ MonoBehaviour:
   extraDamageMultiplier: 1.5
   stickLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 840
