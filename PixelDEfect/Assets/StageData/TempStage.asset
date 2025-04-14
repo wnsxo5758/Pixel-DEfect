@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TempStage
   m_EditorClassIdentifier: 
   cameraLimitMinX: -500
-  cameraLimitMaxX: 500
+  cameraLimitMaxX: 1000
   playerLmitMinX: -500
-  playerLmitMaxX: 500
+  playerLmitMaxX: 1000
   mapLimitMinY: -30

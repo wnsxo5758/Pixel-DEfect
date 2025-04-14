@@ -11,6 +11,8 @@ TagManager:
   - Obstacle
   - Objects
   - SpawnPoint
+  - Valve
+  - ImpactNormal
   layers:
   - Default
   - TransparentFX
@@ -47,4 +49,28 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 1056460031
+    locked: 0
+  - name: Enemy
+    uniqueID: 845593577
+    locked: 0
+  - name: Door
+    uniqueID: 31855629
+    locked: 0
+  - name: Water
+    uniqueID: 3228409109
+    locked: 0
+  - name: Tilemap
+    uniqueID: 1506751187
+    locked: 0
+  - name: ladder
+    uniqueID: 4064401619
+    locked: 0
+  - name: Container
+    uniqueID: 1985080151
+    locked: 0
+  - name: Pipe
+    uniqueID: 243385507
     locked: 0
