@@ -51568,10 +51568,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2883664473655631774, guid: 6b1c83f9b2ff38f4caedf5e05bffdb76, type: 3}
-      propertyPath: delayTime
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 4688006853401873320, guid: 6b1c83f9b2ff38f4caedf5e05bffdb76, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.1
@@ -51612,17 +51608,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4857954687406794368, guid: 6b1c83f9b2ff38f4caedf5e05bffdb76, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6068479952716691775, guid: 6b1c83f9b2ff38f4caedf5e05bffdb76, type: 3}
       propertyPath: m_Name
       value: PressMachine
-      objectReference: {fileID: 0}
-    - target: {fileID: 8019575639757269688, guid: 6b1c83f9b2ff38f4caedf5e05bffdb76, type: 3}
-      propertyPath: m_Layer
-      value: 13
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

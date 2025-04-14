@@ -65,6 +65,9 @@ TagManager:
   - name: Tilemap
     uniqueID: 1506751187
     locked: 0
+  - name: ladder
+    uniqueID: 4064401619
+    locked: 0
   - name: Container
     uniqueID: 1985080151
     locked: 0
