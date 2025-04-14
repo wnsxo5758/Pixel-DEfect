@@ -41,7 +41,7 @@ public class Press : MonoBehaviour
             }
 
         }
-        else if((other.CompareTag("ImpactNormal") || other.CompareTag("ImpactObstacle")) && !isHit)
+        else if(other.CompareTag("ImpactNormal") && !isHit)
         {
             Debug.Log("¹Ù´Ú¿¡ Ãæµ¹µÊ");
             isHit = true; 
@@ -49,8 +49,7 @@ public class Press : MonoBehaviour
             Vector2 hitPoint = other.ClosestPoint(hitTrigger.transform.position);
             Quaternion rot = Quaternion.identity;
 
-            ImpactType type = other.CompareTag("ImpactNormal") ? ImpactType.Normal : ImpactType.Obstacle;
-            impactMemoryPool.OnSpawnImpact(type, hitPoint, rot);
+            impactMemoryPool.OnSpawnImpact(ImpactType.Normal, hitPoint, rot);
 
             if(audioSource != null)
             {
