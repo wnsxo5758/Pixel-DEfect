@@ -10,13 +10,13 @@ public class HoldObject : MonoBehaviour
     private Vector2 collisionSize;
     private Vector2 collisionPoint;
     
-    private Collider2D collider;
+    private Collider2D collider2D;
 
     public bool IsGrounded { get; private set; } = false;
     
     void Start()
     {
-        collider = GetComponent<Collider2D>();
+        collider2D = GetComponent<Collider2D>();
     }
 
     void Update()
@@ -26,7 +26,7 @@ public class HoldObject : MonoBehaviour
 
     public void UpdateCollision()
     {
-        Bounds bounds = collider.bounds;
+        Bounds bounds = collider2D.bounds;
         
         collisionSize = new Vector2((bounds.max.x - bounds.min.x), 0.1f);
         collisionPoint = new Vector2(bounds.center.x, bounds.min.y);

@@ -18,18 +18,18 @@ public class PlayerSound : MonoBehaviour
     [SerializeField]
     private AudioClip landClip;
 
-    private AudioSource audio;
+    private AudioSource audioSoruce;
 
     private void Awake()
     {
-        audio = GetComponent<AudioSource>();
+        audioSoruce = GetComponent<AudioSource>();
     }
 
     private void PlaySound(AudioClip _clip)
     {
-        audio.Stop();
-        audio.clip = _clip;
-        audio.Play();
+        audioSoruce.Stop();
+        audioSoruce.clip = _clip;
+        audioSoruce.Play();
     }
 
     public void JumpSound()
@@ -51,19 +51,19 @@ public class PlayerSound : MonoBehaviour
 
     private void LoopPlaySound(AudioClip _clip)
     {
-        if (audio.clip == _clip && audio.isPlaying) return;
+        if (audioSoruce.clip == _clip && audioSoruce.isPlaying) return;
 
-        audio.loop = true;
-        audio.clip = _clip;
-        audio.Play();
+        audioSoruce.loop = true;
+        audioSoruce.clip = _clip;
+        audioSoruce.Play();
     }
 
     public void StopLoopSound()
     {
-        if(audio.loop)
+        if(audioSoruce.loop)
         {
-            audio.loop = false;
-            audio.Stop();
+            audioSoruce.loop = false;
+            audioSoruce.Stop();
         }
     }
 }

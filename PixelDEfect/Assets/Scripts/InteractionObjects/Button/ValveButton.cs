@@ -69,7 +69,7 @@ public class ValveButton : ButtonBase
     protected override IEnumerator ButtonActive() // 버튼을  누른경우
     {
         isActiving = true; // 작동시작
-        audio.Play();  // 효과음 
+        audioSoruce.Play();  // 효과음 
         colllider.enabled = false;
         if (connectedObjects != null) // 작동되는 오브젝트가 있다면
         {
@@ -92,23 +92,23 @@ public class ValveButton : ButtonBase
 
     private void LoopAudioPlay(AudioClip _clip)
     {
-        if (audio == null) return;
-        if (audio.clip != _clip)
+        if (audioSoruce == null) return;
+        if (audioSoruce.clip != _clip)
         {
-            audio.clip = _clip;
-            audio.Play();
+            audioSoruce.clip = _clip;
+            audioSoruce.Play();
         }
-        else if(! audio.isPlaying)
+        else if(!audioSoruce.isPlaying)
         {
-            audio.Play();
+            audioSoruce.Play();
         }
     }
 
     private void LoopAudioStop()
     {
-        if(audio != null && audio.isPlaying)
+        if(audioSoruce != null && audioSoruce.isPlaying)
         {
-            audio.Stop();   
+            audioSoruce.Stop();   
         }
     }
 }

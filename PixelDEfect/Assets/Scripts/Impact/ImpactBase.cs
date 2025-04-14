@@ -19,13 +19,13 @@ public class ImpactBase : MonoBehaviour
     private ImpactType impactType = ImpactType.Normal;
 
 
-    private AudioSource audio;
+    private AudioSource audioSoruce;
 
     private bool isHit;
 
     private void Awake()
     {
-        audio = GetComponent<AudioSource>();
+        audioSoruce = GetComponent<AudioSource>();
         impactMemoryPool = GetComponent<ImpactMemoryPool>();
     }
 
@@ -41,15 +41,13 @@ public class ImpactBase : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayer);
             if (hit.collider != null && !isHit)
             {
-                Debug.Log("레이캐스트 충돌 감지됨");
-
                 isHit = true;
                 Vector2 hitPoint = hit.point;
 
                 impactMemoryPool.OnSpawnImpact(impactType, hitPoint, Quaternion.identity);
 
-                if (audio != null)
-                    audio.Play();
+                if (audioSoruce != null)
+                    audioSoruce.Play();
             }
             else if (hit.collider == null)
             {

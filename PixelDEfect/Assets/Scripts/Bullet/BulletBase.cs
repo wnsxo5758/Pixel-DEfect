@@ -14,13 +14,13 @@ public class BulletBase : MonoBehaviour
     private bool players; // 플레이어 것인가?
 
     MovementRigidbody2D movement;
-    protected AudioSource audio;
+    protected AudioSource audioSoruce;
     protected Animator animator;
     private MemoryPool memoryPool;
     private void Awake()
     {
         movement = GetComponent<MovementRigidbody2D>();
-        audio = GetComponent<AudioSource>();
+        audioSoruce = GetComponent<AudioSource>();
         animator = GetComponentInChildren<Animator>();
     }
 
@@ -64,9 +64,9 @@ public class BulletBase : MonoBehaviour
 
     private void PlaySound(AudioClip _clip)
     {
-        audio.Stop();
-        audio.clip = _clip;
-        audio.Play();
+        audioSoruce.Stop();
+        audioSoruce.clip = _clip;
+        audioSoruce.Play();
     }
 
 }

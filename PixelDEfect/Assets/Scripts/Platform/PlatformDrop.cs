@@ -14,13 +14,13 @@ public class PlatformDrop : PlatformBase
     private Rigidbody2D rigid;
     private Vector3 originPos;
     private Animator animator;
-    private AudioSource audio;
+    private AudioSource audioSource;
     private SpriteRenderer sprite;
     private void Awake()
     {
         boxCollider2D = GetComponent<BoxCollider2D>();
         rigid = GetComponent<Rigidbody2D>();
-        audio = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
         animator = GetComponentInChildren<Animator>();
         sprite = GetComponentInChildren<SpriteRenderer>();
         originPos = transform.position;
@@ -50,7 +50,7 @@ public class PlatformDrop : PlatformBase
 
     private IEnumerator OnShake()
     {
-        audio.Play();
+        audioSource.Play();
         animator.SetBool("Warning",true);
         float percent = 0;
         float shakeAngle = 5;

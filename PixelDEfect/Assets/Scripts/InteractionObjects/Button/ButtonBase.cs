@@ -25,11 +25,11 @@ public class ButtonBase : MonoBehaviour
     private Sprite inActiveSprite; // 비활성화시
 
     protected SpriteRenderer sprite;
-    protected AudioSource audio;
+    protected AudioSource audioSoruce;
     private void Awake()
     {
         sprite  = GetComponentInChildren<SpriteRenderer>();
-        audio = GetComponent<AudioSource>();
+        audioSoruce = GetComponent<AudioSource>();
         UpdateSprite();
     }
 
@@ -65,7 +65,7 @@ public class ButtonBase : MonoBehaviour
         isActiving = true;
         isActive = true;
         UpdateSprite(); // 버튼 스프라이트 변경
-        audio.Play();  // 효과음 
+        audioSoruce.Play();  // 효과음 
         if (connectedObjects != null) // 작동되는 오브젝트가 있다면
         {
             foreach (var obj in connectedObjects)
@@ -92,7 +92,7 @@ public class ButtonBase : MonoBehaviour
         isActiving = true; // 작동시작
         isActive = !isActive; // 누르면 활성화
         UpdateSprite(); // 버튼 스프라이트 변경
-        audio.Play();  // 효과음 
+        audioSoruce.Play();  // 효과음 
         if (connectedObjects != null) // 작동되는 오브젝트가 있다면
         {
             foreach (var obj in connectedObjects)

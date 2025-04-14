@@ -76,12 +76,25 @@ public class PlayerHp : MonoBehaviour
         Debug.Log($"구급약 획득, 현재 구급약 {currentMedicKit}");
 
     }
-    
-    private void Die()
+
+    public void Die()
     {
         isDead = true;
         currentHp = 0;
 
+        Collider2D collier = GetComponent<Collider2D>();
+        if (collier != null)
+        {
+            collier.enabled = false;
+        }
+        Rigidbody2D rigid = GetComponent<Rigidbody2D>();
+        if(rigid != null)
+        {
+            rigid.velocity = Vector2.zero; // 속도 0으로
+            rigid.angularVelocity = 0f;    // 회전속도도 정지
+            rigid.isKinematic = true;      // 물리 영향 제거
+            rigid.simulated = false;       // 완전 비활성화 (옵션)
+        }
         playerAnimator.TriggerDeathAnim();
         OnPlayerDeath?.Invoke();
     }

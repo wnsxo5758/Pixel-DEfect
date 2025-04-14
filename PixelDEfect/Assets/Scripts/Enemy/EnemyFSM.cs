@@ -60,16 +60,16 @@ public abstract class EnemyFSM : MonoBehaviour
 
     protected MovementRigidbody2D movement;
     protected EnemyAnimator animator;
-    protected AudioSource audio;
-    protected SpriteRenderer renderer;
+    protected AudioSource audioSoruce;
+    protected SpriteRenderer spriteRenderer;
     private Color originalColor;
     private void Awake()
     {
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
-        audio = GetComponent<AudioSource>();
+        audioSoruce = GetComponent<AudioSource>();
 
-        renderer = GetComponentInChildren<SpriteRenderer>(); // EnemyAnimator와 같은 자식 오브젝트라면
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>(); // EnemyAnimator와 같은 자식 오브젝트라면
 
     }
 
@@ -116,9 +116,9 @@ public abstract class EnemyFSM : MonoBehaviour
 
     private void SetUp()
     {
-        if (renderer != null)
+        if (spriteRenderer != null)
         {
-            originalColor = renderer.color;
+            originalColor = spriteRenderer.color;
         }
         currentHp = maxHp;
         if (target == null)
@@ -198,7 +198,7 @@ public abstract class EnemyFSM : MonoBehaviour
         {
             t += Time.deltaTime;
             float lerpValue = t / halfDuration;
-            renderer.color = Color.Lerp(originalColor, Color.red, lerpValue);
+            spriteRenderer.color = Color.Lerp(originalColor, Color.red, lerpValue);
             yield return null;
         }
 
@@ -208,11 +208,11 @@ public abstract class EnemyFSM : MonoBehaviour
         {
             t += Time.deltaTime;
             float lerpValue = t / halfDuration;
-            renderer.color = Color.Lerp(Color.red, originalColor, lerpValue);
+            spriteRenderer.color = Color.Lerp(Color.red, originalColor, lerpValue);
             yield return null;
         }
 
-        renderer.color = originalColor; // 혹시 보간 오류 방지
+        spriteRenderer.color = originalColor; // 혹시 보간 오류 방지
 
         yield return new WaitForSeconds(hitTime);
         isHit = false;
@@ -346,9 +346,9 @@ public abstract class EnemyFSM : MonoBehaviour
     }
     protected void PlaySound(AudioClip clip)
     {
-        audio.Stop();
-        audio.clip = clip;
-        audio.Play();
+        audioSoruce.Stop();
+        audioSoruce.clip = clip;
+        audioSoruce.Play();
     }
 
 }
