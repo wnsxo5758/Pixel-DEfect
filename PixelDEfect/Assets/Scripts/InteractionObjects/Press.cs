@@ -41,7 +41,7 @@ public class Press : MonoBehaviour
             }
 
         }
-        else if(other.CompareTag("ImpactNormal") || other.CompareTag("ImpactObstacle"))
+        else if((other.CompareTag("ImpactNormal") || other.CompareTag("ImpactObstacle")) && !isHit)
         {
             Debug.Log("¹Ù´Ú¿¡ Ãæµ¹µÊ");
             isHit = true; 
