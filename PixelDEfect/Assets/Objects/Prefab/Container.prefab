@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6661495930252432409}
   - component: {fileID: 7276405119912304207}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70,8 +70,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1985080151
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 7402088731717053666, guid: de00252794a128248be3ac19c9d4e5e6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -220,7 +220,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 1.3109621}
+  m_Offset: {x: -0.1130085, y: 1.3109621}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.49999997, y: 0}
@@ -231,7 +231,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 4.8526535, y: 2.5034091}
+  m_Size: {x: 4.6266365, y: 2.5034091}
   m_EdgeRadius: 0
 --- !u!50 &4251802243600849056
 Rigidbody2D:
@@ -288,7 +288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundLayer:
     serializedVersion: 2
-    m_Bits: 8200
+    m_Bits: 72
   rayDistance: 1
   checkInterval: 0.1
 --- !u!82 &6305824007028625364

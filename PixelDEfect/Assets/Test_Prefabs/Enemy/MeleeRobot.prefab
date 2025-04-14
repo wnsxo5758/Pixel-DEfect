@@ -72,10 +72,10 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 845593577
+  m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 1494463543, guid: b3d7e6491b8fe4c4da1a8dc72f76683f, type: 3}
+  m_Sprite: {fileID: -1941615681, guid: 08f2d98cf431a1a48afcfbcd8bb23587, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 5558079765844484687}
   m_Layer: 8
   m_Name: MeleeRobot
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -174,16 +174,16 @@ MonoBehaviour:
   maxHp: 3
   distanceToDetect: 4
   pursuitLimitRange: 6
-  distanceToAttack: 1
+  distanceToAttack: 2
   checkWallDistance: 2
   wallLayer:
     serializedVersion: 2
-    m_Bits: 9736
+    m_Bits: 16968
   hitClip: {fileID: 8300000, guid: f844a034654644548a582424df3ad217, type: 3}
   deadClip: {fileID: 8300000, guid: a39a028559c3b3d47b1ea2463b9e8705, type: 3}
   attackClip: {fileID: 8300000, guid: 36a627d0e7bda2c49bda6b604b9e731b, type: 3}
-  hitTime: 0
-  durationHit: 0
+  hitTime: 0.5
+  durationHit: 0.5
   coins: {fileID: 0}
   amount: 0
   waitTime: 0
