@@ -33,8 +33,6 @@ public abstract class EnemyFSM : MonoBehaviour
 
     [Header("피격관련")]
     [SerializeField]
-    private float hitTime; // 피격후 대기 시간
-    [SerializeField]
     private float durationHit; // 피격후 색전환시간
 
     private bool isHit;
@@ -187,12 +185,28 @@ public abstract class EnemyFSM : MonoBehaviour
 
     protected virtual IEnumerator Hit()
     {
-        if (isHit) yield break;
-        isHit = true;
+        while (true)
+        {
+            if (isHit)
+            {
+                yield return null;
+            }
+            movement.MoveTo(0);
+            isHit = true;
+            StartCoroutine(nameof(HitColorEffect));
+            yield return new WaitForSeconds(1f);
+            isHit = false;
 
+            CalculateDistanceToTargetAndSelectState();
+            yield return null;
+        }
+    }
+
+    private IEnumerator HitColorEffect()
+    {
         float halfDuration = durationHit / 2f;
 
-        // 점점 붉은색으로 변경
+        // 점점 붉은색으로
         float t = 0f;
         while (t < halfDuration)
         {
@@ -202,7 +216,7 @@ public abstract class EnemyFSM : MonoBehaviour
             yield return null;
         }
 
-        // 점점 원래 색으로 복원
+        // 점점 원래색으로 복원
         t = 0f;
         while (t < halfDuration)
         {
@@ -212,13 +226,9 @@ public abstract class EnemyFSM : MonoBehaviour
             yield return null;
         }
 
-        spriteRenderer.color = originalColor; // 혹시 보간 오류 방지
-
-        yield return new WaitForSeconds(hitTime);
-        isHit = false;
-
-        CalculateDistanceToTargetAndSelectState();
+        spriteRenderer.color = originalColor;
     }
+
 
     protected void LookRotationToTarget() //플레이어 감지시 플레이어 방향으로 전환
     {
