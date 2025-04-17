@@ -41,7 +41,7 @@ public class ButtonBase : MonoBehaviour
         }
     }
 
-    public void ButtonTrigger() // 버튼 활성화시 작동
+    public virtual void ButtonTrigger() // 버튼 활성화시 작동
     {
         if(isCount)
         {
