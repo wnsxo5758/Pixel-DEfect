@@ -182,7 +182,6 @@ MonoBehaviour:
   hitClip: {fileID: 8300000, guid: f844a034654644548a582424df3ad217, type: 3}
   deadClip: {fileID: 8300000, guid: a39a028559c3b3d47b1ea2463b9e8705, type: 3}
   attackClip: {fileID: 8300000, guid: 36a627d0e7bda2c49bda6b604b9e731b, type: 3}
-  hitTime: 0.5
   durationHit: 0.5
   coins: {fileID: 0}
   amount: 0

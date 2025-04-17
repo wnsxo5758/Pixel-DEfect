@@ -50,6 +50,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BackGround
+    uniqueID: 1298700999
+    locked: 0
+  - name: Container
+    uniqueID: 1985080151
+    locked: 0
   - name: Player
     uniqueID: 1056460031
     locked: 0
@@ -68,9 +74,9 @@ TagManager:
   - name: ladder
     uniqueID: 4064401619
     locked: 0
-  - name: Container
-    uniqueID: 1985080151
-    locked: 0
   - name: Pipe
     uniqueID: 243385507
+    locked: 0
+  - name: PassTilemap
+    uniqueID: 2101903407
     locked: 0

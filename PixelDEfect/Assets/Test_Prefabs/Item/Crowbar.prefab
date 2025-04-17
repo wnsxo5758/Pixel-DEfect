@@ -143,7 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 720
   stuckDuration: 0.5
-  extraDamageMultiplier: 1.5
+  extraDamageMultiplier: 3
   stickLayers:
     serializedVersion: 2
     m_Bits: 840
