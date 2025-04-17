@@ -50,6 +50,7 @@ public class PlayerAnimator : MonoBehaviour
     public void SetCrouchAnim(bool crouching)
     {
         animator.SetBool(isCrouching, crouching);
+        animator.SetBool(isJump, false);
     }
     
     public void CrawlAnim(float x)

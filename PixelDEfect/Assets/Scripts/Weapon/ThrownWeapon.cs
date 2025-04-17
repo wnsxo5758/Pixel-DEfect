@@ -85,7 +85,7 @@ public class ThrownWeapon : MonoBehaviour
                 float damage = weaponData.Damage;
                 enemy.DecreaseHp((int)damage);
                 Debug.Log($"Hit enemy with thrown weapon for {damage} damage");
-
+                
                 canDealDamage = false;
             }
         }
@@ -150,6 +150,28 @@ public class ThrownWeapon : MonoBehaviour
         return 0f;
     }
 
+    public void DetachFromEnemy(Vector2 position)
+    {
+        if (isStuck && stuckTarget != null)
+        {
+            transform.SetParent(null);
+            transform.position = position;
+            
+            boxCollider.isTrigger = false;
+            boxCollider.enabled = true;
+
+            rb.isKinematic = false;
+            rb.gravityScale = 1f;
+            rb.velocity = Vector2.zero;
+            rb.AddTorque(rotationSpeed);
+            rb.velocity = new Vector2(Random.Range(-1f, 1f), 5f);
+            
+            isStuck = false;
+            stuckTarget = null;
+            canDealDamage = true;
+        }
+    }
+    
     private void OnDrawGizmos()
     {
         if (isStuck)

@@ -338,8 +338,12 @@ public abstract class EnemyFSM : MonoBehaviour
             ChangeState(EnemyState.Hit);
             if (currentHp <= 0)
             {
-
                 ChangeState(EnemyState.Dead);
+                ThrownWeapon attachedWeapon = GetComponentInChildren<ThrownWeapon>();
+                if (attachedWeapon != null)
+                {
+                    attachedWeapon.DetachFromEnemy(transform.position);
+                }
             }
         }
     }
