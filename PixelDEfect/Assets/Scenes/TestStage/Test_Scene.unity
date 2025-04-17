@@ -48651,7 +48651,7 @@ Transform:
   m_GameObject: {fileID: 471901006}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -21.53, y: -3.27, z: 0}
+  m_LocalPosition: {x: 0.48, y: -3.27, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -50081,6 +50081,14 @@ PrefabInstance:
     - target: {fileID: 4581915079527951143, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
       propertyPath: m_Name
       value: MeleeRobot
+      objectReference: {fileID: 0}
+    - target: {fileID: 9126916183087485128, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: hitTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9126916183087485128, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: durationHit
+      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
