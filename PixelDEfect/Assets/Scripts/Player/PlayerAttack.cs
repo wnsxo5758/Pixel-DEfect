@@ -321,7 +321,7 @@ public class PlayerAttack : MonoBehaviour
         if (thrownWeaponPrefab != null && currentWeapon != null)
         {
             Vector2 direction = new Vector2(transform.localScale.x, 0).normalized;
-            Vector2 spawnPosition = (Vector2)transform.position + attackOffset + direction * 1f;
+            Vector2 spawnPosition = (Vector2)transform.position + attackOffset;
             
             GameObject thrownWeaponObj = Instantiate(thrownWeaponPrefab, spawnPosition, Quaternion.identity);
             ThrownWeapon thrownWeapon = thrownWeaponObj.GetComponent<ThrownWeapon>();

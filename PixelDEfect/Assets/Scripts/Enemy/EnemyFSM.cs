@@ -95,6 +95,7 @@ public abstract class EnemyFSM : MonoBehaviour
         yield return new WaitForSeconds(1f);
         isChange = false;
     }
+    
     public bool CheckWall()
     {
         dir = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
@@ -110,7 +111,6 @@ public abstract class EnemyFSM : MonoBehaviour
         }
         return false;
     }
-
 
     private void SetUp()
     {
