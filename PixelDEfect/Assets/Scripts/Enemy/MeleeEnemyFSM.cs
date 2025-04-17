@@ -37,7 +37,6 @@ public class MeleeEnemyFSM : EnemyFSM
         currentCoolTime = coolTime;
         PlaySound(attackClip);
         attackCollider.enabled = true;
-        Debug.Log($"{gameObject.name}이 공격 시도");
         yield return new WaitForSeconds(0.3f);
         attackCollider.enabled = false;
         while (currentCoolTime > 0)
