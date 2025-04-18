@@ -82,18 +82,12 @@ public class PlayerHp : MonoBehaviour
         isDead = true;
         currentHp = 0;
 
-        Collider2D collier = GetComponent<Collider2D>();
-        if (collier != null)
-        {
-            collier.enabled = false;
-        }
         Rigidbody2D rigid = GetComponent<Rigidbody2D>();
         if(rigid != null)
         {
             rigid.velocity = Vector2.zero; // 속도 0으로
             rigid.angularVelocity = 0f;    // 회전속도도 정지
-            rigid.isKinematic = true;      // 물리 영향 제거
-            rigid.simulated = false;       // 완전 비활성화 (옵션)
+            rigid.constraints = RigidbodyConstraints2D.FreezePositionX; // x위치 고정
         }
         playerAnimator.TriggerDeathAnim();
         OnPlayerDeath?.Invoke();

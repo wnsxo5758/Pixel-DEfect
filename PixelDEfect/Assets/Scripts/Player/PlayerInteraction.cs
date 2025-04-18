@@ -105,7 +105,14 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (!IsConnected)
         {
-            if (detectedObject) return true;
+            if (detectedObject)
+            {
+                HoldObject holdObject = detectedObject.GetComponent<HoldObject>();
+                if (holdObject)
+                {
+                    return true;
+                }
+            }
         }
 
         return false;

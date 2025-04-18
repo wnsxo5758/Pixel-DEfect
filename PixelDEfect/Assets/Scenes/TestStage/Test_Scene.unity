@@ -50618,6 +50618,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: MeleeRobot
       objectReference: {fileID: 0}
+    - target: {fileID: 5401329820694318748, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: m_BodyType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5401329820694318748, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9126916183087485128, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
       propertyPath: hitTime
       value: 1

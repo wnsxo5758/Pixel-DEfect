@@ -30,6 +30,7 @@ public class PlayerAttack : MonoBehaviour
     private WeaponBase currentWeapon;
     private PlayerController playerController;
     private PlayerAnimator playerAnimator;
+    private MovementRigidbody2D movement;
     private WeaponPickup nearbyWeapon;
     private ThrownWeapon nearbyThrownWeapon;
     private GameObject attackColliderObject;
@@ -42,6 +43,7 @@ public class PlayerAttack : MonoBehaviour
     {
         playerController = GetComponent<PlayerController>();
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
+        movement = GetComponent<MovementRigidbody2D>();
 
         // 공격 범위 초기화
         InitializeAttackCollider();
@@ -124,7 +126,6 @@ public class PlayerAttack : MonoBehaviour
         {
             ThrownWeapon thrownWeapon = weaponCollider.GetComponent<ThrownWeapon>();
 
-            Debug.Log(thrownWeapon.IsStuck());
             if (thrownWeapon != null && thrownWeapon.IsStuck())
             {
                 nearbyThrownWeapon = thrownWeapon;
@@ -366,8 +367,17 @@ public class PlayerAttack : MonoBehaviour
     {
         var currentState = playerController.GetCurrentState();
 
+        // 떨어지는 동시에 공격 시 공격이 불가능 하도록 설정(state 버그 수정)
+        if (currentState is PlayerStates.Idle || currentState is PlayerStates.Run)
+        {
+            if (!movement.IsGrounded)
+            {
+                return false;
+            }
+        }
+        
         if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || 
-            currentState is PlayerStates.Crawl || currentState is PlayerStates.Jump)
+            currentState is PlayerStates.Crawl || currentState is PlayerStates.Jump )
         {
             return false;
         }

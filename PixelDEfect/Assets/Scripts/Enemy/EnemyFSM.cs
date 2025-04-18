@@ -56,6 +56,7 @@ public abstract class EnemyFSM : MonoBehaviour
     private bool isChange;
     public bool IsFacingRight => isFacingRight;
 
+    protected Rigidbody2D rb;
     protected MovementRigidbody2D movement;
     protected EnemyAnimator animator;
     protected AudioSource audioSoruce;
@@ -63,6 +64,7 @@ public abstract class EnemyFSM : MonoBehaviour
     private Color originalColor;
     private void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
         audioSoruce = GetComponent<AudioSource>();
@@ -192,9 +194,14 @@ public abstract class EnemyFSM : MonoBehaviour
                 yield return null;
             }
             movement.MoveTo(0);
-            isHit = true;
+            
+            rb.constraints = RigidbodyConstraints2D.FreezePosition;
             StartCoroutine(nameof(HitColorEffect));
+            isHit = true;
+            
             yield return new WaitForSeconds(1f);
+            
+            rb.constraints = RigidbodyConstraints2D.None;
             isHit = false;
 
             CalculateDistanceToTargetAndSelectState();
@@ -293,6 +300,7 @@ public abstract class EnemyFSM : MonoBehaviour
             yield return null;
         }
     }
+    
     protected virtual IEnumerator Dead() // 사망
     {
         PlaySound(deadClip);
@@ -308,7 +316,15 @@ public abstract class EnemyFSM : MonoBehaviour
         }
         animator.Death(); // 적 사망 애니메이션 
         yield return new WaitForSeconds((animator.DeathAnimLength+1f));
+        
+        ThrownWeapon attachedWeapon = GetComponentInChildren<ThrownWeapon>();
+        if (attachedWeapon != null)
+        {
+            attachedWeapon.DetachFromEnemy(transform.position);
+        }
+        
         gameObject.SetActive(false);
+        
     }
     protected abstract IEnumerator Attack(); // 하위 객체에서 공격 구현
 
@@ -339,11 +355,6 @@ public abstract class EnemyFSM : MonoBehaviour
             if (currentHp <= 0)
             {
                 ChangeState(EnemyState.Dead);
-                ThrownWeapon attachedWeapon = GetComponentInChildren<ThrownWeapon>();
-                if (attachedWeapon != null)
-                {
-                    attachedWeapon.DetachFromEnemy(transform.position);
-                }
             }
         }
     }
