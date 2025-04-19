@@ -43,7 +43,7 @@ public class Press : MonoBehaviour
         }
         else if(!isHit)
         {
-            Debug.Log("¹Ù´Ú¿¡ Ãæµ¹µÊ");
+            // Debug.Log("¹Ù´Ú¿¡ Ãæµ¹µÊ");
             isHit = true; 
 
             Vector2 hitPoint = other.ClosestPoint(hitTrigger.transform.position);

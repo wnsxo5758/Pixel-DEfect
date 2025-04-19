@@ -62,7 +62,6 @@ public class PlayerHp : MonoBehaviour
         }
         else
         {
-            Debug.Log($"플레이어가 {damage}만큼의 데미지를 받아서 현재 체력 {currentHp}");
             OnInvincibility(1.5f);
         }
 

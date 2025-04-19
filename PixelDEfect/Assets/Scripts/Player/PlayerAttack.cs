@@ -413,13 +413,6 @@ public class PlayerAttack : MonoBehaviour
         // 무기 감지 범위
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position + (Vector3)attackOffset, weaponDetectionRadius);
-
-        if (attackCollider != null)
-        {
-            Gizmos.color = Color.magenta;
-            Bounds bounds = attackCollider.bounds;
-            Gizmos.DrawWireCube(bounds.center, bounds.size);
-        }
     }
 
     void OnGUI()

@@ -39,7 +39,7 @@ public class TurretFSM : EnemyFSM
         // 쿨타임이 다 차면 발사
         if (currentCoolTime >= maxCoolTime)
         {
-            audioSoruce.PlayOneShot(attackClip);
+            audioSource.PlayOneShot(attackClip);
 
             GameObject bulletObj = Instantiate(bulletPrefab, firePos.position, firePos.rotation);
             TurretBullet bullet = bulletObj.GetComponent<TurretBullet>();

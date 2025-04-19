@@ -59,7 +59,7 @@ public abstract class EnemyFSM : MonoBehaviour
     protected Rigidbody2D rb;
     protected MovementRigidbody2D movement;
     protected EnemyAnimator animator;
-    protected AudioSource audioSoruce;
+    protected AudioSource audioSource;
     protected SpriteRenderer spriteRenderer;
     private Color originalColor;
     private void Awake()
@@ -67,7 +67,7 @@ public abstract class EnemyFSM : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
-        audioSoruce = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>(); // EnemyAnimator와 같은 자식 오브젝트라면
 
@@ -77,7 +77,6 @@ public abstract class EnemyFSM : MonoBehaviour
     {
         SetUp();
     }
-
 
     public void ChangeFacing()
     {
@@ -133,6 +132,7 @@ public abstract class EnemyFSM : MonoBehaviour
         StopCoroutine(enemyState.ToString());
         enemyState = EnemyState.None;
     }
+    
     protected virtual void ChangeState(EnemyState state) // State 변경시 사용
     {
         if (enemyState == state) return;
@@ -141,8 +141,10 @@ public abstract class EnemyFSM : MonoBehaviour
 
         //새로운 상태 설정 후 실행
         enemyState = state;
+        Debug.Log(enemyState);
         StartCoroutine(enemyState.ToString());
     }
+    
     protected virtual IEnumerator Idle() // 정지(휴식)
     {
         movement.MoveTo(0);
@@ -156,6 +158,7 @@ public abstract class EnemyFSM : MonoBehaviour
         }
 
     }
+    
     protected virtual IEnumerator Wander()  // 배회
     {
         float currentTime = 0;
@@ -187,26 +190,14 @@ public abstract class EnemyFSM : MonoBehaviour
 
     protected virtual IEnumerator Hit()
     {
-        while (true)
-        {
-            if (isHit)
-            {
-                yield return null;
-            }
-            movement.MoveTo(0);
-            
-            rb.constraints = RigidbodyConstraints2D.FreezePosition;
-            StartCoroutine(nameof(HitColorEffect));
-            isHit = true;
-            
-            yield return new WaitForSeconds(1f);
-            
-            rb.constraints = RigidbodyConstraints2D.None;
-            isHit = false;
+        rb.constraints = RigidbodyConstraints2D.FreezeAll;
+        movement.MoveTo(0);
+        StartCoroutine(nameof(HitColorEffect));
 
-            CalculateDistanceToTargetAndSelectState();
-            yield return null;
-        }
+        yield return new WaitForSeconds(1f);
+        
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        CalculateDistanceToTargetAndSelectState();
     }
 
     private IEnumerator HitColorEffect()
@@ -236,7 +227,6 @@ public abstract class EnemyFSM : MonoBehaviour
         spriteRenderer.color = originalColor;
     }
 
-
     protected void LookRotationToTarget() //플레이어 감지시 플레이어 방향으로 전환
     {
         Vector2 dirToTarget = (target.position - transform.position).normalized;
@@ -249,6 +239,7 @@ public abstract class EnemyFSM : MonoBehaviour
             if (IsFacingRight == true) { ChangeFacing(); }
         }
     }
+    
     protected virtual void CalculateDistanceToTargetAndSelectState() //플레이어와의 거리 측정후 상태 변경
     {
         if (target == null) return; // 목표가 없으면 리턴
@@ -263,9 +254,22 @@ public abstract class EnemyFSM : MonoBehaviour
         {
             // Debug.Log($"{gameObject.name}은 플레이어 감지했다! : {enemyState}");
             ChangeState(EnemyState.Pursuit);
-
         }
-        else if (distance >= pursuitLimitRange) // 추적 범위에서 벗어난 경우
+        else if (enemyState != EnemyState.Pursuit) // 추적 상태가 아닌 경우
+        {
+            if (distance > distanceToDetect) // 감지 범위 외부에 있는 경우
+            {
+                ChangeState(EnemyState.Wander);
+            }
+        }
+        else if (enemyState == EnemyState.Pursuit) // 추적 상태인 경우
+        {
+            if (distance >= pursuitLimitRange) // 인식 범위 외부에 있는 경우
+            {
+                ChangeState(EnemyState.Wander);
+            }
+        }
+        else // 예외 상태일 시 배회 상태
         {
             ChangeState(EnemyState.Wander);
         }
@@ -279,6 +283,7 @@ public abstract class EnemyFSM : MonoBehaviour
 
         ChangeState(EnemyState.Wander);
     }
+    
     protected virtual IEnumerator Pursuit() // 추적
     {
         float speed;
@@ -326,6 +331,7 @@ public abstract class EnemyFSM : MonoBehaviour
         gameObject.SetActive(false);
         
     }
+    
     protected abstract IEnumerator Attack(); // 하위 객체에서 공격 구현
 
     private void OnDrawGizmos()
@@ -345,19 +351,25 @@ public abstract class EnemyFSM : MonoBehaviour
 
 
     }
+    
     public void DecreaseHp(int _damage)
     {
         if (currentHp > 0)
         {
             currentHp -= _damage;
             PlaySound(hitClip);
-            ChangeState(EnemyState.Hit);
-            if (currentHp <= 0)
+            if (currentHp > 0)
+            {
+                ChangeState(EnemyState.Hit);
+            }
+            else
             {
                 ChangeState(EnemyState.Dead);
             }
+            
         }
     }
+    
     public void IncreaseHp(int _amount)
     {
         if (currentHp < maxHp)
@@ -369,11 +381,12 @@ public abstract class EnemyFSM : MonoBehaviour
             }
         }
     }
+    
     protected void PlaySound(AudioClip clip)
     {
-        audioSoruce.Stop();
-        audioSoruce.clip = clip;
-        audioSoruce.Play();
+        audioSource.Stop();
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 
 }

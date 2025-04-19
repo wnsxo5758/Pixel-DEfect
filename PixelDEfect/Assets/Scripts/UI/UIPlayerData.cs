@@ -21,7 +21,7 @@ public class UIPlayerData : MonoBehaviour
 
     public void SetHpAll(int currentHp)
     {
-        Debug.Log("체력 UI 작동");
+        // Debug.Log("체력 UI 작동");
         for (int i = 0; i < hpBars.Length; i++)
         {
             Animator anim = hpBars[i].GetComponent<Animator>();
@@ -30,13 +30,13 @@ public class UIPlayerData : MonoBehaviour
 
             if (i < currentHp)
             {
-                Debug.Log("체력 UI 애니메이션작동");
+                // Debug.Log("체력 UI 애니메이션작동");
                 anim.ResetTrigger("Damage");
                 anim.SetTrigger("Heal");
             }
             else
             {
-                Debug.Log("체력 UI 애니메이션작동");
+                // Debug.Log("체력 UI 애니메이션작동");
                 anim.ResetTrigger("Heal");
                 anim.SetTrigger("Damage");
             }

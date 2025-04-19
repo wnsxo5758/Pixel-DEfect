@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MeleeEnemyFSM : EnemyFSM
@@ -15,10 +16,11 @@ public class MeleeEnemyFSM : EnemyFSM
     private Collider2D attackCollider; // 공격할곳
 
     private bool isAttacking;
+    
+    
     protected override IEnumerator Attack() 
     {
         //이동을 멈춤
-        Debug.Log("플레이어에 대한 공격!");
         while (true)
         {
             movement.MoveTo(0);
@@ -33,6 +35,18 @@ public class MeleeEnemyFSM : EnemyFSM
     {
         if (isAttacking  ||currentCoolTime > 0) yield break;
 
+        LookRotationToTarget();
+        if (IsFacingRight)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), 
+                                    transform.localScale.y, transform.localScale.z );
+        }
+        else
+        {
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x),
+                                    transform.localScale.y, transform.localScale.z );
+        }
+        
         isAttacking = true;
         currentCoolTime = coolTime;
         PlaySound(attackClip);
