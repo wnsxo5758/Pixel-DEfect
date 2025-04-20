@@ -141,7 +141,6 @@ public abstract class EnemyFSM : MonoBehaviour
 
         //새로운 상태 설정 후 실행
         enemyState = state;
-        Debug.Log(enemyState);
         StartCoroutine(enemyState.ToString());
     }
     

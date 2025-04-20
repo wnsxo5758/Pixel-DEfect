@@ -49,7 +49,7 @@ public class PlayerHp : MonoBehaviour
 
     public void DecreaseHp(int damage)
     {
-        if (isInvincibility || isDead) return;
+        if (isInvincibility || isDead || player.IsRolling) return;
 
         currentHp -= damage;
         currentHp = Mathf.Max(currentHp, 0); // 음수 방지

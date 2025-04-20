@@ -5135,7 +5135,7 @@ ParticleSystem:
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
-  looping: 1
+  looping: 0
   prewarm: 0
   playOnAwake: 1
   useUnscaledTime: 0
@@ -10047,8 +10047,7 @@ MonoBehaviour:
   belowCollisionLayer:
     serializedVersion: 2
     m_Bits: 64
-  walkSpeed: 6
-  runSpeed: 8
+  runSpeed: 6
   crawlSpeed: 3
   climbSpeed: 6
   jumpForce: 30
@@ -10071,6 +10070,7 @@ MonoBehaviour:
   aboveLayer:
     serializedVersion: 2
     m_Bits: 584
+  rollCooldown: 1
 --- !u!114 &658921088476211807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10083,7 +10083,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba317ef02f609241b7d877efd32f605, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponDetectionRadius: 1
+  weaponDetectionRadius: 0.8
   pickupLayer:
     serializedVersion: 2
     m_Bits: 32768
@@ -10134,7 +10134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7213c661733e704ab3b467f2df1e989, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rayDistance: 0.75
+  rayDistance: 0.4
   interactableLayer:
     serializedVersion: 2
     m_Bits: 512

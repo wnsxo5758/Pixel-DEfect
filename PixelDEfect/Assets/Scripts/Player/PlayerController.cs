@@ -1,4 +1,5 @@
 using PlayerStates;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -9,16 +10,21 @@ public class PlayerController : MonoBehaviour
     [Header("웅크리기")] 
     [SerializeField] private float crouchCheckDistance = 0.5f;
     [SerializeField] private LayerMask aboveLayer;
+
+    [Header("구르기")] 
+    [SerializeField] private float rollCooldown = 1f;
+    private bool canRoll = true;
     
     private MovementRigidbody2D movement;
     private PlayerHp playerHp;
     private PlayerAttack playerAttack;
     private PlayerInteraction playerInteraction;
     private PlayerStateMachine<PlayerController> stateMachine;
-    
+
     public bool IsOnLadder { get; set; } //사다리 
     public bool IsCrouching { get; set; } //웅크리기
-
+    public bool IsRolling { get; set; }
+    
     private void Awake()
     {
         movement = GetComponent<MovementRigidbody2D>();
@@ -36,6 +42,7 @@ public class PlayerController : MonoBehaviour
         InputManager.Instance.OnJumpPressed += OnJump;
         InputManager.Instance.OnCrouchPressed += OnCrouch;
         InputManager.Instance.OnHoldPressed += OnHold;
+        InputManager.Instance.OnRollPressed += OnRoll;
 
         if (playerHp != null)
         {
@@ -55,15 +62,7 @@ public class PlayerController : MonoBehaviour
     //입력 관련 메소드
     public float HorizontalInput() // 좌우 입력
     {
-        float x = InputManager.Instance.HorizontalInput;
-        float offset = 0.5f + InputManager.Instance.SprintInput * 0.5f;
-
-        if (playerInteraction.IsConnected || IsCrouching)
-        {
-            offset = 0.5f;
-        }
-
-        return x * offset;
+        return InputManager.Instance.HorizontalInput;
     }
 
     public float VerticalInput() // 상하 입력 (사다리)
@@ -113,6 +112,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnRoll()
+    {
+        if (canRoll && movement.IsGrounded && !IsStateLimited())
+        {
+            ChangeState(new Roll());
+        }
+    }
+    
     public void OnHold() // 홀드 입력
     {
         if (playerInteraction.CheckHold())
@@ -135,6 +142,13 @@ public class PlayerController : MonoBehaviour
             movement.LadderJump(HorizontalInput());
             ChangeState(new Jump());
         }
+    }
+
+    public IEnumerator StartRollCoroutine()
+    {
+        canRoll = false;
+        yield return new WaitForSeconds(rollCooldown);
+        canRoll = true;
     }
     
     public void UpdateMove(float x) // 이동
@@ -173,6 +187,13 @@ public class PlayerController : MonoBehaviour
                 platform.UpdateCollision(gameObject);
             }
         }
+    }
+
+    private bool IsStateLimited()
+    {
+        var currentState = stateMachine.CurrentState;
+        return currentState is Crawl || currentState is Hold || currentState is Climb ||
+               currentState is Attack || currentState is Roll;
     }
     
     private void OnPlayerDeath()
@@ -251,6 +272,7 @@ public class PlayerController : MonoBehaviour
             InputManager.Instance.OnCrouchPressed -= OnCrouch;
             InputManager.Instance.OnHoldPressed -= OnHold;
             InputManager.Instance.OnCrouchReleased -= UnCrouch;
+            InputManager.Instance.OnRollPressed -= OnRoll;
         }
 
         if (playerHp != null)

@@ -9,7 +9,6 @@ public class MovementRigidbody2D : MonoBehaviour
     [SerializeField] private LayerMask belowCollisionLayer;
     
     [Header("움직임")] 
-    [SerializeField] private float walkSpeed; // 걷기 속도
     [SerializeField] private float runSpeed; // 달리기 속도
     [SerializeField] private float crawlSpeed; // 기어가기 속도
     [SerializeField] private float climbSpeed; // 사다리 속도
@@ -36,14 +35,14 @@ public class MovementRigidbody2D : MonoBehaviour
     public bool IsGrounded { private set; get; } = false;
     public float InteractSpeed
     {
-        set => walkSpeed = initialSpeed * (1 / value);
+        set => runSpeed = initialSpeed * (1 / value);
     }
     public Vector2 Velocity => rigid.velocity;
 
     private void Awake()
     {
-        initialSpeed = walkSpeed;
-        moveSpeed = walkSpeed;
+        initialSpeed = runSpeed;
+        moveSpeed = runSpeed;
         rigid = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
         
@@ -69,7 +68,7 @@ public class MovementRigidbody2D : MonoBehaviour
     
     public void MoveTo(float x)
     {
-        moveSpeed = Mathf.Abs(x) != 1 ? walkSpeed : runSpeed;
+        moveSpeed = runSpeed;
         if (x != 0) x = Mathf.Sign(x);
         rigid.velocity = new Vector2(x * moveSpeed, rigid.velocity.y);
     }
@@ -103,6 +102,12 @@ public class MovementRigidbody2D : MonoBehaviour
         if (x != 0) x = Mathf.Sign(x);
         rigid.velocity = new Vector2(x * crawlSpeed, rigid.velocity.y);
     }
+
+    public void Roll(float direction, float speed)
+    {
+        Vector2 rollVelocity = new Vector2(direction * speed, rigid.velocity.y);
+        rigid.velocity = rollVelocity;
+    }
     
     public void Climb(float y)
     {
@@ -112,7 +117,7 @@ public class MovementRigidbody2D : MonoBehaviour
     public void LadderJump(float x)
     {
         if(x != 0) x = Mathf.Sign(x);
-        rigid.velocity = new Vector2(x * walkSpeed, jumpForce / 2);
+        rigid.velocity = new Vector2(x * runSpeed, jumpForce / 2);
     }
         
     public void DisableGravity()

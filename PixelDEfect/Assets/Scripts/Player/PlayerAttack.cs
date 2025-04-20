@@ -99,6 +99,12 @@ public class PlayerAttack : MonoBehaviour
 
             if (pickup != null)
             {
+                if (playerController.GetCurrentState() is PlayerStates.Hold)
+                {
+                    InputManager.Instance.SetCanPickup(false);
+                    return;
+                }
+                
                 nearbyWeapon = pickup;
                 InputManager.Instance.SetCanPickup(true);
                 InputManager.Instance.SetCanHold(false);
@@ -128,6 +134,12 @@ public class PlayerAttack : MonoBehaviour
 
             if (thrownWeapon != null && thrownWeapon.IsStuck())
             {
+                if (playerController.GetCurrentState() is PlayerStates.Hold)
+                {
+                    InputManager.Instance.SetCanPickup(false);
+                    return;
+                }
+                
                 nearbyThrownWeapon = thrownWeapon;
                 InputManager.Instance.SetCanPickup(true);
                 InputManager.Instance.SetCanHold(false);
@@ -149,7 +161,7 @@ public class PlayerAttack : MonoBehaviour
     private void OnPickupWeapon()
     {
         // 던져진 무기 픽업
-        if (nearbyThrownWeapon != null)
+        if (nearbyThrownWeapon != null && canThrow)
         {
             WeaponBase weaponData = nearbyThrownWeapon.GetWeaponData();
             
@@ -376,8 +388,8 @@ public class PlayerAttack : MonoBehaviour
             }
         }
         
-        if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || 
-            currentState is PlayerStates.Crawl || currentState is PlayerStates.Jump )
+        if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || currentState is PlayerStates.Crawl || 
+            currentState is PlayerStates.Jump || currentState is PlayerStates.Roll)
         {
             return false;
         }

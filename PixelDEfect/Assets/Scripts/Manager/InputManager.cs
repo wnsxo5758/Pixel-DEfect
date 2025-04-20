@@ -10,20 +10,22 @@ public class InputManager : MonoBehaviour
     [SerializeField] private KeyCode holdKey = KeyCode.F;
     [SerializeField] private KeyCode interactKey = KeyCode.G;
     [SerializeField] private KeyCode crouchKey = KeyCode.DownArrow;
+    [SerializeField] private KeyCode rollKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode pickupKey = KeyCode.F;
     [SerializeField] private KeyCode meleeAttackKey = KeyCode.Z;
     [SerializeField] private KeyCode throwWeaponKey = KeyCode.X;
+    
 
     private bool canPickup = false;
     private bool canHold = false;
     
     public float HorizontalInput => Input.GetAxisRaw("Horizontal");
     public float VerticalInput => Input.GetAxisRaw("Vertical");
-    public float SprintInput => Input.GetAxisRaw("Sprint");
 
     public event Action OnJumpPressed;
     public event Action OnCrouchPressed;
     public event Action OnCrouchReleased;
+    public event Action OnRollPressed;
     public event Action OnHoldPressed;
     public event Action OnInteractPressed;
     public event Action OnValvePressed;
@@ -63,6 +65,10 @@ public class InputManager : MonoBehaviour
             OnCrouchPressed?.Invoke();
         if(Input.GetKeyUp(crouchKey))
             OnCrouchReleased?.Invoke();
+        
+        // 구르기 입력
+        if(Input.GetKeyDown(rollKey))
+            OnRollPressed?.Invoke();
             
         // 끌기 입력
         if (Input.GetKeyDown(holdKey) && canHold)
@@ -77,8 +83,7 @@ public class InputManager : MonoBehaviour
             OnValvePressed?.Invoke();
         if (Input.GetKeyUp(interactKey))
             OnValveReleased?.Invoke();
-            
-
+        
         // 공격 입력
         if (Input.GetKeyDown(pickupKey) && canPickup)
             OnPickupPressed?.Invoke();

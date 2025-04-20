@@ -50173,6 +50173,7 @@ MonoBehaviour:
   holdKey: 102
   interactKey: 103
   crouchKey: 274
+  rollKey: 304
   pickupKey: 102
   meleeAttackKey: 122
   throwWeaponKey: 120
@@ -51971,7 +51972,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8212538770150572543, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
       propertyPath: m_Mass
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8212538770150572543, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
       propertyPath: m_Constraints
@@ -53271,10 +53272,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1797690814823175465, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
-      propertyPath: looping
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5592127285762298269, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.8824437

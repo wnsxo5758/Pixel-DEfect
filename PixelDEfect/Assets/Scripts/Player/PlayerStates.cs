@@ -151,6 +151,77 @@ namespace PlayerStates
             InputManager.Instance.OnHoldPressed += player.OnHold;
         }
     }
+
+    public class Roll : State<PlayerController>
+    {
+        private MovementRigidbody2D movement;
+        private PlayerAnimator animator;
+        private float rollSpeed = 8f;
+        private float rollDuration = 0.5f;
+        private float rollTimer;
+        private float rollDirection;
+        private int playerLayer;
+        private int enemyLayer;
+        private bool wasCollisionEnabled;
+        
+        public override void Enter(PlayerController player)
+        {
+            movement = player.GetComponent<MovementRigidbody2D>();
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            
+            // 구르기 방향 설정 (현재 바라보는 방향)
+            rollDirection = player.transform.localScale.x > 0 ? 1 : -1;
+            rollTimer = rollDuration;
+            
+            // 무적 처리 (레이어)
+            playerLayer = player.gameObject.layer;
+            enemyLayer = LayerMask.NameToLayer("Enemy");
+            
+            // 적의 투사체 레이어가 있다면
+            /*
+            int projectileLayer = LayerMask.NameToLayer("EnemyProjectile");
+            if (projectileLayer != -1)
+            {
+                Physics2D.IgnoreLayerCollision(playerLayer, projectileLayer, true);
+            } 
+            */
+            
+            InputManager.Instance.OnJumpPressed -= player.OnJump;
+            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
+            InputManager.Instance.OnHoldPressed -= player.OnHold;
+            
+            // 구르기 애니메이션
+            animator.StartRollAnim();
+            player.IsRolling = true;
+            
+            // 구르기
+            player.StartCoroutine(player.StartRollCoroutine());
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            movement.Roll(rollDirection, rollSpeed);
+            
+            rollTimer -= Time.deltaTime;
+
+            if (rollTimer <= 0)
+            {
+                player.ChangeState(new Idle());
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            // 충돌 활성화 (구현 예정)
+            
+            InputManager.Instance.OnJumpPressed += player.OnJump;
+            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
+            InputManager.Instance.OnHoldPressed += player.OnHold;
+            
+            // 구르기 종료
+            player.IsRolling = false;
+        }
+    }
     
     public class Hold : State<PlayerController>
     {

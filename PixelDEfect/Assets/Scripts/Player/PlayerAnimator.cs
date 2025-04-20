@@ -12,6 +12,7 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int isConnected = Animator.StringToHash("IsConnected");
     private readonly int isClimbing = Animator.StringToHash("IsClimbing");
     private readonly int isCrouching = Animator.StringToHash("IsCrouching");
+    private readonly int roll = Animator.StringToHash("Roll");
     private readonly int death = Animator.StringToHash("Death");
     
     // 공격 애니메이션
@@ -56,6 +57,11 @@ public class PlayerAnimator : MonoBehaviour
     public void CrawlAnim(float x)
     {
         animator.SetFloat(velocityX, Mathf.Abs(x));
+    }
+
+    public void StartRollAnim()
+    {
+        animator.SetTrigger(roll);
     }
     
     public void EnterHoldAnim(float dir)
