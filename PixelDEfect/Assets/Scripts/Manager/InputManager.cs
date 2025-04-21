@@ -14,10 +14,12 @@ public class InputManager : MonoBehaviour
     [SerializeField] private KeyCode pickupKey = KeyCode.F;
     [SerializeField] private KeyCode meleeAttackKey = KeyCode.Z;
     [SerializeField] private KeyCode throwWeaponKey = KeyCode.X;
+    [SerializeField] private KeyCode teleportKey = KeyCode.X;
     
 
     private bool canPickup = false;
     private bool canHold = false;
+    private bool canTeleport = false;
     
     public float HorizontalInput => Input.GetAxisRaw("Horizontal");
     public float VerticalInput => Input.GetAxisRaw("Vertical");
@@ -34,6 +36,7 @@ public class InputManager : MonoBehaviour
     public event Action OnPickupPressed;
     public event Action OnMeleeAttackPressed;
     public event Action OnThrowWeaponPressed;
+    public event Action OnTeleportPressed;
 
     private void Awake()
     {
@@ -90,6 +93,10 @@ public class InputManager : MonoBehaviour
         if (Input.GetKeyDown(meleeAttackKey))
             OnMeleeAttackPressed?.Invoke();
 
+        // 텔레포트 입력
+        if (Input.GetKeyDown(teleportKey) && canTeleport)
+            OnTeleportPressed?.Invoke();
+
         // 무기 던지기 입력
         if (Input.GetKeyDown(throwWeaponKey))
             OnThrowWeaponPressed?.Invoke();
@@ -109,4 +116,5 @@ public class InputManager : MonoBehaviour
     
     public void SetCanPickup(bool value) => canPickup = value;
     public void SetCanHold(bool value) => canHold = value;
+    public void SetCanTeleport(bool value) => canTeleport = value;
 }

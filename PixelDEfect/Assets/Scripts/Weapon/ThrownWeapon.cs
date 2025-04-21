@@ -134,7 +134,7 @@ public class ThrownWeapon : MonoBehaviour
         return weaponData;
     }
 
-    public float PullOutFromEnemy()
+    public void PullOutFromEnemy()
     {
         if (isStuck && stuckTarget != null && stuckTarget.CompareTag("Enemy"))
         {
@@ -144,11 +144,8 @@ public class ThrownWeapon : MonoBehaviour
                 float extraDamage = weaponData.Damage * extraDamageMultiplier;
                 enemy.DecreaseHp((int)extraDamage);
                 Debug.Log($"Extra damage dealt for {extraDamage} damage");
-                return extraDamage;
             }
         }
-
-        return 0f;
     }
 
     public void DetachFromEnemy(Vector2 position)
@@ -170,6 +167,16 @@ public class ThrownWeapon : MonoBehaviour
             isStuck = false;
             stuckTarget = null;
             canDealDamage = true;
+        }
+    }
+
+    public void StopMovement()
+    {
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.isKinematic = true;
         }
     }
     

@@ -26,6 +26,10 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float throwUpwardForce = 5f;
     [SerializeField] private GameObject thrownWeaponPrefab;
     [SerializeField] private float throwCooldown = 1f;
+
+    [Header("텔레포트 설정")] 
+    [SerializeField] private float teleportDelayTime = 0.5f;
+    [SerializeField] private float teleportCooldown = 3f;
     
     private WeaponBase currentWeapon;
     private PlayerController playerController;
@@ -33,12 +37,15 @@ public class PlayerAttack : MonoBehaviour
     private MovementRigidbody2D movement;
     private WeaponPickup nearbyWeapon;
     private ThrownWeapon nearbyThrownWeapon;
+    private ThrownWeapon lastThrownWeapon;
     private GameObject attackColliderObject;
     
     private bool isAttacking = false;
     private bool hasWeapon = false;
     private bool canThrow = true;
-
+    private bool canTeleport = true;
+    private bool isTeleporting = false;
+    
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
@@ -79,6 +86,7 @@ public class PlayerAttack : MonoBehaviour
     private void Start()
     {
         InputManager.Instance.OnPickupPressed += OnPickupWeapon;
+        InputManager.Instance.OnTeleportPressed += OnTeleportToWeapon;
     }
 
     private void Update()
@@ -166,7 +174,7 @@ public class PlayerAttack : MonoBehaviour
             WeaponBase weaponData = nearbyThrownWeapon.GetWeaponData();
             
             // 적에게 박힌 무기라면 추가 데미지 적용
-            float extraDamage = nearbyThrownWeapon.PullOutFromEnemy();
+            nearbyThrownWeapon.PullOutFromEnemy();
 
             if (weaponData != null)
             {
@@ -202,6 +210,8 @@ public class PlayerAttack : MonoBehaviour
         currentWeapon = weaponData;
         hasWeapon = true;
 
+        lastThrownWeapon = null;
+        
         if (attackColliderObject != null)
         {
             attackColliderObject.SetActive(true);
@@ -209,7 +219,9 @@ public class PlayerAttack : MonoBehaviour
         
         InputManager.Instance.OnMeleeAttackPressed += OnMeleeAttack;
         InputManager.Instance.OnThrowWeaponPressed += OnThrowWeapon;
-
+        
+        InputManager.Instance.SetCanTeleport(false);
+        
         // 무기 장착 상태 애니메이션 변경
         if (playerAnimator != null)
         {
@@ -295,6 +307,77 @@ public class PlayerAttack : MonoBehaviour
         StartCoroutine(ThrowCooldownTimer());
     }
     
+    // 텔레포트 메소드
+    private void OnTeleportToWeapon()
+    {
+        if (lastThrownWeapon != null && canTeleport && !isTeleporting &&
+            playerController.GetCurrentState() is not PlayerStates.Climb and not PlayerStates.Hold)
+        {
+            StartCoroutine(TeleportCoroutine(lastThrownWeapon));
+        }
+    }
+
+    private IEnumerator TeleportCoroutine(ThrownWeapon targetWeapon)
+    {
+        if (targetWeapon == null) yield break;
+
+        canTeleport = false;
+        isTeleporting = true;
+        
+        // 텔레포트 시작 이펙트 (구현 예정)
+        
+        playerController.ChangeState(new PlayerStates.Teleport());
+
+        yield return new WaitForSeconds(teleportDelayTime);
+        
+        // 무기가 이미 파괴되었는지 확인
+        if (targetWeapon == null)
+        {
+            isTeleporting = false;
+            playerController.ChangeState(new PlayerStates.Idle());
+            yield break;
+        }
+
+        Vector3 teleportPosition = targetWeapon.transform.position;
+
+        // 무기가 날아가는 중이면 리지드바디 멈추기
+        if (!targetWeapon.IsStuck())
+        {
+            targetWeapon.StopMovement();
+        }
+        // 적에게 무기가 박혀있는 경우 
+        else
+        {
+            targetWeapon.PullOutFromEnemy();
+        }
+        
+        // 무기 장착
+        WeaponBase weaponData = targetWeapon.GetWeaponData();
+        if (weaponData != null)
+        {
+            EquipWeapon(weaponData);
+        }
+        
+        // 플레이어 위치 이동
+        transform.position = teleportPosition;
+        
+        // 도착 이펙트 (구현 예정)
+        
+        // 던져진 무기 제거
+        Destroy(targetWeapon.gameObject);
+
+        //텔레포트 쿨다운
+        StartCoroutine(TeleportCooldownTimer());
+        
+        isTeleporting = false;
+    }
+
+    private IEnumerator TeleportCooldownTimer()
+    {
+        yield return new WaitForSeconds(teleportCooldown);
+        canTeleport = true;
+    }
+    
     // 근접 공격 애니메이션 재생
     private void MeleeAttackAnimation()
     {
@@ -345,10 +428,12 @@ public class PlayerAttack : MonoBehaviour
                 Vector2 throwForceVector = direction * throwForce + Vector2.up * throwUpwardForce;
                 
                 thrownWeapon.Initialize(currentWeapon, throwForceVector, direction);
+
+                lastThrownWeapon = thrownWeapon;
+                
+                InputManager.Instance.SetCanTeleport(true);
                 
                 UnEquipWeapon();
-                
-                Debug.Log("Weapon thrown");
             }
         }
     }
@@ -389,7 +474,7 @@ public class PlayerAttack : MonoBehaviour
         }
         
         if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || currentState is PlayerStates.Crawl || 
-            currentState is PlayerStates.Jump || currentState is PlayerStates.Roll)
+            currentState is PlayerStates.Jump || currentState is PlayerStates.Roll || currentState is PlayerStates.Teleport)
         {
             return false;
         }
@@ -417,6 +502,7 @@ public class PlayerAttack : MonoBehaviour
             InputManager.Instance.OnPickupPressed -= OnPickupWeapon;
             InputManager.Instance.OnMeleeAttackPressed -= OnMeleeAttack;
             InputManager.Instance.OnThrowWeaponPressed -= OnThrowWeapon;
+            InputManager.Instance.OnTeleportPressed -= OnTeleportToWeapon;
         }
     }
 
@@ -425,6 +511,12 @@ public class PlayerAttack : MonoBehaviour
         // 무기 감지 범위
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position + (Vector3)attackOffset, weaponDetectionRadius);
+
+        if (lastThrownWeapon != null)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(transform.position, lastThrownWeapon.transform.position);
+        }
     }
 
     void OnGUI()

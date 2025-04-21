@@ -268,10 +268,6 @@ public abstract class EnemyFSM : MonoBehaviour
                 ChangeState(EnemyState.Wander);
             }
         }
-        else // 예외 상태일 시 배회 상태
-        {
-            ChangeState(EnemyState.Wander);
-        }
     }
 
     private IEnumerator AutoChangeFromIdleToWander() // 일정 시간이 지난 뒤, 배회상태로 변경

@@ -156,7 +156,7 @@ namespace PlayerStates
     {
         private MovementRigidbody2D movement;
         private PlayerAnimator animator;
-        private float rollSpeed = 8f;
+        private float rollSpeed = 10f;
         private float rollDuration = 0.5f;
         private float rollTimer;
         private float rollDirection;
@@ -220,6 +220,7 @@ namespace PlayerStates
             
             // 구르기 종료
             player.IsRolling = false;
+            player.UpdateMove(0);
         }
     }
     
@@ -336,6 +337,47 @@ namespace PlayerStates
         }
     }
 
+    public class Teleport : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private float teleportDuration = 0.5f;
+        private float teleportTimer;
+        
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            
+            teleportTimer = teleportDuration;
+
+            InputManager.Instance.OnJumpPressed -= player.OnJump;
+            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
+            InputManager.Instance.OnHoldPressed -= player.OnHold;
+            
+            player.UpdateMove(0f);
+            // 임시 애니메이션
+            animator.MovementAnim(0f);
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            teleportTimer -= Time.deltaTime;
+            
+            // 텔레포트 완료
+            if (teleportTimer <= 0)
+            {
+                player.ChangeState(new Idle());
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            
+            
+            InputManager.Instance.OnJumpPressed += player.OnJump;
+            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
+            InputManager.Instance.OnHoldPressed += player.OnHold;
+        }
+    }
     public class StateGlobal : State<PlayerController>
     {
         
