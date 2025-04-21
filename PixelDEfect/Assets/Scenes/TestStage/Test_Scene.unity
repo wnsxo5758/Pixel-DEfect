@@ -171,10 +171,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea595fda38ce3504aa6ccfef85c995ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isActive: 0
   upFloorTransform: {fileID: 71671600}
   moveSpeed: 2
-  internalButton: {fileID: 1283578533}
+  internalButton: {fileID: 0}
+  isMoving: 0
 --- !u!4 &56846499 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1572757546378683874, guid: 51ef8d7ff61079b4f848bbdf63f0fc88, type: 3}
@@ -205,7 +205,7 @@ Transform:
   m_GameObject: {fileID: 71671599}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.96, y: 10.45, z: 0.07262695}
+  m_LocalPosition: {x: -37.46, y: 17.61, z: 0.07262695}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -225,7 +225,7 @@ GameObject:
   - component: {fileID: 128065064}
   m_Layer: 0
   m_Name: ElevatorButton
-  m_TagString: Untagged
+  m_TagString: Button
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -248,10 +248,11 @@ MonoBehaviour:
   isCount: 0
   timeToLimit: 0
   connectedObjects: []
-  activeSprite: {fileID: -155366678, guid: 835902135269a34438b054acf1924349, type: 3}
-  inActiveSprite: {fileID: -1086677487, guid: 835902135269a34438b054acf1924349, type: 3}
+  activeSprite: {fileID: -1086677487, guid: 835902135269a34438b054acf1924349, type: 3}
+  inActiveSprite: {fileID: -155366678, guid: 835902135269a34438b054acf1924349, type: 3}
   elevator: {fileID: 43769906}
   isUpperFloorButton: 0
+  isInsideButton: 0
 --- !u!4 &128065063
 Transform:
   m_ObjectHideFlags: 0
@@ -50501,12 +50502,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1283578531}
+  - component: {fileID: 1283578535}
   - component: {fileID: 1283578532}
-  - component: {fileID: 1283578533}
   - component: {fileID: 1283578534}
   m_Layer: 0
   m_Name: Button
-  m_TagString: Untagged
+  m_TagString: Button
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -50572,27 +50573,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &1283578533
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1283578530}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d71c9c59e8cff9849a57c62744139b78, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canRange: 0
-  isActive: 0
-  isActiving: 0
-  isCount: 0
-  timeToLimit: 0
-  connectedObjects: []
-  activeSprite: {fileID: -155366678, guid: 835902135269a34438b054acf1924349, type: 3}
-  inActiveSprite: {fileID: -1086677487, guid: 835902135269a34438b054acf1924349, type: 3}
-  elevator: {fileID: 43769906}
 --- !u!82 &1283578534
 AudioSource:
   m_ObjectHideFlags: 0
@@ -50689,6 +50669,29 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1283578535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283578530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88f4f7d309251b248839baaa3f500c33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canRange: 0
+  isActive: 0
+  isActiving: 0
+  isCount: 0
+  timeToLimit: 0
+  connectedObjects: []
+  activeSprite: {fileID: -1086677487, guid: 835902135269a34438b054acf1924349, type: 3}
+  inActiveSprite: {fileID: -155366678, guid: 835902135269a34438b054acf1924349, type: 3}
+  elevator: {fileID: 43769906}
+  isUpperFloorButton: 0
+  isInsideButton: 1
 --- !u!1 &1294696510 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6326456131935108557, guid: 2e6610b166fd59b47a0997b85a9d6777, type: 3}
@@ -52232,7 +52235,7 @@ GameObject:
   - component: {fileID: 2011114584}
   m_Layer: 0
   m_Name: ElevatorButton_Up
-  m_TagString: Untagged
+  m_TagString: Button
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -52396,10 +52399,11 @@ MonoBehaviour:
   isCount: 0
   timeToLimit: 0
   connectedObjects: []
-  activeSprite: {fileID: -155366678, guid: 835902135269a34438b054acf1924349, type: 3}
-  inActiveSprite: {fileID: -1086677487, guid: 835902135269a34438b054acf1924349, type: 3}
+  activeSprite: {fileID: -1086677487, guid: 835902135269a34438b054acf1924349, type: 3}
+  inActiveSprite: {fileID: -155366678, guid: 835902135269a34438b054acf1924349, type: 3}
   elevator: {fileID: 43769906}
   isUpperFloorButton: 1
+  isInsideButton: 0
 --- !u!4 &2011114587
 Transform:
   m_ObjectHideFlags: 0

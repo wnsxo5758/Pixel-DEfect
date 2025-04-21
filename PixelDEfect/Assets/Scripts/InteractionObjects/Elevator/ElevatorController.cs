@@ -2,41 +2,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ElevatorController : InteractableObject
+public class ElevatorController : MonoBehaviour
 {
-    [Header("엘리베이터 기본 설정")]
-    [SerializeField]
-    private Transform upFloorTransform; // 위층 위치
-    [SerializeField]
-    private float moveSpeed; // 엘리베이터 속도
+    [Header("엘리베이터 설정")]
+    [SerializeField] private Transform upFloorTransform;          // 위층 위치
+    [SerializeField] private float moveSpeed = 2f;                // 이동 속도
+    [SerializeField] private ElevatorButton internalButton; // 내부 버튼 참조
 
-    [Header("엘리베이터 내부 버튼")]
+    private Vector3 downFloorPosition; // 아래층 위치
+    private bool isAtUpperFloor = false;
     [SerializeField]
-    private ElevatorInternalButton internalButton;
- 
-    private Transform startPos; // 아래층 위치
-    private bool isAtUpperFloor = false; //위층인가?
-    private bool isMoving = false; // 움직이는 중인가?
+    private bool isMoving = false;
 
     public bool IsAtUpperFloor => isAtUpperFloor;
     public bool IsMoving => isMoving;
 
     private void Awake()
     {
-        startPos = transform;
+        downFloorPosition = transform.position;
     }
 
-    public void ActivateElevator()
+    public void RequestMove()
     {
+        Debug.Log("이동 명령받음");
         if (isMoving) return;
-
-        Vector3 destination = isAtUpperFloor ? startPos.position : upFloorTransform.position;
+        Vector3 destination = isAtUpperFloor ? downFloorPosition : upFloorTransform.position;
         StartCoroutine(MoveElevator(destination));
     }
 
     private IEnumerator MoveElevator(Vector3 destination)
     {
         isMoving = true;
+
+        // 내부 버튼 비활성화
         if (internalButton != null)
             internalButton.SetInteractable(false);
 
@@ -49,30 +47,9 @@ public class ElevatorController : InteractableObject
         transform.position = destination;
         isAtUpperFloor = !isAtUpperFloor;
         isMoving = false;
+
+        // 도착 후 내부 버튼 다시 활성화
+        if (internalButton != null)
+            internalButton.SetInteractable(true);
     }
-
-    // 외부 버튼용 Trigger
-    public override void Trigger()
-    {
-        if (isMoving) return;
-
-        // 외부 버튼에서는 엘리베이터가 현재 위치에 없을 때만 작동
-        if ((!isAtUpperFloor && transform.position == startPos.position) ||
-            (isAtUpperFloor && transform.position == upFloorTransform.position))
-        {
-            ActivateElevator();
-        }
-
-        ActivateElevator();
-    }
-
-    // 내부 버튼에서 호출할 메서드
-    public void PressInternalButton()
-    {
-        if (!isMoving)
-        {
-            ActivateElevator();
-        }
-    }
-
 }
