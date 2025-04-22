@@ -4,56 +4,77 @@ using UnityEngine;
 
 public class LaserTrap : InteractableObject
 {
+    [Header("레이저 기본설정")]
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LaserBeam laserPrefab;
+    [SerializeField] private Transform laserPos;
 
-    [Header("레이저 설정")]
-    [SerializeField]
-    private LayerMask groundLayer; // 레이저가 닿을 레이어, 이것에 닿기 전까지는 계속 늘어난다
-    [SerializeField]
-    private LaserBeam laserPrefab; // 레이저 프리팹
-    [SerializeField]
-    private float maxLaserLength; // 최대 레이저 길이
-    [SerializeField]
-    private Transform laserPos; // 레이저가 시작되는 위치
+    [Header("움직이는 레이저 관련")]
+    [SerializeField] private bool canMove;
+    [SerializeField] private Transform movePos;
+    [SerializeField] private float moveDuration;
+    [SerializeField] private float waitDuration;
 
+    private Vector3 originalPos;
+    private Coroutine moveRoutine;
     private LaserBeam currentLaser;
+
     public override void Trigger()
     {
-        ActivateLaser();
+        isActive = !isActive;
+
+        if (isActive)
+        {
+            ActivateLaser();
+
+            if (canMove && moveRoutine == null)
+                moveRoutine = StartCoroutine(MoveRoutine());
+        }
+        else
+        {
+            DeactivateLaser();
+
+            if (canMove && moveRoutine != null)
+            {
+                StopCoroutine(moveRoutine);
+                moveRoutine = null;
+            }
+        }
     }
 
     private void Awake()
     {
-        ActivateLaser();
+        if (canMove)
+        {
+            originalPos = transform.position;
+        }
+
+        Trigger(); // 초기 상태에서 활성화 여부 결정
     }
 
     private void Update()
     {
-        if (isActive) 
+        if (isActive)
         {
             UpdateLaser();
         }
     }
+
     private void ActivateLaser()
     {
-        isActive = !isActive;
-
-        if (isActive == true) // 활성화한 경우
+        if (currentLaser == null)
         {
-            if (currentLaser == null)
-            {
-                currentLaser = Instantiate(laserPrefab, transform.position, Quaternion.identity);
-                currentLaser.SetSource(laserPos);
-            }
+            currentLaser = Instantiate(laserPrefab, transform.position, Quaternion.identity);
+            currentLaser.SetSource(laserPos);
         }
-        else if (isActive == false) // 비활성화한 경우
-        {
-            Destroy(currentLaser);
-            if(currentLaser != null)
-            {
-                Destroy(currentLaser.gameObject);
-                currentLaser = null;
-            }
+    }
 
+    private void DeactivateLaser()
+    {
+        if (currentLaser != null)
+        {
+            Destroy(currentLaser.gameObject);
+            currentLaser = null;
         }
     }
 
@@ -61,9 +82,35 @@ public class LaserTrap : InteractableObject
     {
         if (currentLaser == null) return;
 
-        RaycastHit2D hit = Physics2D.Raycast(laserPos.position, Vector2.down, maxLaserLength, groundLayer);
-        float laserLength = hit.collider != null ? hit.distance : maxLaserLength;
+        RaycastHit2D hit = Physics2D.Raycast(laserPos.position, Vector2.down, Mathf.Infinity, groundLayer);
+        float laserLength = hit.collider != null ? hit.distance : 100f;
 
         currentLaser.SetLength(laserLength);
+    }
+
+    private IEnumerator MoveRoutine()
+    {
+        while (true)
+        {
+            yield return MoveTo(movePos.position);
+            yield return new WaitForSeconds(waitDuration);
+            yield return MoveTo(originalPos);
+            yield return new WaitForSeconds(waitDuration);
+        }
+    }
+
+    private IEnumerator MoveTo(Vector3 targetPos)
+    {
+        Vector3 startPos = transform.position;
+        float elapsed = 0f;
+
+        while (elapsed < moveDuration)
+        {
+            transform.position = Vector3.Lerp(startPos, targetPos, elapsed / moveDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.position = targetPos;
     }
 }
