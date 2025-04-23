@@ -34,14 +34,14 @@ public abstract class EnemyFSM : MonoBehaviour
     [Header("피격관련")]
     [SerializeField]
     private float durationHit; // 피격후 색전환시간
+    [SerializeField] 
+    private float normalHitDelay = 1f; // 일반 피격 딜레이 시간
+    [SerializeField] 
+    private float stunHitDelay = 3.0f; // 스턴 피격 딜레이 시간
 
-    private bool isHit;
-
-    [Header("사망시 보상")]
-    [SerializeField]
-    private GameObject coins; // 사망시 드랍하는 코인
-    [SerializeField]
-    private int amount; // 드랍하는 코인의 최댓값
+    private bool isHit = false; // 피격 상태 플래그
+    private bool isStunned = false; // 스턴 상태 플래그
+    private bool isDead = false; // 사망 상태 플래그
 
     protected EnemyState enemyState = EnemyState.None;
     [SerializeField]
@@ -62,6 +62,7 @@ public abstract class EnemyFSM : MonoBehaviour
     protected AudioSource audioSource;
     protected SpriteRenderer spriteRenderer;
     private Color originalColor;
+    
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -189,12 +190,19 @@ public abstract class EnemyFSM : MonoBehaviour
 
     protected virtual IEnumerator Hit()
     {
+        isHit = true;
         rb.constraints = RigidbodyConstraints2D.FreezeAll;
         movement.MoveTo(0);
         StartCoroutine(nameof(HitColorEffect));
-
-        yield return new WaitForSeconds(1f);
         
+        float delayTime = isStunned ? stunHitDelay : normalHitDelay;
+        durationHit = delayTime;
+
+        yield return new WaitForSeconds(delayTime);
+
+        Debug.Log("Hit");
+        isHit = false;
+        isStunned = false;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         CalculateDistanceToTargetAndSelectState();
     }
@@ -305,6 +313,7 @@ public abstract class EnemyFSM : MonoBehaviour
     {
         PlaySound(deadClip);
         movement.MoveTo(0);
+        
         if(TryGetComponent(out Rigidbody2D rigid))
         {
             rigid.bodyType = RigidbodyType2D.Static;
@@ -343,33 +352,32 @@ public abstract class EnemyFSM : MonoBehaviour
 
         Gizmos.color = Color.black; // 벽확인용
         Gizmos.DrawRay(transform.position, dir * checkWallDistance);
-
-
     }
     
-    public void DecreaseHp(int _damage)
+    public void DecreaseHp(int amount, bool fromThrowable = false)
     {
-        if (currentHp > 0)
+        if (isDead) return;
+
+        currentHp -= amount;
+        PlaySound(hitClip);
+
+        if (currentHp <= 0)
         {
-            currentHp -= _damage;
-            PlaySound(hitClip);
-            if (currentHp > 0)
-            {
-                ChangeState(EnemyState.Hit);
-            }
-            else
-            {
-                ChangeState(EnemyState.Dead);
-            }
-            
+            currentHp = 0;
+            isDead = true;
+            ChangeState(EnemyState.Dead);
+            return;
         }
+        
+        isStunned = fromThrowable;
+        ChangeState(EnemyState.Hit);
     }
     
-    public void IncreaseHp(int _amount)
+    public void IncreaseHp(int amount)
     {
         if (currentHp < maxHp)
         {
-            currentHp += _amount;
+            currentHp += amount;
             if (currentHp > maxHp)
             {
                 currentHp = maxHp;

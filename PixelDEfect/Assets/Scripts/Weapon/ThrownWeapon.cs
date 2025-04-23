@@ -10,6 +10,7 @@ public class ThrownWeapon : MonoBehaviour
     [SerializeField] private float stuckDuration = 0.5f;
     [SerializeField] private float extraDamageMultiplier = 1.5f;
     [SerializeField] private LayerMask stickLayers;
+    [SerializeField] private float hitStunDuration = 3f; // 던진 무기 피격 시간
     
     private WeaponBase weaponData;
     private Rigidbody2D rb;
@@ -84,7 +85,7 @@ public class ThrownWeapon : MonoBehaviour
             if (enemy != null)
             {
                 float damage = weaponData.Damage;
-                enemy.DecreaseHp((int)damage);
+                enemy.DecreaseHp((int)damage, true);
                 Debug.Log($"Hit enemy with thrown weapon for {damage} damage");
                 
                 canDealDamage = false;
@@ -142,6 +143,7 @@ public class ThrownWeapon : MonoBehaviour
             if (enemy != null)
             {
                 float extraDamage = weaponData.Damage * extraDamageMultiplier;
+                
                 enemy.DecreaseHp((int)extraDamage);
                 Debug.Log($"Extra damage dealt for {extraDamage} damage");
             }
