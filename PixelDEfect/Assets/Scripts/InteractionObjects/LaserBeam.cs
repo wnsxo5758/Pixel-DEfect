@@ -9,9 +9,17 @@ public class LaserBeam : MonoBehaviour
     private int damage = 1;// 데미지
     [SerializeField]
     private Transform beamTransform; // 레이저의 실제 Transforem 
-    [SerializeField]
-    private LayerMask damageAbleLayer; // 데미지를 줄 레이어
 
+    [SerializeField]
+    private LayerMask groundLayer;
+
+    private ImpactMemoryPool impactPool;
+
+
+    private void Awake()
+    {
+        impactPool = GetComponent<ImpactMemoryPool>();
+    }
     private Transform source;
     public void SetSource(Transform laserTrap)
     {
@@ -19,12 +27,23 @@ public class LaserBeam : MonoBehaviour
         transform.position = source.position;
     }
 
-    public void SetLength(float length)
+    public void SetLength(float maxLength)
     {
-        if (beamTransform == null) return;
+        if (beamTransform == null || source == null) return;
 
-        beamTransform.localScale = new Vector3 (1,length, 1);
-        beamTransform.position = source.position + Vector3.down * (length / 2);
+        // 바닥이나 충돌 지점까지 레이저 뻗음
+        RaycastHit2D hit = Physics2D.Raycast(source.position, Vector2.down, Mathf.Infinity, groundLayer);
+        float actualLength = hit.collider != null ? hit.distance : maxLength;
+
+        // 레이저 빔 크기 및 위치 설정
+        beamTransform.localScale = new Vector3(1, actualLength, 1);
+        beamTransform.position = source.position + Vector3.down * (actualLength / 2);
+
+        // 이펙트 발생
+        if (hit.collider != null && impactPool != null)
+        {
+            impactPool.SpawnImpact(hit);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

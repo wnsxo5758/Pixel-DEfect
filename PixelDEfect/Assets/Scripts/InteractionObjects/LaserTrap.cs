@@ -44,12 +44,14 @@ public class LaserTrap : InteractableObject
 
     private void Awake()
     {
-        if (canMove)
-        {
-            originalPos = transform.position;
-        }
+        originalPos = transform.position;
 
-        Trigger(); // 초기 상태에서 활성화 여부 결정
+        // 미리 생성 & 비활성화
+        currentLaser = Instantiate(laserPrefab, transform.position, Quaternion.identity);
+        currentLaser.SetSource(laserPos);
+        currentLaser.gameObject.SetActive(false);
+
+        Trigger(); // 초기 전원 상태 설정
     }
 
     private void Update()
@@ -62,25 +64,23 @@ public class LaserTrap : InteractableObject
 
     private void ActivateLaser()
     {
-        if (currentLaser == null)
+        if (currentLaser != null && !currentLaser.gameObject.activeSelf)
         {
-            currentLaser = Instantiate(laserPrefab, transform.position, Quaternion.identity);
-            currentLaser.SetSource(laserPos);
+            currentLaser.gameObject.SetActive(true);
         }
     }
 
     private void DeactivateLaser()
     {
-        if (currentLaser != null)
+        if (currentLaser != null && currentLaser.gameObject.activeSelf)
         {
-            Destroy(currentLaser.gameObject);
-            currentLaser = null;
+            currentLaser.gameObject.SetActive(false);
         }
     }
 
     private void UpdateLaser()
     {
-        if (currentLaser == null) return;
+        if (currentLaser == null || !currentLaser.gameObject.activeSelf) return;
 
         RaycastHit2D hit = Physics2D.Raycast(laserPos.position, Vector2.down, Mathf.Infinity, groundLayer);
         float laserLength = hit.collider != null ? hit.distance : 100f;
