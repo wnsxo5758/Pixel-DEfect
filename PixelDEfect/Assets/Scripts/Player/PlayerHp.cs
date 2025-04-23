@@ -62,6 +62,8 @@ public class PlayerHp : MonoBehaviour
         }
         else
         {
+            Debug.Log("플레이어에게 " + damage + "데미지");
+            
             OnInvincibility(1.5f);
         }
 

@@ -1,15 +1,14 @@
 public class BehaviorTree
 {
     private Node root;
-    private Blackboard blackboard;
 
     public BehaviorTree(Node root)
     {
         this.root = root;
-        blackboard = new Blackboard();
+        Blackboard = new Blackboard();
     }
 
-    public Blackboard Blackboard => blackboard;
+    public Blackboard Blackboard { get; set; }
 
     public NodeState Evaluate()
     {
