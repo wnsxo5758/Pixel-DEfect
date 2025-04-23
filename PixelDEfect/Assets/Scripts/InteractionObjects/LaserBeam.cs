@@ -1,61 +1,124 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class LaserBeam : MonoBehaviour
 {
-    [Header("∑π¿Ã¿˙ ∫ˆº≥¡§")]
-    [SerializeField]
-    private int damage = 1;// µ•πÃ¡ˆ
-    [SerializeField]
-    private Transform beamTransform; // ∑π¿Ã¿˙¿« Ω«¡¶ Transforem 
+    [Header("Î†àÏù¥Ï†Ä ÎπîÏÑ§Ï†ï")]
+    [SerializeField] private int damage = 1;
+    [SerializeField] private Transform beamTransform;
+    [SerializeField] private LayerMask groundLayer;
 
-    [SerializeField]
-    private LayerMask groundLayer;
+    private Transform source;
+    private LaserDirection direction = LaserDirection.Down;
 
-    private ImpactMemoryPool impactPool;
-
+    private ImpactMemoryPool pool;
+    private GameObject impactEffect;
 
     private void Awake()
     {
-        impactPool = GetComponent<ImpactMemoryPool>();
+        pool = GetComponent<ImpactMemoryPool>();
     }
-    private Transform source;
+
     public void SetSource(Transform laserTrap)
     {
         source = laserTrap;
         transform.position = source.position;
     }
 
+    public void SetDirection(LaserDirection dir)
+    {
+        direction = dir;
+    }
+
     public void SetLength(float maxLength)
     {
         if (beamTransform == null || source == null) return;
 
-        // πŸ¥⁄¿Ã≥™ √Êµπ ¡ˆ¡°±Ó¡ˆ ∑π¿Ã¿˙ ª∏¿Ω
-        RaycastHit2D hit = Physics2D.Raycast(source.position, Vector2.down, Mathf.Infinity, groundLayer);
+        Vector2 dirVec = GetDirectionVector2D();
+        RaycastHit2D hit = Physics2D.Raycast(source.position, dirVec, Mathf.Infinity, groundLayer);
         float actualLength = hit.collider != null ? hit.distance : maxLength;
 
-        // ∑π¿Ã¿˙ ∫ˆ ≈©±‚ π◊ ¿ßƒ° º≥¡§
-        beamTransform.localScale = new Vector3(1, actualLength, 1);
-        beamTransform.position = source.position + Vector3.down * (actualLength / 2);
-
-        // ¿Ã∆Â∆Æ πﬂª˝
-        if (hit.collider != null && impactPool != null)
+        // Î†àÏù¥Ï†Ä Ïä§ÏºÄÏùº Ï°∞Ï†ï
+        beamTransform.localScale = direction switch
         {
-            impactPool.SpawnImpact(hit);
+            LaserDirection.Left or LaserDirection.Right => new Vector3(actualLength, 1, 1),
+            _ => new Vector3(1, actualLength, 1)
+        };
+
+        // Î†àÏù¥Ï†Ä ÏúÑÏπò Ï°∞Ï†ï (Ï§ëÏïô Î≥¥Ï†ï)
+        beamTransform.position = source.position + GetOffsetVector3(actualLength);
+
+        // ÌöåÏ†Ñ Ïú†ÏßÄ
+        beamTransform.rotation = GetRotation();
+
+        // Ïù¥ÌéôÌä∏ ÏÉùÏÑ± Î∞è ÏúÑÏπò Ï≤òÎ¶¨
+        if (hit.collider != null && pool != null)
+        {
+            if (impactEffect == null)
+            {
+                impactEffect = pool.SpawnImpactAndReturn(hit);
+            }
+
+            // ‚úÖ Ï†ïÌôïÌïú Ï∂©Îèå ÏúÑÏπòÏóê ÏÉùÏÑ±
+            impactEffect.transform.position = hit.point;
         }
+        else
+        {
+            if (impactEffect != null)
+            {
+                impactEffect.SetActive(false);
+                impactEffect = null;
+            }
+        }
+    }
+
+    private Vector2 GetDirectionVector2D()
+    {
+        return direction switch
+        {
+            LaserDirection.Up => Vector2.up,
+            LaserDirection.Down => Vector2.down,
+            LaserDirection.Left => Vector2.left,
+            LaserDirection.Right => Vector2.right,
+            _ => Vector2.down
+        };
+    }
+
+    private Vector3 GetOffsetVector3(float length)
+    {
+        return direction switch
+        {
+            LaserDirection.Up => Vector3.up * (length / 2),
+            LaserDirection.Down => Vector3.down * (length / 2),
+            LaserDirection.Left => Vector3.left * (length / 2),
+            LaserDirection.Right => Vector3.right * (length / 2),
+            _ => Vector3.down * (length / 2)
+        };
+    }
+
+    private Quaternion GetRotation()
+    {
+        return direction switch
+        {
+            LaserDirection.Up => Quaternion.Euler(0, 0, 0),
+            LaserDirection.Down => Quaternion.Euler(0, 0, 180),
+            LaserDirection.Left => Quaternion.Euler(0, 0, 90),
+            LaserDirection.Right => Quaternion.Euler(0, 0, -90),
+            _ => Quaternion.identity
+        };
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.CompareTag("Player"))
+        if (collision.CompareTag("Player"))
         {
-            collision.GetComponent<PlayerHp>().DecreaseHp(damage);
+            collision.GetComponent<PlayerHp>()?.DecreaseHp(damage);
         }
-        else if(collision.CompareTag("Enemy"))
+        else if (collision.CompareTag("Enemy"))
         {
-            collision.GetComponent<EnemyFSM>().DecreaseHp(damage);
+            collision.GetComponent<EnemyFSM>()?.DecreaseHp(damage);
         }
     }
-
 }
+

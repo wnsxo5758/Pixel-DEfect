@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum LaserDirection { Down =0, Up , Right, Left}
 public class LaserTrap : InteractableObject
 {
     [Header("레이저 기본설정")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LaserBeam laserPrefab;
     [SerializeField] private Transform laserPos;
+    [SerializeField]
+    private LaserDirection laserDirection;
 
     [Header("움직이는 레이저 관련")]
     [SerializeField] private bool canMove;
@@ -41,17 +44,35 @@ public class LaserTrap : InteractableObject
             }
         }
     }
+    private void ApplyRotationByDirection()
+    {
+        float zRotation = laserDirection switch
+        {
+            LaserDirection.Up => 180f,
+            LaserDirection.Down => 0f,
+            LaserDirection.Left => -90f,
+            LaserDirection.Right => 90f,
+            _ => 0f
+        };
+
+        transform.rotation = Quaternion.Euler(0f, 0f, zRotation);
+    }
 
     private void Awake()
     {
-        originalPos = transform.position;
+        laserSetUp();
+        Trigger(); // 초기 전원 상태 설정
+    }
 
-        // 미리 생성 & 비활성화
+    private void laserSetUp()
+    {
+        originalPos = transform.position;
+        ApplyRotationByDirection();
         currentLaser = Instantiate(laserPrefab, transform.position, Quaternion.identity);
         currentLaser.SetSource(laserPos);
+        currentLaser.SetDirection(laserDirection);
         currentLaser.gameObject.SetActive(false);
 
-        Trigger(); // 초기 전원 상태 설정
     }
 
     private void Update()
@@ -82,10 +103,7 @@ public class LaserTrap : InteractableObject
     {
         if (currentLaser == null || !currentLaser.gameObject.activeSelf) return;
 
-        RaycastHit2D hit = Physics2D.Raycast(laserPos.position, Vector2.down, Mathf.Infinity, groundLayer);
-        float laserLength = hit.collider != null ? hit.distance : 100f;
-
-        currentLaser.SetLength(laserLength);
+        currentLaser.SetLength(100f); // 적당한 최대 길이만 넘겨주면, 내부에서 Raycast 방향 처리함
     }
 
     private IEnumerator MoveRoutine()
