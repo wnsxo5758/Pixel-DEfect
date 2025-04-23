@@ -53960,7 +53960,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1045097589475407134, guid: da20c532e759984468a31941c23a185a, type: 3}
       propertyPath: laserDirection
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1045097589475407134, guid: da20c532e759984468a31941c23a185a, type: 3}
       propertyPath: groundLayer.m_Bits

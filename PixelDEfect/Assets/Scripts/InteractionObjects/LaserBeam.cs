@@ -39,28 +39,21 @@ public class LaserBeam : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(source.position, dirVec, Mathf.Infinity, groundLayer);
         float actualLength = hit.collider != null ? hit.distance : maxLength;
 
-        // 레이저 스케일 조정
-        beamTransform.localScale = direction switch
-        {
-            LaserDirection.Left or LaserDirection.Right => new Vector3(actualLength, 1, 1),
-            _ => new Vector3(1, actualLength, 1)
-        };
+        // ✅ 항상 Y축만 scale 변경
+        beamTransform.localScale = new Vector3(1, actualLength, 1);
 
-        // 레이저 위치 조정 (중앙 보정)
+        // ✅ 로컬 Y축 기준으로 offset
         beamTransform.position = source.position + GetOffsetVector3(actualLength);
 
-        // 회전 유지
+        // ✅ 회전은 미리 설정되어 있다고 가정
         beamTransform.rotation = GetRotation();
 
-        // 이펙트 생성 및 위치 처리
+        // ✅ 이펙트
         if (hit.collider != null && pool != null)
         {
             if (impactEffect == null)
-            {
                 impactEffect = pool.SpawnImpactAndReturn(hit);
-            }
 
-            // ✅ 정확한 충돌 위치에 생성
             impactEffect.transform.position = hit.point;
         }
         else
@@ -87,14 +80,8 @@ public class LaserBeam : MonoBehaviour
 
     private Vector3 GetOffsetVector3(float length)
     {
-        return direction switch
-        {
-            LaserDirection.Up => Vector3.up * (length / 2),
-            LaserDirection.Down => Vector3.down * (length / 2),
-            LaserDirection.Left => Vector3.left * (length / 2),
-            LaserDirection.Right => Vector3.right * (length / 2),
-            _ => Vector3.down * (length / 2)
-        };
+        // ✅ 항상 로컬 Y축 기준이므로, 회전된 방향과 관계없이 "up"을 기준
+        return transform.up * (length / 2f);
     }
 
     private Quaternion GetRotation()
@@ -108,6 +95,16 @@ public class LaserBeam : MonoBehaviour
             _ => Quaternion.identity
         };
     }
+
+    public void Deactivate()
+    {
+        if (impactEffect != null)
+        {
+            impactEffect.SetActive(false);
+            impactEffect = null;
+        }
+    }
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

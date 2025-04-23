@@ -1,18 +1,18 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public enum LaserDirection { Down =0, Up , Right, Left}
 public class LaserTrap : InteractableObject
 {
-    [Header("·¹ÀÌÀú ±âº»¼³Á¤")]
+    [Header("ë ˆì´ì € ê¸°ë³¸ì„¤ì •")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LaserBeam laserPrefab;
     [SerializeField] private Transform laserPos;
     [SerializeField]
     private LaserDirection laserDirection;
 
-    [Header("¿òÁ÷ÀÌ´Â ·¹ÀÌÀú °ü·Ã")]
+    [Header("ì›€ì§ì´ëŠ” ë ˆì´ì € ê´€ë ¨")]
     [SerializeField] private bool canMove;
     [SerializeField] private Transform movePos;
     [SerializeField] private float moveDuration;
@@ -61,9 +61,8 @@ public class LaserTrap : InteractableObject
     private void Awake()
     {
         laserSetUp();
-        Trigger(); // ÃÊ±â Àü¿ø »óÅÂ ¼³Á¤
+        Trigger(); // ì´ˆê¸° ì „ì› ìƒíƒœ ì„¤ì •
     }
-
     private void laserSetUp()
     {
         originalPos = transform.position;
@@ -72,9 +71,7 @@ public class LaserTrap : InteractableObject
         currentLaser.SetSource(laserPos);
         currentLaser.SetDirection(laserDirection);
         currentLaser.gameObject.SetActive(false);
-
     }
-
     private void Update()
     {
         if (isActive)
@@ -95,6 +92,7 @@ public class LaserTrap : InteractableObject
     {
         if (currentLaser != null && currentLaser.gameObject.activeSelf)
         {
+            currentLaser.Deactivate(); // âœ… ì´í™íŠ¸ ì •ë¦¬
             currentLaser.gameObject.SetActive(false);
         }
     }
@@ -103,7 +101,7 @@ public class LaserTrap : InteractableObject
     {
         if (currentLaser == null || !currentLaser.gameObject.activeSelf) return;
 
-        currentLaser.SetLength(100f); // Àû´çÇÑ ÃÖ´ë ±æÀÌ¸¸ ³Ñ°ÜÁÖ¸é, ³»ºÎ¿¡¼­ Raycast ¹æÇâ Ã³¸®ÇÔ
+        currentLaser.SetLength(100f); // ì ë‹¹í•œ ìµœëŒ€ ê¸¸ì´ë§Œ ë„˜ê²¨ì£¼ë©´, ë‚´ë¶€ì—ì„œ Raycast ë°©í–¥ ì²˜ë¦¬í•¨
     }
 
     private IEnumerator MoveRoutine()

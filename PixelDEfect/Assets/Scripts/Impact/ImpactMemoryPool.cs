@@ -39,10 +39,10 @@ public class ImpactMemoryPool : MonoBehaviour
         GameObject item = memoryPools[(int)type.Value].ActivePoolItem();
         if (item != null)
         {
-            // ✅ 충돌 지점에 바로 생성
+            // 충돌 지점에 바로 생성
             item.transform.position = hit.point;
 
-            // ✅ 회전만 유지 (방향은 유지하고 위치만 정확히)
+            //회전만 유지 (방향은 유지하고 위치만 정확히)
             item.transform.rotation = Quaternion.LookRotation(Vector3.forward, hit.normal);
 
             item.GetComponent<Impact>().SetUp(memoryPools[(int)type.Value]);
