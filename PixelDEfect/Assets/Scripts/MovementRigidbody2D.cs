@@ -72,6 +72,13 @@ public class MovementRigidbody2D : MonoBehaviour
         if (x != 0) x = Mathf.Sign(x);
         rigid.velocity = new Vector2(x * moveSpeed, rigid.velocity.y);
     }
+
+    public void MoveToFast(float x)
+    {
+        moveSpeed = runSpeed * 1.2f;
+        if (x != 0) x = Mathf.Sign(x);
+        rigid.velocity = new Vector2(x * moveSpeed, rigid.velocity.y);
+    }
     
     public void Jump() //มกวม
     {

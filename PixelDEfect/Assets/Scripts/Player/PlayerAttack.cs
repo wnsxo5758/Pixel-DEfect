@@ -406,8 +406,6 @@ public class PlayerAttack : MonoBehaviour
     public void PerformMeleeAttack()
     {
         HandleAttackCollision();
-        
-        Debug.Log("Melee Attack");
     }
 
     // 무기 던지기 수행

@@ -163,6 +163,9 @@ public class EnemyBT : MonoBehaviour
         // 피격 중이거나 사망 상태면 타겟 감지하지 않음
         if (isHit || isDead) return;
         
+        bool previouslyDetected = blackboard.GetValue<bool>("PlayerDetected");
+        bool currentlyDetected = previouslyDetected;
+        
         if (target == null)
         {
             // 플레이어 자동 탐색
@@ -172,35 +175,79 @@ public class EnemyBT : MonoBehaviour
             {
                 target = playerCollider.transform;
                 blackboard.SetValue("Target", target);
+                currentlyDetected = true;
             }
         }
         else
         {
             // 타겟 거리 확인
             float distanceToTarget = Vector2.Distance(transform.position, target.position);
-            
-            // 시야 내에 있는지 확인 (레이캐스트)
-            bool canSeeTarget = false;
-            if (distanceToTarget <= detectionRange)
-            {
-                Vector2 directionToTarget = (target.position - transform.position).normalized;
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToTarget,
-                                    detectionRange, targetLayer);
 
-                if (hit.collider != null && hit.collider.transform == target)
+            if (previouslyDetected)
+            {
+                // 이미 추적 중
+                if (distanceToTarget > loseTargetRange)
                 {
-                    canSeeTarget = true;
+                    currentlyDetected = false;
+                }
+                else
+                {
+                    currentlyDetected = true;
                 }
             }
-            
-            // 타겟을 너무 멀리 쫒아가면 포기
-            if (distanceToTarget > loseTargetRange)
+            else
             {
-                canSeeTarget = false;
+                // 추적 중이 아니면 시야 체크
+                if (distanceToTarget <= detectionRange)
+                {
+                    Vector2 directionToTarget = (target.position - transform.position).normalized;
+                    RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToTarget,
+                        detectionRange, targetLayer);
+                    Debug.DrawRay(transform.position, directionToTarget * detectionRange, Color.red);
+                
+                    if (hit.collider != null && hit.collider.transform == target)
+                    {
+                        currentlyDetected = true;
+                    }
+                }
             }
+        }
+        
+        // 블랙보드 업데이트
+        blackboard.SetValue("PlayerDetected", currentlyDetected);
             
-            // 블랙보드 업데이트
-            blackboard.SetValue("PlayerDetected", canSeeTarget);
+        // 플레이어 감지 상태가 변경되었으면 애니메이션 업데이트 및 패트롤 방향 설정
+        if (previouslyDetected != currentlyDetected)
+        {
+            if (animator != null)
+            {
+                animator.SetChasingState(currentlyDetected);
+            }
+                
+            // 추적을 포기할 때 현재 방향에 맞게 패트롤 방향 초기화
+            if (!currentlyDetected && previouslyDetected)
+            {
+                // 추적 모드에서 패트롤 모드로 전환될 때 방향 설정
+                HandleLostTarget();
+            }
+        }
+    }
+
+    // 추적 포기 시 방향 설정 처리
+    protected virtual void HandleLostTarget()
+    {
+        // 현재 방향 가져오기
+        float currentDirection = GetDirection();
+        
+        // 현재 방향으로 패트롤 방향 설정
+        blackboard.SetValue("PatrolDirection", currentDirection);
+        
+        // 벽 체크 - 만약 현재 방향에 벽 있다면 방향 반전
+        if (CheckWall(currentDirection))
+        {
+            currentDirection *= -1;
+            blackboard.SetValue("PatrolDirection", currentDirection);
+            SetDirection(currentDirection);
         }
     }
     
@@ -214,37 +261,57 @@ public class EnemyBT : MonoBehaviour
 
         if (currentTarget == null)
         {
+            if (animator != null)
+            {
+                animator.SetChasingState(false);
+            }
             return NodeState.Failure;
+        }
+
+        // 추적 애니메이션 활성화
+        if (animator != null)
+        {
+            animator.SetChasingState(true);
         }
         
         // 타겟 방향으로 이동
         Vector2 direction = (currentTarget.position - transform.position).normalized;
-        float moveDirection = Mathf.Sign(direction.x);
+        float directionToTarget = Mathf.Sign(direction.x);
         
         // 방향 설정
-        if (moveDirection != 0)
+        if (directionToTarget != 0)
         {
-            SetDirection(moveDirection);
+            SetDirection(directionToTarget);
+        }
+
+        // 공격 범위 내에 있는지 확인
+        bool inAttackRange = IsTargetInAttackRange();
+
+        // 공격 범위 내에 있으면 이동하지 않고 방향만 설정
+        if (inAttackRange)
+        {
+            if (movement != null)
+            {
+                movement.MoveTo(0);
+            }
+            else
+            {
+                rb.velocity = new Vector2(0, rb.velocity.y);
+            }
+        }
+        // 공격 범위 밖에 있으면 추적
+        else
+        {
+            bool isWallAhead = CheckWall(directionToTarget);
+            float moveDirection = isWallAhead ? 0 : directionToTarget;
+            
+            // 이동
+            if (movement != null)
+            {
+                movement.MoveToFast(moveDirection);
+            }
         }
         
-        //벽 체크
-        bool isWallAhead = CheckWall(moveDirection);
-        if (isWallAhead)
-        {
-            // 벽이 있으면 이동 중지
-            moveDirection = 0;
-        }
-
-        if (movement != null)
-        {
-            movement.MoveTo(moveDirection);
-        }
-
-        if (animator != null)
-        {
-            
-        }
-
         return NodeState.Running;
     }
 
@@ -253,18 +320,33 @@ public class EnemyBT : MonoBehaviour
     {
         // 피격 중이거나 사망 상태면 패트롤하지 않음
         if (isHit || isDead) return NodeState.Failure;
+
+        if (animator != null)
+        {
+            animator.SetChasingState(false);
+        }
         
         float direction = blackboard.GetValue<float>("PatrolDirection");
-        
-        // 벽, 땅 체크
-        bool isWallAhead = CheckWall(direction);
-        bool isGroundAhead = CheckGround(direction);
 
-        // 벽이 있거나 바닥이 없으면 방향 전환
-        if (isWallAhead || !isGroundAhead)
+        // 방향 값 검증
+        if (float.IsNaN(direction) || direction == 0)
+        {
+            direction = 1f;
+            blackboard.SetValue("PatrolDirection", direction);
+        }
+        
+        // 벽 체크
+        bool isWallAhead = CheckWall(direction);
+
+        // 벽이 있으면 방향 전환
+        if (isWallAhead)
         {
             direction *= -1;
             blackboard.SetValue("PatrolDirection", direction);
+            SetDirection(direction);
+        }
+        else
+        {
             SetDirection(direction);
         }
         
@@ -276,7 +358,7 @@ public class EnemyBT : MonoBehaviour
 
         if (animator != null)
         {
-            
+            animator.SetMovementAnim(Mathf.Abs(direction));
         }
 
         return NodeState.Running;
@@ -298,7 +380,8 @@ public class EnemyBT : MonoBehaviour
         // 피격 애니메이션 재생
         if (animator != null)
         {
-            
+            animator.SetMovementAnim(0);
+            animator.TriggerHitAnim();
         }
 
         return NodeState.Running;
@@ -323,7 +406,9 @@ public class EnemyBT : MonoBehaviour
         // 사망 애니메이션 재생
         if (animator != null)
         {
-            
+            animator.SetMovementAnim(0);
+            animator.SetChasingState(false);
+            animator.TriggerDeathAnim();
         }
         
         // 오브젝트 제거 (딜레이 적용)
@@ -381,7 +466,14 @@ public class EnemyBT : MonoBehaviour
         if (direction != 0)
         {
             Vector3 scale = transform.localScale;
+            float previousX = scale.x;
             scale.x = Mathf.Abs(scale.x) * Mathf.Sign(direction);
+            
+            if (!Mathf.Approximately(previousX, scale.x))
+            {
+                Debug.Log($"Direction changed from {previousX} to {scale.x}");
+            }
+            
             transform.localScale = scale;
         }
     }
@@ -398,7 +490,7 @@ public class EnemyBT : MonoBehaviour
                             new Vector2(wallCheckOffset.x * direction, wallCheckOffset.y);
         
         RaycastHit2D hit = Physics2D.Raycast(originPos, new Vector2(direction, 0), wallCheckDistance, wallLayer);
-        Debug.DrawRay(originPos, new Vector2(direction, 0), hit ? Color.red : Color.green);
+        Debug.DrawRay(originPos, new Vector2(direction, 0) * wallCheckDistance, hit ? Color.red : Color.green);
 
         return hit;
     }
@@ -413,6 +505,18 @@ public class EnemyBT : MonoBehaviour
         Debug.DrawRay(originPos, Vector2.down * wallCheckDistance, hit ? Color.green : Color.red);
 
         return hit;
+    }
+
+    protected virtual bool IsTargetInAttackRange()
+    {
+        // 하위 클래스에서 공격 범위를 설정
+        return false;
+    }
+
+    protected virtual float GetAttackRange()
+    {
+        // 하위 클래스에서 오버라이드
+        return 0f;
     }
     
     // 거리 계산 메서드

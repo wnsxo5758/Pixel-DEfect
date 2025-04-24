@@ -10,6 +10,13 @@ public class EnemyAnimator : MonoBehaviour
     private bool isDeath; // 사망시
     private float deathAnimLength;
     public float DeathAnimLength => deathAnimLength;
+
+    private readonly string moveParam = "Speed";
+    private readonly string attackTrigger = "Attack";
+    private readonly string hitTrigger = "Hit";
+    private readonly string deathTrigger = "Death";
+    private readonly string chasingParam = "IsChasing";
+    
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -59,4 +66,58 @@ public class EnemyAnimator : MonoBehaviour
         transform.parent.localScale = new Vector3((x < 0 ? -1 : 1), 1, 1);
     }
 
+    
+    // 새로운 animation 메소드
+
+    public void SetMovementAnim(float speed)
+    {
+        if (animator != null)
+        {
+            animator.SetFloat(moveParam, speed);
+        }
+    }
+
+    public void SetChasingState(bool isChasing)
+    {
+        if (animator != null)
+        {
+            animator.SetBool(chasingParam, isChasing);
+        }
+    }
+    
+    public void TriggerAttackAnim()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(attackTrigger);
+        }
+    }
+    
+    public void TriggerHitAnim()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(hitTrigger);
+        }
+    }
+
+    public void TriggerDeathAnim()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(deathTrigger);
+        }
+    }
+
+    private void OnAttackEvent()
+    {
+        MeleeEnemy enemy = transform.GetComponentInParent<MeleeEnemy>();
+        enemy.OnAttackAnimationEvent();
+    }
+
+    private void OnAttackFinished()
+    {
+        MeleeEnemy enemy = transform.GetComponentInParent<MeleeEnemy>();
+        enemy.OnAttackAnimationFinished();
+    }
 }

@@ -81,6 +81,25 @@ public class MeleeEnemy : EnemyBT
         
         return attackSequence;
     }
+
+    protected override bool IsTargetInAttackRange()
+    {
+        Transform currentTarget = blackboard.GetValue<Transform>("Target");
+
+        if (currentTarget == null)
+        {
+            return false;
+        }
+
+        float distance = Vector2.Distance(transform.position, currentTarget.position);
+        return distance <= attackRange;
+    }
+    
+    // 공격 범위 반환 메서드
+    protected override float GetAttackRange()
+    {
+        return attackRange;
+    }
     
     // 공격 범위 내 체크
     private bool IsInAttackRange()
@@ -97,8 +116,6 @@ public class MeleeEnemy : EnemyBT
         // 타겟이 공격 범위 내에 있으면 해당 방향으로 적 방향 설정
         if (distance <= attackRange)
         {
-            float directionToTarget = Mathf.Sign(currentTarget.position.x - transform.position.x);
-            SetDirection(directionToTarget);
             return true;
         }
         
@@ -120,6 +137,10 @@ public class MeleeEnemy : EnemyBT
         blackboard.SetValue("CanAttack", false);
         blackboard.SetValue("IsAttacking", true);
         
+        Transform currentTarget = blackboard.GetValue<Transform>("Target");
+        float directionToTarget = Mathf.Sign(currentTarget.position.x - transform.position.x);
+        SetDirection(directionToTarget);
+        
         //이동 중지
         if (movement != null)
         {
@@ -129,7 +150,9 @@ public class MeleeEnemy : EnemyBT
         // 애니메이션 재생
         if (animator != null)
         {
-            
+            animator.SetMovementAnim(0);
+            animator.SetChasingState(true);
+            animator.TriggerAttackAnim();
         }
 
         return NodeState.Success;
@@ -149,6 +172,22 @@ public class MeleeEnemy : EnemyBT
     {
         isAttacking = false;
         blackboard.SetValue("IsAttacking", false);
+
+        if (IsTargetInAttackRange())
+        {
+            // 공격 범위 내에 있으면 플레이어 방향만 바라보도록 설정
+            Transform currentTarget = blackboard.GetValue<Transform>("Target");
+            if (currentTarget != null)
+            {
+                float directionToTarget = Mathf.Sign(currentTarget.position.x - transform.position.x);
+                SetDirection(directionToTarget);
+
+                if (movement != null)
+                {
+                    movement.MoveTo(0);
+                }
+            }
+        }
     }
     
     // 데미지 처리
