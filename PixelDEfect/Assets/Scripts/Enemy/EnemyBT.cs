@@ -46,6 +46,7 @@ public class EnemyBT : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
+        enemyCollider = GetComponent<Collider2D>();
         
         blackboard = new Blackboard();
         
@@ -74,8 +75,6 @@ public class EnemyBT : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (isDead) return;
-
         // 피격 상태 처리
         if (isHit)
         {
@@ -90,7 +89,7 @@ public class EnemyBT : MonoBehaviour
         }
         
         // 타깃 감지
-        if (!isHit)
+        if (!isHit && !isDead)
         {
             DetectTarget();
         }
@@ -402,6 +401,13 @@ public class EnemyBT : MonoBehaviour
         {
             rb.velocity = new Vector2(0, rb.velocity.y);
         }
+
+        if (rb != null)
+        {
+            rb.bodyType = RigidbodyType2D.Static;
+        }
+
+        enemyCollider.enabled = false;
         
         // 사망 애니메이션 재생
         if (animator != null)
@@ -421,7 +427,12 @@ public class EnemyBT : MonoBehaviour
     protected IEnumerator DestroyAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        
+
+        ThrownWeapon attachedWeapon = GetComponentInChildren<ThrownWeapon>();
+        if (attachedWeapon != null)
+        {
+            attachedWeapon.DetachFromEnemy(transform.position);
+        }
         // 오브젝트 풀링 비활성화
         gameObject.SetActive(false);
     }
@@ -452,7 +463,7 @@ public class EnemyBT : MonoBehaviour
         blackboard.SetValue("StunTimer", stunTimer);
         
         // 넉백 적용 (피격 방향의 반대로)
-        if (target != null && rb != null)
+        if (target != null && rb != null && !isThrownWeapon)
         {
             Vector2 knockBackDirection = ((Vector2)transform.position - (Vector2)target.position).normalized;
             rb.velocity = Vector2.zero;

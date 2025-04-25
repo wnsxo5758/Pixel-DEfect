@@ -447,7 +447,7 @@ public class PlayerAttack : MonoBehaviour
 
         foreach (Collider2D enemyCollider in results)
         {
-            EnemyFSM enemy = enemyCollider.GetComponent<EnemyFSM>();
+            EnemyBT enemy = enemyCollider.GetComponent<EnemyBT>();
             if (enemy != null)
             {
                 enemy.DecreaseHp((int)currentWeapon.Damage);

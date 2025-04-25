@@ -81,7 +81,7 @@ public class ThrownWeapon : MonoBehaviour
         // 적 감지 및 데미지 처리
         if (canDealDamage && collision.transform.CompareTag("Enemy"))
         {
-            EnemyFSM enemy = collision.transform.GetComponent<EnemyFSM>();
+            EnemyBT enemy = collision.transform.GetComponent<EnemyBT>();
             if (enemy != null)
             {
                 float damage = weaponData.Damage;
@@ -139,7 +139,7 @@ public class ThrownWeapon : MonoBehaviour
     {
         if (isStuck && stuckTarget != null && stuckTarget.CompareTag("Enemy"))
         {
-            EnemyFSM enemy = stuckTarget.GetComponent<EnemyFSM>();
+            EnemyBT enemy = stuckTarget.GetComponent<EnemyBT>();
             if (enemy != null)
             {
                 float extraDamage = weaponData.Damage * extraDamageMultiplier;
