@@ -126,7 +126,7 @@ public class MeleeEnemy : EnemyBT
     private NodeState PerformAttack()
     {
         // 피격 중이면 공격 취소
-        if (isHit) return NodeState.Failure;
+        if (isHit || isDead) return NodeState.Failure;
         
         // 공격 쿨다운 설정
         canAttack = false;

@@ -34,6 +34,9 @@ public class EnemyBT : MonoBehaviour
     protected MovementRigidbody2D movement;
     protected EnemyAnimator animator;
     protected Collider2D enemyCollider;
+    protected SpriteRenderer spriteRenderer;
+    protected Color originalColor;
+    protected Coroutine flashCoroutine;
     
     // 상태 변수
     protected int currentHp;
@@ -47,6 +50,12 @@ public class EnemyBT : MonoBehaviour
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
         enemyCollider = GetComponent<Collider2D>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+        }
         
         blackboard = new Blackboard();
         
@@ -85,6 +94,17 @@ public class EnemyBT : MonoBehaviour
             {
                 isHit = false;
                 blackboard.SetValue("IsHit", false);
+
+                if (flashCoroutine != null)
+                {
+                    StopCoroutine(flashCoroutine);
+                    flashCoroutine = null;
+                }
+
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = originalColor;
+                }
             }
         }
         
@@ -451,6 +471,15 @@ public class EnemyBT : MonoBehaviour
             currentHp = 0;
             isDead = true;
             blackboard.SetValue("IsDead", true);
+
+            if (flashCoroutine != null)
+            {
+                StopCoroutine(flashCoroutine);
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = originalColor;
+                }
+            }
             return;
         }
         
@@ -462,6 +491,17 @@ public class EnemyBT : MonoBehaviour
         stunTimer = isThrownWeapon ? throwStunDuration : normalStunDuration;
         blackboard.SetValue("StunTimer", stunTimer);
         
+        // 피격 이펙트
+        if (spriteRenderer != null)
+        {
+            if (flashCoroutine != null)
+            {
+                StopCoroutine(flashCoroutine);
+            }
+
+            flashCoroutine = StartCoroutine(FlashEffect());
+        }
+        
         // 넉백 적용 (피격 방향의 반대로)
         if (target != null && rb != null && !isThrownWeapon)
         {
@@ -469,6 +509,23 @@ public class EnemyBT : MonoBehaviour
             rb.velocity = Vector2.zero;
             rb.AddForce(knockBackDirection * knockBackForce, ForceMode2D.Impulse);
         }
+    }
+
+    protected virtual IEnumerator FlashEffect()
+    {
+        float flashInterval = 0.2f;
+        Color flashColor = new Color(1f, 0.3f, 0.3f, 1f);
+
+        while (isHit && !isDead)
+        {
+            spriteRenderer.color = flashColor;
+            yield return new WaitForSeconds(flashInterval);
+            
+            spriteRenderer.color = originalColor;
+            yield return new WaitForSeconds(flashInterval);
+        }
+        
+        spriteRenderer.color = originalColor;
     }
     
     // 방향 설정 메서드
