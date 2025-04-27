@@ -72,7 +72,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1985080151
-  m_SortingLayer: 7
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 7402088731717053666, guid: de00252794a128248be3ac19c9d4e5e6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -117,7 +117,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.3997543, y: 0.6423095}
+  m_Offset: {x: 0.0002322197, y: 0.64230955}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.49999997, y: 0}
@@ -128,7 +128,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.64, y: 1.28}
+  m_Size: {x: 2.4399729, y: 1.28}
   m_EdgeRadius: 0
 --- !u!1001 &4689316640204570692
 PrefabInstance:
@@ -270,6 +270,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fa625c113ea8834e8966047daeaede4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  normalLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
   impactPrefab:
   - {fileID: 7075850266487279244, guid: 48ae48c14134bea41b7106302d6294f2, type: 3}
 --- !u!114 &1880296183994867729
