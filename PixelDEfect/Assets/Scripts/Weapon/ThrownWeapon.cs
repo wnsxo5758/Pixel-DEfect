@@ -20,9 +20,19 @@ public class ThrownWeapon : MonoBehaviour
     private bool isStuck = false;
     private bool canDealDamage = true;
     private Transform stuckTarget;
-    private Vector2 stuckLocalPosition;
-    private Vector3 stuckLocalRotation;
+    private Vector2 contactNormal; // 충돌 표면의 법선 벡터
+    private Vector2 throwDirection; // 던지는 방향 저장
+    private Vector2 playerPositionOnThrow; // 던진 시점의 플레이어 위치
+    public LayerMask StickLayers => stickLayers;
 
+    private static readonly Vector2[] possibleNormals =
+    {
+        Vector2.right,
+        Vector2.left,
+        Vector2.up,
+        Vector2.down,
+    };
+    
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -35,9 +45,13 @@ public class ThrownWeapon : MonoBehaviour
         }
     }
 
-    public void Initialize(WeaponBase weaponData, Vector2 throwForce, Vector2 direction)
+    public void Initialize(WeaponBase weaponData, Vector2 throwForce, Vector2 direction, Vector2 playerPosition)
     {
         this.weaponData = weaponData;
+        
+        throwDirection = direction.normalized;
+
+        playerPositionOnThrow = playerPosition;
         
         // 무기 데이터 적용
         if (spriteRenderer != null && weaponData.GetComponent<SpriteRenderer>() != null)
@@ -101,6 +115,23 @@ public class ThrownWeapon : MonoBehaviour
         Vector2 impactPoint = contact.point;
         Vector2 impactNormal = contact.normal;
 
+        // 법선 벡터 저장
+        contactNormal = impactNormal;
+        
+        if (throwDirection != Vector2.zero && Mathf.Abs(impactNormal.x) > Mathf.Abs(impactNormal.y))
+        {
+            Vector2 inversedThrowDir = -throwDirection;
+
+            float angleWithPhysicsNormal = Vector2.Angle(impactNormal, inversedThrowDir);
+
+            if (angleWithPhysicsNormal < 100f)
+            {
+                contactNormal = GetClosestCardinalDirection(inversedThrowDir);
+            }
+        }
+        
+        ValidateNormalWithPlayerPosition(impactPoint);
+        
         rb.velocity = Vector2.zero;
         rb.angularVelocity = 0f;
         rb.gravityScale = 0f;
@@ -110,6 +141,7 @@ public class ThrownWeapon : MonoBehaviour
         
         // 위치 & 회전 보정
         transform.position = impactPoint;
+        
         float angle = Mathf.Atan2(impactNormal.y, impactNormal.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
 
@@ -118,13 +150,59 @@ public class ThrownWeapon : MonoBehaviour
         {
             transform.SetParent(collision.transform);
             stuckTarget = collision.transform;
-            stuckLocalPosition = transform.localPosition;
-            stuckLocalRotation = transform.localEulerAngles;
         }
         
         isStuck = true;
     }
 
+    private void ValidateNormalWithPlayerPosition(Vector2 impactPoint)
+    {
+        if (Mathf.Abs(contactNormal.y) > Mathf.Abs(contactNormal.x))
+        {
+            return;
+        }
+
+        // 플레이어와 무기의 X 위치 차이
+        float xDifference = impactPoint.x - playerPositionOnThrow.x;
+        
+        // 법선 벡터의 예상 X 방향
+        float expectedNormalX = Mathf.Sign(xDifference);
+        
+        // 법선 벡터의 현재 X 방향
+        float currentNormalX = contactNormal.x;
+
+        // 만약 법선 벡터의 X 방향이 예상과 다르면 반전
+        if (expectedNormalX * currentNormalX > 0)
+        {
+            contactNormal = new Vector2(-contactNormal.x, contactNormal.y);
+        }
+    }
+    
+    private Vector2 GetClosestCardinalDirection(Vector2 inputVector)
+    {
+        Vector2 normalizedInput = inputVector.normalized;
+        
+        float maxDot = float.MinValue;
+        Vector2 closestDirection = Vector2.right;
+        
+        foreach (Vector2 direction in possibleNormals)
+        {
+            float dot = Vector2.Dot(normalizedInput, direction);
+            if (dot > maxDot)
+            {
+                maxDot = dot;
+                closestDirection = direction;
+            }
+        }
+        
+        return closestDirection;
+    }
+    
+    public Vector2 GetContactNormal()
+    {
+        return contactNormal;
+    }
+    
     public bool IsStuck()
     {
         return isStuck;

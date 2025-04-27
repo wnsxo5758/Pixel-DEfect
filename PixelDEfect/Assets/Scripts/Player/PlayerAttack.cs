@@ -338,7 +338,7 @@ public class PlayerAttack : MonoBehaviour
             yield break;
         }
 
-        Vector3 teleportPosition = targetWeapon.transform.position;
+        Vector3 teleportPosition = FindSafeTeleportPosition(targetWeapon);
 
         // 무기가 날아가는 중이면 리지드바디 멈추기
         if (!targetWeapon.IsStuck())
@@ -372,6 +372,51 @@ public class PlayerAttack : MonoBehaviour
         isTeleporting = false;
     }
 
+    private Vector3 FindSafeTeleportPosition(ThrownWeapon weapon)
+    {
+        Vector3 weaponPosition = weapon.transform.position;
+        LayerMask stickLayer = weapon.StickLayers;
+        
+        Collider2D playerCollider = GetComponent<Collider2D>();
+        if (playerCollider == null) return weaponPosition;
+        
+        Vector2 playerSize = playerCollider.bounds.size;
+        
+        // 무기가 박혀있지 않으면 무기 위치 반환
+        if (!weapon.IsStuck())
+        {
+            return weaponPosition;
+        }
+
+        Vector2 contactNormal = weapon.GetContactNormal();
+        
+        float absNormalX = Mathf.Abs(contactNormal.x);
+        float absNormalY = Mathf.Abs(contactNormal.y);
+
+        Vector2 teleportDirection;
+        float teleportDistance = playerSize.x * 1.5f;
+
+        // 법선 벡터가 수평 방향인 경우
+        if (absNormalX > absNormalY)
+        {
+            float diagonalX = Mathf.Sign(contactNormal.x);
+            teleportDirection = new Vector2(diagonalX, 1f).normalized;
+            
+            // 수평 벽의 경우 더 큰 거리 설정
+            teleportDistance = playerSize.x * 3f;
+        }
+        // 법선 벡터가 수직 방향인 경우
+        else
+        {
+            teleportDirection = contactNormal.y < 0 ? Vector2.down : Vector2.up;
+        }
+        
+        // 텔레포트 위치 계산
+        Vector2 basePosition = (Vector2)weaponPosition + teleportDirection * teleportDistance;
+
+        return basePosition;
+    }
+    
     private IEnumerator TeleportCooldownTimer()
     {
         yield return new WaitForSeconds(teleportCooldown);
@@ -425,7 +470,7 @@ public class PlayerAttack : MonoBehaviour
                 // 던지는 힘 계산 (포물선)
                 Vector2 throwForceVector = direction * throwForce + Vector2.up * throwUpwardForce;
                 
-                thrownWeapon.Initialize(currentWeapon, throwForceVector, direction);
+                thrownWeapon.Initialize(currentWeapon, throwForceVector, direction, transform.position);
 
                 lastThrownWeapon = thrownWeapon;
                 
@@ -510,10 +555,35 @@ public class PlayerAttack : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position + (Vector3)attackOffset, weaponDetectionRadius);
 
-        if (lastThrownWeapon != null)
+        if (lastThrownWeapon != null && lastThrownWeapon.IsStuck())
         {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(transform.position, lastThrownWeapon.transform.position);
+            Vector2 normal = lastThrownWeapon.GetContactNormal();
+            
+            if (normal != Vector2.zero)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawRay(lastThrownWeapon.transform.position, normal);
+                
+                // 계산된 텔레포트 방향 시각화
+                float absNormalX = Mathf.Abs(normal.x);
+                float absNormalY = Mathf.Abs(normal.y);
+            
+                Vector2 teleportDirection;
+            
+                if (absNormalX > absNormalY)
+                {
+                    float diagonalX = Mathf.Sign(normal.x);
+                    teleportDirection = new Vector2(diagonalX, 1f).normalized;
+                    Gizmos.color = Color.magenta;
+                }
+                else
+                {
+                    teleportDirection = normal.y < 0 ? Vector2.down : Vector2.up;
+                    Gizmos.color = Color.green;
+                }
+            
+                Gizmos.DrawRay(lastThrownWeapon.transform.position, teleportDirection * 3);
+            }
         }
     }
 
