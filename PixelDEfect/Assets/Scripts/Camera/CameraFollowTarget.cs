@@ -4,26 +4,23 @@ using UnityEngine;
 
 public class CameraFollowTarget : MonoBehaviour
 {
-    [SerializeField]
-    private StageData stageData;
-    [SerializeField]
-    private Transform target;
-    [SerializeField]
-    private bool x, y, z;
-
-    private float offsetY;
-
+    [Header("Camera Settings")]
+    [SerializeField] private StageData stageData;
+    [SerializeField] private Transform target;
+    [SerializeField] private bool x, y, z;
+    
+    [Header("Follow Settings")]
     [SerializeField] private float yFollowThreshold = 10f; // 추적 시작하는 최소 y 차이
     [SerializeField] private float yStopThreshold = 0.05f; // 추적 중지 판단 기준
     [SerializeField] private float yStopDelay = 1f; // 추적 중지를 위한 대기 시간
     [SerializeField] private float yLerpSpeed = 5f; // Y축 보간 속도
-
-
+    
+    private float offsetY;
+    
     private bool isYFollowing;
     private float yFollowTimer;
     private float lastTargetY;
-
-
+    
     private void Awake()
     {
         offsetY = Mathf.Abs(transform.position.y - target.position.y);
