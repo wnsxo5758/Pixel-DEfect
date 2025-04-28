@@ -52876,7 +52876,7 @@ GameObject:
   - component: {fileID: 2032050284}
   - component: {fileID: 2032050283}
   - component: {fileID: 2032050282}
-  - component: {fileID: 2032050285}
+  - component: {fileID: 2032050286}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -52958,7 +52958,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2032050285
+--- !u!114 &2032050286
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -52967,18 +52967,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 2032050281}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef828da9357617a42b840755d533f12a, type: 3}
+  m_Script: {fileID: 11500000, guid: 1aff6b043adab694cb28d1ca047796d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   stageData: {fileID: 11400000, guid: f050f4c803de5b941ba6ce1bedac6443, type: 2}
   target: {fileID: 680686593}
-  x: 1
-  y: 0
-  z: 0
+  trackX: 1
+  trackY: 0
   yFollowThreshold: 5
   yStopThreshold: 0.05
   yStopDelay: 1
   yLerpSpeed: 5
+  defaultShakeDuration: 0.2
+  defaultShakeMagnitude: 0.1
+  defaultShakeFadeTime: 0.1
 --- !u!1001 &2037084045
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -498,7 +498,7 @@ public class PlayerAttack : MonoBehaviour
                 enemy.DecreaseHp((int)currentWeapon.Damage);
                 Debug.Log("Hit enemy");
                 // 히트 이펙트
-                CameraShake.Instance.ShakeScreen();
+                CameraController.Instance.ShakeScreen();
             }
         }
     }
