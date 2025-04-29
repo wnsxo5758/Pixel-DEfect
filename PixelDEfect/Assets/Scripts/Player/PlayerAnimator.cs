@@ -13,6 +13,7 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int isClimbing = Animator.StringToHash("IsClimbing");
     private readonly int isCrouching = Animator.StringToHash("IsCrouching");
     private readonly int roll = Animator.StringToHash("Roll");
+    private readonly int stopRoll = Animator.StringToHash("StopRoll");
     private readonly int death = Animator.StringToHash("Death");
     
     // 공격 애니메이션
@@ -62,6 +63,13 @@ public class PlayerAnimator : MonoBehaviour
     public void StartRollAnim()
     {
         animator.SetTrigger(roll);
+        animator.ResetTrigger(stopRoll);
+    }
+
+    public void StopRollAnim()
+    {
+        animator.SetTrigger(stopRoll);
+        animator.ResetTrigger(roll);
     }
     
     public void EnterHoldAnim(float dir)

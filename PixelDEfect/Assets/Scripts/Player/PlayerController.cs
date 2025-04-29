@@ -112,7 +112,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void OnRoll()
+    public void OnRoll() // 구르기 입력
     {
         if (canRoll && movement.IsGrounded && !IsStateLimited())
         {

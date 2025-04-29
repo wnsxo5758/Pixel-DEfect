@@ -164,6 +164,13 @@ namespace PlayerStates
         private int enemyLayer;
         private bool wasCollisionEnabled;
         
+        // 벽 감지 변수
+        private bool isWallDetected = false; 
+        private float wallCheckDistance = 0.5f; // 벽 감지 거리
+        private float wallHitDelay = 0.15f; // 벽 충돌 후 지연 시간
+        private float wallHitTimer = 0f; // 벽 충돌 후 경과시간
+        private LayerMask wallLayer; // 벽 레이어
+        
         public override void Enter(PlayerController player)
         {
             movement = player.GetComponent<MovementRigidbody2D>();
@@ -185,6 +192,8 @@ namespace PlayerStates
                 Physics2D.IgnoreLayerCollision(playerLayer, projectileLayer, true);
             } 
             */
+
+            wallLayer = LayerMask.GetMask("Ground", "Platform", "Object");
             
             InputManager.Instance.OnJumpPressed -= player.OnJump;
             InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
@@ -196,14 +205,46 @@ namespace PlayerStates
             
             // 구르기
             player.StartCoroutine(player.StartRollCoroutine());
+            
+            isWallDetected = false;
+            wallHitTimer = 0f;
         }
 
         public override void Execute(PlayerController player)
         {
-            movement.Roll(rollDirection, rollSpeed);
-            
-            rollTimer -= Time.deltaTime;
+            // 벽 감지 체크
+            if (!isWallDetected)
+            {
+                isWallDetected = CheckForWall(player);
 
+                if (isWallDetected)
+                {
+                    movement.Roll(rollDirection, rollSpeed * 0.5f);
+                }
+                else
+                {
+                    movement.Roll(rollDirection, rollSpeed);
+                }
+            }
+
+            // 벽에 부딪힌 경우
+            if (isWallDetected)
+            {
+                wallHitTimer += Time.deltaTime;
+
+                if (wallHitTimer >= wallHitDelay)
+                {
+                    animator.StopRollAnim();
+                    
+                    player.ChangeState(new Idle());
+                    return;
+                }
+                
+                movement.Roll(rollDirection, rollSpeed * 0.2f);
+            }
+            
+            // 구르기 타이머
+            rollTimer -= Time.deltaTime;
             if (rollTimer <= 0)
             {
                 player.ChangeState(new Idle());
@@ -221,6 +262,18 @@ namespace PlayerStates
             // 구르기 종료
             player.IsRolling = false;
             player.UpdateMove(0);
+        }
+
+        private bool CheckForWall(PlayerController player)
+        {
+            Vector2 rayOrigin = player.transform.position + new Vector3(0f, 0.3f, 0f);
+            Vector2 rayDirection = new Vector2(rollDirection, 0);
+            
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, wallCheckDistance, wallLayer);
+            
+            Debug.DrawRay(rayOrigin, rayDirection* wallCheckDistance, hit ? Color.red : Color.green, 0.5f);
+
+            return hit.collider != null;
         }
     }
     
