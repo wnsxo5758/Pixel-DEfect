@@ -35,11 +35,32 @@ public class BulletBase : MonoBehaviour
     {
         this.memoryPool = _memoryPool;
 
+        moveDir = direction.normalized;
+
+        // Rigidbody2D 이동 적용
+        if (rigid != null)
+        {
+            rigid.velocity = moveDir * speed;
+        }
+
+        // 회전 적용
+        RotateToDirection(moveDir);
+
+        // Collider 활성화 (풀에서 재사용 시 초기화 필수)
+        if (collider2D != null)
+        {
+            collider2D.enabled = true;
+        }
+
+
     }
 
     private  void OnTriggerEnter2D(Collider2D collision)
     {
-        StartCoroutine(nameof(DestoryBullet));
+        if ((hitLayer.value & (1 << collision.gameObject.layer)) > 0)
+        {
+            StartCoroutine(nameof(DestoryBullet));
+        }
     }
 
     //총알 비활성화(Destory 아님)

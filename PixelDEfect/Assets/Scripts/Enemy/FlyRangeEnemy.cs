@@ -26,7 +26,7 @@ public class FlyRangeEnemy : EnemyBT
     private float attackTimer = 0f;
     private bool canAttack = true;
     private bool isAttacking = false;
-
+    private MemoryPool bulletPool;
     protected override void Awake()
     {
         base.Awake();
@@ -40,6 +40,12 @@ public class FlyRangeEnemy : EnemyBT
         blackboard.SetValue("CanAttack", true);
         blackboard.SetValue("IsAttacking", false);
         blackboard.SetValue("InitialPosition", initialPosition);
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        bulletPool = new MemoryPool(bulletPrefab);
     }
     private void SetupFlyRangeBehaviorTree()
     {
@@ -138,31 +144,59 @@ public class FlyRangeEnemy : EnemyBT
 
     private NodeState PerformRangedAttack()
     {
-        if (isDead || isHit) return NodeState.Failure;
+        if (isDead || isHit || !canAttack) return NodeState.Failure;
 
         canAttack = false;
         attackTimer = 0f;
         blackboard.SetValue("CanAttack", false);
 
-        // 공격 애니메이션 트리거
+        // 공격 시 멈춤
+        rb.velocity = Vector2.zero;
+
+        // 공격 애니메이션 (선택)
         if (animator != null)
         {
             animator.TriggerAttackAnim();
         }
 
-        // 총알 생성
-        if (bulletPrefab != null && firePoint != null)
-        {
-            Vector2 dir = ((Vector2)blackboard.GetValue<Transform>("Target").position - (Vector2)firePoint.position).normalized;
-            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-            BulletBase bulletScript = bullet.GetComponent<BulletBase>();
-            if (bulletScript != null)
-            {
-                bulletScript.SetUp(dir, null); // 풀 없으면 null
-            }
-        }
+        // 3연속 사격 시작
+        StartCoroutine(PerformTripleShot());
 
         return NodeState.Success;
+    }
+
+    private IEnumerator PerformTripleShot()
+    {
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target == null) yield break;
+
+        int shotCount = 3;
+        float interval = 0.3f; // 각 발사 간격
+
+        for (int i = 0; i < shotCount; i++)
+        {
+            // 총알 발사
+            GameObject bullet = bulletPool.ActivePoolItem();
+            if (bullet != null)
+            {
+                bullet.transform.position = firePoint.position;
+                bullet.transform.rotation = Quaternion.identity;
+
+                BulletBase bulletScript = bullet.GetComponent<BulletBase>();
+                if (bulletScript != null)
+                {
+                    Vector2 dir = ((Vector2)target.position - (Vector2)firePoint.position).normalized;
+                    bulletScript.SetUp(dir, bulletPool);
+                }
+            }
+
+            yield return new WaitForSeconds(interval);
+        }
+
+        // 전체 공격 쿨타임 이후 공격 가능 상태로 복귀
+        yield return new WaitForSeconds(attackCooldown);
+        canAttack = true;
+        blackboard.SetValue("CanAttack", true);
     }
 
     protected override NodeState Patrol()
