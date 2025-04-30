@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BulletBase : MonoBehaviour
 {
+    [Header("총알 세팅")]
     [SerializeField]
     protected int damage; // 총알 데미지
     [SerializeField]
@@ -11,62 +12,58 @@ public class BulletBase : MonoBehaviour
     [SerializeField]
     protected AudioClip hitSound;
     [SerializeField]
-    private bool players; // 플레이어 것인가?
+    protected LayerMask hitLayer; // 피격대상 레이어
 
-    MovementRigidbody2D movement;
+
+    private Vector2 moveDir;
+
+    Rigidbody2D rigid;
+
     protected AudioSource audioSoruce;
     protected Animator animator;
     private MemoryPool memoryPool;
+    private Collider2D collider2D;
     private void Awake()
     {
-        movement = GetComponent<MovementRigidbody2D>();
+        rigid = GetComponent<Rigidbody2D>();
         audioSoruce = GetComponent<AudioSource>();
         animator = GetComponentInChildren<Animator>();
+        collider2D = GetComponent<Collider2D>();
     }
 
-    public virtual void SetUp(float x, MemoryPool _memoryPool)
+    public virtual void SetUp(Vector2 direction, MemoryPool _memoryPool)
     {
         this.memoryPool = _memoryPool;
-        movement.MoveTo(x);
+
     }
 
     private  void OnTriggerEnter2D(Collider2D collision)
     {
-        if (players == true)
-        {
-            if (collision.CompareTag("Enemy"))
-            {
-                collision.GetComponent<EnemyFSM>().DecreaseHp(damage);
-            }
-        }
-        else
-        {
-            if (collision.CompareTag("Player"))
-            {
-                collision.GetComponent<PlayerHp>().DecreaseHp(damage);
-            }
-
-        }
         StartCoroutine(nameof(DestoryBullet));
     }
 
+    //총알 비활성화(Destory 아님)
     protected virtual IEnumerator DestoryBullet()
     {
-        movement.MoveTo(0);
         GetComponent<Collider2D>().enabled = false;
-        //애니메이션 추가시 설정
-        //animator.SetTrigger("isHit");
-        //PlaySound(hitSound);
-        //yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         yield return null;
         memoryPool.DeactivatePoolItems(gameObject);
     }
 
+    //사운두
     private void PlaySound(AudioClip _clip)
     {
         audioSoruce.Stop();
         audioSoruce.clip = _clip;
         audioSoruce.Play();
     }
+    
+    // 총알 회전시 슬프라이트 회전
+    protected void RotateToDirection(Vector2 direction)
+    {
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+    }
+
 
 }

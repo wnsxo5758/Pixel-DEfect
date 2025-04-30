@@ -76,6 +76,12 @@ public class EnemyBT : MonoBehaviour
         SetDirection(patrolDirection);
     }
 
+    protected virtual void OnAttackAnimationEvent()
+    { }
+
+    protected virtual void OnAttackAnimationFinished()
+    { }
+
     protected virtual void Start()
     {
         // 기본 행동 트리 설정
@@ -599,7 +605,9 @@ public class EnemyBT : MonoBehaviour
 
         return Vector2.Distance(transform.position, currentTarget.position);
     }
-    
+
+
+
     protected virtual void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;

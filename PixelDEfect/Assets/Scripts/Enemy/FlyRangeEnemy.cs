@@ -4,45 +4,87 @@ using UnityEngine;
 
 public class FlyRangeEnemy : EnemyBT
 {
+    [Header("원거리 공격 설정")]
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float attackRange = 5f;
+    [SerializeField] private float attackCooldown = 2f;
+    [SerializeField] private int bulletDamage = 1;
+    [SerializeField] private float bulletSpeed = 10f;
 
-    [Header("원거리 적 기본 세팅")]
+    [Header("후퇴 설정")]
+    [SerializeField] private float retreatRange = 2f;
+    [SerializeField] private float retreatSpeedMultiplier = 0.5f;
 
-    [SerializeField] private float attackRange = 1.5f;
-    [SerializeField] private float attackCooldown = 1.5f;
-    [SerializeField] private int attackDamage = 1;
-    [SerializeField] private LayerMask playerLayer;
+    [Header("복귀 설정")]
+    [SerializeField] private float returnSpeed = 2f;
 
+    [Header("이동 설정")]
+    [SerializeField] protected float moveSpeed = 3f;
 
-    [Header("총알 관련")]
-    [SerializeField]
-    private Transform attackPos;
-    [SerializeField]
-    private GameObject bullet;
-
-    private MemoryPool pool; // 총알 관리를 위한 메모리풀
-
+    private Vector2 initialPosition;
     private float attackTimer = 0f;
     private bool canAttack = true;
     private bool isAttacking = false;
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
         base.Awake();
-        // 공격 관련 값 블랙보드에 추가
+        initialPosition = transform.position;
+        // 중력 제거 - 공중 적은 중력 영향 받지 않음
+        rb.gravityScale = 0f; 
+
+
         blackboard.SetValue("AttackRange", attackRange);
+        blackboard.SetValue("RetreatRange", retreatRange);
         blackboard.SetValue("CanAttack", true);
-        blackboard.SetValue("AttackTimer", 0f);
         blackboard.SetValue("IsAttacking", false);
-
+        blackboard.SetValue("InitialPosition", initialPosition);
     }
+    private void SetupFlyRangeBehaviorTree()
+    {
+        Selector root = new Selector();
 
+        // 사망
+        Sequence deathSequence = new Sequence();
+        deathSequence.AddChild(new ConditionNode(() => blackboard.GetValue<bool>("IsDead")));
+        deathSequence.AddChild(new ActionNode(HandleDeath));
+
+        // 피격
+        Sequence hitSequence = new Sequence();
+        hitSequence.AddChild(new ConditionNode(() => blackboard.GetValue<bool>("IsHit")));
+        hitSequence.AddChild(new ActionNode(HandleHit));
+
+        // 공격 및 후퇴
+        Node attackNode = CreateAttackSequence();
+
+        // 추적
+        Sequence chaseSequence = new Sequence();
+        chaseSequence.AddChild(new ConditionNode(() => blackboard.GetValue<bool>("PlayerDetected")));
+        chaseSequence.AddChild(new ActionNode(ChaseTarget));
+
+        // 순찰
+        Sequence patrolSequence = new Sequence();
+        patrolSequence.AddChild(new ActionNode(Patrol));
+
+        // 트리 구성
+        root.AddChild(deathSequence);
+        root.AddChild(hitSequence);
+        root.AddChild(attackNode);
+        root.AddChild(chaseSequence);
+        root.AddChild(patrolSequence);
+
+        behaviorTree = new BehaviorTree(root)
+        {
+            Blackboard = blackboard
+        };
+    }
     protected override void Update()
     {
-        // 공격 쿨다운 관리
+        // 공격 쿨다운 처리
         if (!canAttack)
         {
             attackTimer += Time.deltaTime;
-            blackboard.SetValue("AttackTimer", attackTimer);
 
             if (attackTimer >= attackCooldown)
             {
@@ -52,137 +94,147 @@ public class FlyRangeEnemy : EnemyBT
             }
         }
 
-        // 공격 중이면서 피격 중이 아닐 때만 공격 상태 유지
-        if (isAttacking && !isHit)
-        {
-
-        }
-        else
-        {
-            base.Update();
-        }
+        base.Update();
     }
-
 
     protected override Node CreateAttackSequence()
     {
+        Selector attackSelector = new Selector();
+
+        // 후퇴 시퀀스
+        Sequence retreatSequence = new Sequence();
+        retreatSequence.AddChild(new ConditionNode(() => IsTargetInRetreatRange()));
+        retreatSequence.AddChild(new ActionNode(RetreatFromTarget));
+
         // 공격 시퀀스
         Sequence attackSequence = new Sequence();
+        attackSequence.AddChild(new ConditionNode(() => !isHit));
+        attackSequence.AddChild(new ConditionNode(() => IsTargetInAttackRange()));
+        attackSequence.AddChild(new ConditionNode(() => canAttack));
+        attackSequence.AddChild(new ActionNode(PerformRangedAttack));
 
-        // 조건 노드들
-        ConditionNode isNotHit = new ConditionNode(() => !blackboard.GetValue<bool>("IsHit"));
-        ConditionNode isPlayerDetected = new ConditionNode(() => blackboard.GetValue<bool>("PlayerDetected"));
-        ConditionNode isInAttackRange = new ConditionNode(IsInAttackRange);
-        ConditionNode canAttackNow = new ConditionNode(() => blackboard.GetValue<bool>("CanAttack"));
-        ConditionNode isNotAttacking = new ConditionNode(() => !blackboard.GetValue<bool>("IsAttacking"));
+        attackSelector.AddChild(retreatSequence);
+        attackSelector.AddChild(attackSequence);
 
-        // 공격 액션 노드
-        ActionNode performAttack = new ActionNode(PerformAttack);
-
-        // 공격 시퀀스 구성
-        attackSequence.AddChild(isNotHit);          // 피격 상태가 아닌지
-        attackSequence.AddChild(isPlayerDetected);  // 플레이어가 감지되었는지
-        attackSequence.AddChild(isInAttackRange);   // 공격 범위 내에 있는지
-        attackSequence.AddChild(canAttackNow);      // 공격 쿨다운이 끝났는지
-        attackSequence.AddChild(isNotAttacking);    // 이미 공격 중이 아닌지
-        attackSequence.AddChild(performAttack);     // 공격 수행
-
-        return attackSequence;
+        return attackSelector;
     }
 
-
+    // 공격 범위 내 판단
     protected override bool IsTargetInAttackRange()
     {
-        Transform currentTarget = blackboard.GetValue<Transform>("Target");
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target == null) return false;
 
-        if (currentTarget == null)
-        {
-            return false;
-        }
-
-        float distance = Vector2.Distance(transform.position, currentTarget.position);
-        return distance <= attackRange;
+        return Vector2.Distance(transform.position, target.position) <= attackRange;
     }
 
-    // 공격 범위 반환 메서드
-    protected override float GetAttackRange()
+    private bool IsTargetInRetreatRange()
     {
-        return attackRange;
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target == null) return false;
+
+        return Vector2.Distance(transform.position, target.position) <= retreatRange;
     }
 
-    // 공격 범위 내 체크
-    private bool IsInAttackRange()
+    private NodeState PerformRangedAttack()
     {
-        Transform currentTarget = blackboard.GetValue<Transform>("Target");
+        if (isDead || isHit) return NodeState.Failure;
 
-        if (currentTarget == null)
-        {
-            return false;
-        }
-
-        float distance = Vector2.Distance(transform.position, currentTarget.position);
-
-        // 타겟이 공격 범위 내에 있으면 해당 방향으로 적 방향 설정
-        if (distance <= attackRange)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    // 공격 수행
-    private NodeState PerformAttack()
-    {
-        // 피격 중이면 공격 취소
-        if (isHit || isDead) return NodeState.Failure;
-
-        // 공격 쿨다운 설정
         canAttack = false;
-        isAttacking = true;
         attackTimer = 0f;
-
-        // 블랙보드 업데이트
         blackboard.SetValue("CanAttack", false);
-        blackboard.SetValue("IsAttacking", true);
 
-        Transform currentTarget = blackboard.GetValue<Transform>("Target");
-        float directionToTarget = Mathf.Sign(currentTarget.position.x - transform.position.x);
-        SetDirection(directionToTarget);
-
-        //이동 중지
-        if (movement != null)
-        {
-            movement.MoveTo(0);
-        }
-
-        // 애니메이션 재생
+        // 공격 애니메이션 트리거
         if (animator != null)
         {
-            animator.SetMovementAnim(0);
-            animator.SetChasingState(true);
             animator.TriggerAttackAnim();
+        }
+
+        // 총알 생성
+        if (bulletPrefab != null && firePoint != null)
+        {
+            Vector2 dir = ((Vector2)blackboard.GetValue<Transform>("Target").position - (Vector2)firePoint.position).normalized;
+            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+            BulletBase bulletScript = bullet.GetComponent<BulletBase>();
+            if (bulletScript != null)
+            {
+                bulletScript.SetUp(dir, null); // 풀 없으면 null
+            }
         }
 
         return NodeState.Success;
     }
 
-    private void FireBullet()
+    protected override NodeState Patrol()
     {
-        GameObject bullet = pool.ActivePoolItem();
-        if (bullet != null)
-        {
-            bullet.transform.position = attackPos.position;
-            bullet.transform.rotation = attackPos.rotation;
-            bullet.SetActive(true);
+        if (isHit || isDead) return NodeState.Failure;
 
-            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                float bulletSpeed = 10f;
-                Vector2 dir = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-                rb.velocity = dir * bulletSpeed;
-            }
+        float direction = blackboard.GetValue<float>("PatrolDirection");
+
+        if (float.IsNaN(direction) || direction == 0)
+        {
+            direction = 1f;
+            blackboard.SetValue("PatrolDirection", direction);
         }
+
+        if (CheckWall(direction))
+        {
+            direction *= -1;
+            blackboard.SetValue("PatrolDirection", direction);
+            SetDirection(direction);
+        }
+
+        // 공중 이동 → 직접 속도 설정
+        rb.velocity = new Vector2(direction * moveSpeed, 0f);
+
+        return NodeState.Running;
+    }
+
+
+    private NodeState RetreatFromTarget()
+    {
+        if (isDead || isHit) return NodeState.Failure;
+
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target == null) return NodeState.Failure;
+
+        Vector2 direction = ((Vector2)transform.position - (Vector2)target.position).normalized;
+        float speed = moveSpeed * retreatSpeedMultiplier;
+        transform.position += (Vector3)(direction * speed * Time.deltaTime);
+
+        // 방향 전환
+        SetDirection(Mathf.Sign(direction.x));
+
+        return NodeState.Running;
+    }
+
+    // 추적 상태에서 범위를 벗어나면 원래 위치로 복귀
+    protected override void HandleLostTarget()
+    {
+        base.HandleLostTarget();
+        StartCoroutine(ReturnToInitialPosition());
+    }
+
+    private IEnumerator ReturnToInitialPosition()
+    {
+        while (Vector2.Distance(transform.position, initialPosition) > 0.1f)
+        {
+            Vector2 direction = (initialPosition - (Vector2)transform.position).normalized;
+            transform.position += (Vector3)(direction * returnSpeed * Time.deltaTime);
+            yield return null;
+        }
+    }
+
+    protected override float GetAttackRange() => attackRange;
+
+    protected override void OnDrawGizmosSelected()
+    {
+        base.OnDrawGizmosSelected();
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, retreatRange);
     }
 }
