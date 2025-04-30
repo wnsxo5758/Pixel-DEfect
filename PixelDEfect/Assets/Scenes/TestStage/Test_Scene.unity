@@ -562,7 +562,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 72
-  bulletPrefab: {fileID: 4514244661379776588, guid: 0ae57c52189b0734a8f0ec485935d3d8, type: 3}
+  bulletPrefab: {fileID: 9020362962565754560, guid: 00a55b9b25ceb3843b12faa02d3f9742, type: 3}
   firePoint: {fileID: 313199401}
   attackRange: 5
   attackCooldown: 2
@@ -49849,10 +49849,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1057111343}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 150, y: -25}
+  m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &502969837
 Animator:
@@ -52388,10 +52388,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1057111343}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 50, y: -25}
+  m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1767530992
 MonoBehaviour:
@@ -53649,10 +53649,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1057111343}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 250, y: -25}
+  m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &2131520493
 Animator:

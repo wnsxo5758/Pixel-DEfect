@@ -1,10 +1,10 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class FlyRangeEnemy : EnemyBT
 {
-    [Header("¿ø°Å¸® °ø°İ ¼³Á¤")]
+    [Header("ì›ê±°ë¦¬ ê³µê²© ì„¤ì •")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float attackRange = 5f;
@@ -12,14 +12,14 @@ public class FlyRangeEnemy : EnemyBT
     [SerializeField] private int bulletDamage = 1;
     [SerializeField] private float bulletSpeed = 10f;
 
-    [Header("ÈÄÅğ ¼³Á¤")]
+    [Header("í›„í‡´ ì„¤ì •")]
     [SerializeField] private float retreatRange = 2f;
     [SerializeField] private float retreatSpeedMultiplier = 0.5f;
 
-    [Header("º¹±Í ¼³Á¤")]
+    [Header("ë³µê·€ ì„¤ì •")]
     [SerializeField] private float returnSpeed = 2f;
 
-    [Header("ÀÌµ¿ ¼³Á¤")]
+    [Header("ì´ë™ ì„¤ì •")]
     [SerializeField] protected float moveSpeed = 3f;
 
     private Vector2 initialPosition;
@@ -31,7 +31,7 @@ public class FlyRangeEnemy : EnemyBT
     {
         base.Awake();
         initialPosition = transform.position;
-        // Áß·Â Á¦°Å - °øÁß ÀûÀº Áß·Â ¿µÇâ ¹ŞÁö ¾ÊÀ½
+        // ì¤‘ë ¥ ì œê±° - ê³µì¤‘ ì ì€ ì¤‘ë ¥ ì˜í–¥ ë°›ì§€ ì•ŠìŒ
         rb.gravityScale = 0f; 
 
 
@@ -51,29 +51,29 @@ public class FlyRangeEnemy : EnemyBT
     {
         Selector root = new Selector();
 
-        // »ç¸Á
+        // ì‚¬ë§
         Sequence deathSequence = new Sequence();
         deathSequence.AddChild(new ConditionNode(() => blackboard.GetValue<bool>("IsDead")));
         deathSequence.AddChild(new ActionNode(HandleDeath));
 
-        // ÇÇ°İ
+        // í”¼ê²©
         Sequence hitSequence = new Sequence();
         hitSequence.AddChild(new ConditionNode(() => blackboard.GetValue<bool>("IsHit")));
         hitSequence.AddChild(new ActionNode(HandleHit));
 
-        // °ø°İ ¹× ÈÄÅğ
+        // ê³µê²© ë° í›„í‡´
         Node attackNode = CreateAttackSequence();
 
-        // ÃßÀû
+        // ì¶”ì 
         Sequence chaseSequence = new Sequence();
         chaseSequence.AddChild(new ConditionNode(() => blackboard.GetValue<bool>("PlayerDetected")));
         chaseSequence.AddChild(new ActionNode(ChaseTarget));
 
-        // ¼øÂû
+        // ìˆœì°°
         Sequence patrolSequence = new Sequence();
         patrolSequence.AddChild(new ActionNode(Patrol));
 
-        // Æ®¸® ±¸¼º
+        // íŠ¸ë¦¬ êµ¬ì„±
         root.AddChild(deathSequence);
         root.AddChild(hitSequence);
         root.AddChild(attackNode);
@@ -87,7 +87,7 @@ public class FlyRangeEnemy : EnemyBT
     }
     protected override void Update()
     {
-        // °ø°İ Äğ´Ù¿î Ã³¸®
+        // ê³µê²© ì¿¨ë‹¤ìš´ ì²˜ë¦¬
         if (!canAttack)
         {
             attackTimer += Time.deltaTime;
@@ -107,12 +107,12 @@ public class FlyRangeEnemy : EnemyBT
     {
         Selector attackSelector = new Selector();
 
-        // ÈÄÅğ ½ÃÄö½º
+        // í›„í‡´ ì‹œí€€ìŠ¤
         Sequence retreatSequence = new Sequence();
         retreatSequence.AddChild(new ConditionNode(() => IsTargetInRetreatRange()));
         retreatSequence.AddChild(new ActionNode(RetreatFromTarget));
 
-        // °ø°İ ½ÃÄö½º
+        // ê³µê²© ì‹œí€€ìŠ¤
         Sequence attackSequence = new Sequence();
         attackSequence.AddChild(new ConditionNode(() => !isHit));
         attackSequence.AddChild(new ConditionNode(() => IsTargetInAttackRange()));
@@ -125,7 +125,7 @@ public class FlyRangeEnemy : EnemyBT
         return attackSelector;
     }
 
-    // °ø°İ ¹üÀ§ ³» ÆÇ´Ü
+    // ê³µê²© ë²”ìœ„ ë‚´ íŒë‹¨
     protected override bool IsTargetInAttackRange()
     {
         Transform target = blackboard.GetValue<Transform>("Target");
@@ -144,22 +144,24 @@ public class FlyRangeEnemy : EnemyBT
 
     private NodeState PerformRangedAttack()
     {
-        if (isDead || isHit || !canAttack) return NodeState.Failure;
+        if (isDead || isHit || !canAttack || isAttacking) return NodeState.Failure;
+
+        isAttacking = true; // ì¤‘ë³µ í˜¸ì¶œ ë°©ì§€
 
         canAttack = false;
         attackTimer = 0f;
         blackboard.SetValue("CanAttack", false);
 
-        // °ø°İ ½Ã ¸ØÃã
+        // ê³µê²© ì‹œ ë©ˆì¶¤
         rb.velocity = Vector2.zero;
 
-        // °ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç (¼±ÅÃ)
+        // ê³µê²© ì• ë‹ˆë©”ì´ì…˜ (ì„ íƒ)
         if (animator != null)
         {
             animator.TriggerAttackAnim();
         }
 
-        // 3¿¬¼Ó »ç°İ ½ÃÀÛ
+        // 3ì—°ì† ì‚¬ê²© ì‹œì‘
         StartCoroutine(PerformTripleShot());
 
         return NodeState.Success;
@@ -168,35 +170,44 @@ public class FlyRangeEnemy : EnemyBT
     private IEnumerator PerformTripleShot()
     {
         Transform target = blackboard.GetValue<Transform>("Target");
-        if (target == null) yield break;
+        if (target == null)
+        {
+            isAttacking = false;
+            yield break;
+        }
 
         int shotCount = 3;
-        float interval = 0.3f; // °¢ ¹ß»ç °£°İ
+        float interval = 0.3f;
 
         for (int i = 0; i < shotCount; i++)
         {
-            // ÃÑ¾Ë ¹ß»ç
-            GameObject bullet = bulletPool.ActivePoolItem();
-            if (bullet != null)
+            // ì´ì•Œ ìƒì„± ë° ë°œì‚¬
+            if (bulletPrefab != null && firePoint != null)
             {
-                bullet.transform.position = firePoint.position;
-                bullet.transform.rotation = Quaternion.identity;
-
-                BulletBase bulletScript = bullet.GetComponent<BulletBase>();
-                if (bulletScript != null)
+                GameObject bullet = bulletPool.ActivePoolItem();
+                if (bullet != null)
                 {
-                    Vector2 dir = ((Vector2)target.position - (Vector2)firePoint.position).normalized;
-                    bulletScript.SetUp(dir, bulletPool);
+                    bullet.transform.position = firePoint.position;
+                    bullet.transform.rotation = Quaternion.identity;
+
+                    BulletBase bulletScript = bullet.GetComponent<BulletBase>();
+                    if (bulletScript != null)
+                    {
+                        Vector2 dir = ((Vector2)target.position - (Vector2)firePoint.position).normalized;
+                        bulletScript.SetUp(dir, bulletPool);
+                    }
                 }
             }
 
             yield return new WaitForSeconds(interval);
         }
 
-        // ÀüÃ¼ °ø°İ ÄğÅ¸ÀÓ ÀÌÈÄ °ø°İ °¡´É »óÅÂ·Î º¹±Í
+        // ì¿¨ë‹¤ìš´ ëŒ€ê¸°
         yield return new WaitForSeconds(attackCooldown);
+
         canAttack = true;
         blackboard.SetValue("CanAttack", true);
+        isAttacking = false;
     }
 
     protected override NodeState Patrol()
@@ -218,7 +229,7 @@ public class FlyRangeEnemy : EnemyBT
             SetDirection(direction);
         }
 
-        // °øÁß ÀÌµ¿ ¡æ Á÷Á¢ ¼Óµµ ¼³Á¤
+        // ê³µì¤‘ ì´ë™ â†’ ì§ì ‘ ì†ë„ ì„¤ì •
         rb.velocity = new Vector2(direction * moveSpeed, 0f);
 
         return NodeState.Running;
@@ -232,17 +243,15 @@ public class FlyRangeEnemy : EnemyBT
         Transform target = blackboard.GetValue<Transform>("Target");
         if (target == null) return NodeState.Failure;
 
-        Vector2 direction = ((Vector2)transform.position - (Vector2)target.position).normalized;
-        float speed = moveSpeed * retreatSpeedMultiplier;
-        transform.position += (Vector3)(direction * speed * Time.deltaTime);
+        Vector2 retreatDir = ((Vector2)transform.position - (Vector2)target.position).normalized;
+        float retreatSpeed = moveSpeed * retreatSpeedMultiplier;
 
-        // ¹æÇâ ÀüÈ¯
-        SetDirection(Mathf.Sign(direction.x));
+        rb.velocity = retreatDir * retreatSpeed;
 
         return NodeState.Running;
     }
 
-    // ÃßÀû »óÅÂ¿¡¼­ ¹üÀ§¸¦ ¹ş¾î³ª¸é ¿ø·¡ À§Ä¡·Î º¹±Í
+    // ì¶”ì  ìƒíƒœì—ì„œ ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ ì›ë˜ ìœ„ì¹˜ë¡œ ë³µê·€
     protected override void HandleLostTarget()
     {
         base.HandleLostTarget();
@@ -258,7 +267,26 @@ public class FlyRangeEnemy : EnemyBT
             yield return null;
         }
     }
+    protected override NodeState ChaseTarget()
+    {
+        if (isHit || isDead) return NodeState.Failure;
 
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target == null) return NodeState.Failure;
+
+        Vector2 dir = ((Vector2)target.position - (Vector2)transform.position).normalized;
+
+        // Rigidbody2Dë¥¼ ì‚¬ìš©í•´ 2D ììœ  ì´ë™
+        rb.velocity = dir * moveSpeed;
+
+        // ìŠ¤í”„ë¼ì´íŠ¸ ë°©í–¥ ì „í™˜ (Xì¶• ê¸°ì¤€)
+        if (dir.x != 0)
+        {
+            SetDirection(Mathf.Sign(dir.x));
+        }
+
+        return NodeState.Running;
+    }
     protected override float GetAttackRange() => attackRange;
 
     protected override void OnDrawGizmosSelected()
