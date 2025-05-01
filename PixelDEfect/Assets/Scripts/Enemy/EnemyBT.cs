@@ -412,6 +412,13 @@ public class EnemyBT : MonoBehaviour
     // 피격 처리 메서드
     protected virtual NodeState HandleHit()
     {
+        // 공격 중이면 공격 애니메이션 종료
+        bool wasAttacking = blackboard.GetValue<bool>("IsAttacking");
+        if (wasAttacking)
+        {
+            OnAttackAnimationFinished();
+        }
+        
         // 움직임 멈춤
         if (movement != null)
         {
