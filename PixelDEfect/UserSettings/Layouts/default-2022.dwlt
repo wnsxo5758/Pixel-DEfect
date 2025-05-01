@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 2560
     height: 1349
   m_ShowMode: 4
-  m_Title: Project
+  m_Title: Game
   m_RootView: {fileID: 5}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 196
+  controlID: 195
   draggingID: 0
 --- !u!114 &5
 MonoBehaviour:
@@ -197,7 +197,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 150}
   m_MaxSize: {x: 24288, y: 24288}
   vertical: 1
-  controlID: 29
+  controlID: 193
   draggingID: 0
 --- !u!114 &9
 MonoBehaviour:
@@ -224,7 +224,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 150}
   m_MaxSize: {x: 24288, y: 24288}
   vertical: 0
-  controlID: 30
+  controlID: 194
   draggingID: 0
 --- !u!114 &10
 MonoBehaviour:
@@ -251,7 +251,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 150}
   m_MaxSize: {x: 8096, y: 24288}
   vertical: 1
-  controlID: 31
+  controlID: 22
   draggingID: 0
 --- !u!114 &11
 MonoBehaviour:
@@ -272,8 +272,8 @@ MonoBehaviour:
     y: 0
     width: 1530
     height: 487
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 18}
@@ -300,8 +300,8 @@ MonoBehaviour:
     y: 487
     width: 1530
     height: 405
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
@@ -352,8 +352,8 @@ MonoBehaviour:
     y: 0
     width: 513
     height: 890
-  m_MinSize: {x: 276, y: 71}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 22}
   m_Panes:
   - {fileID: 22}
@@ -895,9 +895,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 14.571992, y: -1.1874087, z: -0.015537806}
+    m_Target: {x: 11.368674, y: -0.8171425, z: -0.03364462}
     speed: 2
-    m_Value: {x: 14.664475, y: -1.2544155, z: -0.014002235}
+    m_Value: {x: 11.674398, y: -0.94237906, z: -0.03132933}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -947,9 +947,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 3.565943
+    m_Target: 5.3766317
     speed: 2
-    m_Value: 3.4123857
+    m_Value: 5.145102
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -1067,7 +1067,7 @@ MonoBehaviour:
       e10: 0
       e11: 0.76346153
       e12: 0
-      e13: 53.173096
+      e13: 53.17308
       e20: 0
       e21: 0
       e22: 1
@@ -1624,7 +1624,7 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 31124
+  m_LastSelectedObjectID: 30926
 --- !u!114 &21
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -1662,20 +1662,20 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 8e990000
-      m_LastClickedID: 0
-      m_ExpandedIDs: c4f9ffffd4f9ffff76faffffa278000004790000
+      m_SelectedIDs: ce780000
+      m_LastClickedID: 30926
+      m_ExpandedIDs: 40f9ffffdafafffffefaffffce780000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: Melee
-        m_OriginalName: Melee
+        m_Name: Render
+        m_OriginalName: Render
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: 30980
+        m_UserData: 31070
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
         m_OriginalEventType: 0
@@ -1780,7 +1780,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/DeadRevolver/PixelPrototypePlayerSprites/Robot_Melee/Aseprites
+    - Assets/DeadRevolver/PixelPrototypePlayerSprites/Robot_Melee/Sprites/Walk
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -1788,16 +1788,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/DeadRevolver/PixelPrototypePlayerSprites/Robot_Melee/Aseprites
+  - Assets/DeadRevolver/PixelPrototypePlayerSprites/Robot_Melee/Sprites/Walk
   m_LastFoldersGridSize: -1
   m_LastProjectPath: D:\Unity\Pixel-DEfect\PixelDEfect
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 130}
-    m_SelectedIDs: 10990000
-    m_LastClickedID: 39184
-    m_ExpandedIDs: 000000006c9700006e9700007097000072970000749700008097000084970000869800008a9800009498000012990000f29a0000
+    scrollPos: {x: 0, y: 499}
+    m_SelectedIDs: 8a990000
+    m_LastClickedID: 39306
+    m_ExpandedIDs: 00000000ce970000d0970000d2970000d4970000d6970000d8970000da970000dc970000de970000e0970000ea970000129800005a980000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1825,7 +1825,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000006c9700006e970000709700007297000074970000
+    m_ExpandedIDs: 00000000ce970000d0970000d2970000d4970000d6970000d8970000da970000dc970000de970000e0970000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1853,7 +1853,7 @@ MonoBehaviour:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: ae7100009cd10000d0d200001c62000014790000ec7f0000408200003a7d0000907400004a7f00007475000066630000149000005e9400008e840000aa8400000c8800005a880000207e000096870000127e0000cc7e0000be7e0000e27700000e800000f67f000096800000fe790000808300001e7c0000be83000086990000
+    m_ExpandedInstanceIDs: ae7100009cd10000d0d200001c62000014790000ec7f0000408200003a7d0000907400004a7f00007475000066630000149000005e9400008e840000aa8400000c8800005a880000207e000096870000127e0000cc7e0000be7e0000e27700000e800000f67f000096800000fe790000808300001e7c0000be83000086990000529f0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

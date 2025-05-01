@@ -111,13 +111,13 @@ public class EnemyAnimator : MonoBehaviour
 
     private void OnAttackEvent()
     {
-        MeleeEnemy enemy = transform.GetComponentInParent<MeleeEnemy>();
+        EnemyBT enemy = transform.GetComponentInParent<EnemyBT>();
         enemy.OnAttackAnimationEvent();
     }
 
     private void OnAttackFinished()
     {
-        MeleeEnemy enemy = transform.GetComponentInParent<MeleeEnemy>();
+        EnemyBT enemy = transform.GetComponentInParent<EnemyBT>();
         enemy.OnAttackAnimationFinished();
     }
 }

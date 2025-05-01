@@ -76,10 +76,12 @@ public class EnemyBT : MonoBehaviour
         SetDirection(patrolDirection);
     }
 
-    protected virtual void OnAttackAnimationEvent()
-    { }
+    public virtual void OnAttackAnimationEvent()
+    {
+        
+    }
 
-    protected virtual void OnAttackAnimationFinished()
+    public virtual void OnAttackAnimationFinished()
     { }
 
     protected virtual void Start()
@@ -150,6 +152,13 @@ public class EnemyBT : MonoBehaviour
         // 공격 시퀀스 (하위 클래스에서 구현)
         Node attackSequence = CreateAttackSequence();
         
+        // 공격 중 시퀀스
+        Sequence attackingSequence = new Sequence();
+        ConditionNode isAttackingCondition = new ConditionNode(() => blackboard.GetValue<bool>("IsAttacking"));
+        ActionNode stayInAttackAction = new ActionNode(MaintainAttackState);
+        attackingSequence.AddChild(isAttackingCondition);
+        attackingSequence.AddChild(stayInAttackAction);
+        
         // 추적 시퀀스
         Sequence chaseSequence = new Sequence();
         ConditionNode isPlayerDetected = new ConditionNode(() => blackboard.GetValue<bool>("PlayerDetected"));
@@ -165,6 +174,7 @@ public class EnemyBT : MonoBehaviour
         // 트리 구성 (우선순위 순)
         rootSelector.AddChild(deathSequence);   // 사망 상태 (최우선)
         rootSelector.AddChild(hitSequence);     // 피격 상태 (다음 우선순위)
+        rootSelector.AddChild(attackingSequence); // 공격 중 상태
         rootSelector.AddChild(attackSequence);  // 공격 가능하면 공격
         rootSelector.AddChild(chaseSequence);   // 공격 불가능하면 추적
         rootSelector.AddChild(patrolSequence);  // 추적 불가능하면 패트롤
@@ -274,6 +284,16 @@ public class EnemyBT : MonoBehaviour
             blackboard.SetValue("PatrolDirection", currentDirection);
             SetDirection(currentDirection);
         }
+    }
+
+    protected virtual NodeState MaintainAttackState()
+    {
+        if (movement != null)
+        {
+            movement.MoveTo(0);
+        }
+
+        return NodeState.Running;
     }
     
     // 타겟 추적 메서드
@@ -542,11 +562,6 @@ public class EnemyBT : MonoBehaviour
             Vector3 scale = transform.localScale;
             float previousX = scale.x;
             scale.x = Mathf.Abs(scale.x) * Mathf.Sign(direction);
-            
-            if (!Mathf.Approximately(previousX, scale.x))
-            {
-                Debug.Log($"Direction changed from {previousX} to {scale.x}");
-            }
             
             transform.localScale = scale;
         }

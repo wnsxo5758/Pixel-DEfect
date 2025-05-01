@@ -43,16 +43,8 @@ public class MeleeEnemy : EnemyBT
                 blackboard.SetValue("CanAttack", true);
             }
         }
-        
-        // 공격 중이면서 피격 중이 아닐 때만 공격 상태 유지
-        if (isAttacking && !isHit)
-        {
-            
-        }
-        else
-        {
-            base.Update();
-        }
+
+        base.Update();
     }
     
     // 공격 시퀀스 생성 오버라이드
@@ -155,11 +147,11 @@ public class MeleeEnemy : EnemyBT
             animator.TriggerAttackAnim();
         }
 
-        return NodeState.Success;
+        return NodeState.Running;
     }
     
     // 애니메이션 이벤트 호출
-    public void OnAttackAnimationEvent()
+    public override void OnAttackAnimationEvent()
     {
         // 피격 중이면 공격 판정 취소
         if (isHit) return;
@@ -168,7 +160,7 @@ public class MeleeEnemy : EnemyBT
     }
 
     // 애니메이션 종료 이벤트 호출
-    public void OnAttackAnimationFinished()
+    public override void OnAttackAnimationFinished()
     {
         isAttacking = false;
         blackboard.SetValue("IsAttacking", false);
@@ -196,7 +188,7 @@ public class MeleeEnemy : EnemyBT
         // 캐릭터 방향에 따라 공격 박스 위치 조정
         float direction = GetDirection();
         Vector2 attackPos = attackPoint != null
-            ? (Vector2)attackPoint.position
+            ? attackPoint.position
             : (Vector2)transform.position + new Vector2(attackBoxOffset.x * direction, attackBoxOffset.y);
         
         // 공격 반정 박스 생성
@@ -227,7 +219,7 @@ public class MeleeEnemy : EnemyBT
         Gizmos.color = Color.magenta;
         float direction = Application.isPlaying ? GetDirection() : Mathf.Sign(transform.localScale.x);
         Vector2 attackPos = attackPoint != null
-            ? (Vector2)attackPoint.position
+            ? attackPoint.position
             : (Vector2)transform.position + new Vector2(attackBoxOffset.x * direction, attackBoxOffset.y);
         
         Gizmos.DrawWireCube(attackPos, attackBoxSize);

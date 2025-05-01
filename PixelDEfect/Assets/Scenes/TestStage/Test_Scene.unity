@@ -49720,7 +49720,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.1, y: -0.25}
+  m_Offset: {x: -0.45, y: -0.3}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -49731,7 +49731,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.5, y: 1.5}
+  m_Size: {x: 1.8, y: 1.9}
   m_EdgeRadius: 0
 --- !u!114 &501646890
 MonoBehaviour:
@@ -49790,12 +49790,12 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  attackRange: 1.5
+  attackRange: 1.75
   attackCooldown: 1.5
   attackDamage: 1
   attackPoint: {fileID: 1700756522}
-  attackBoxSize: {x: 1.4, y: 0.8}
-  attackBoxOffset: {x: 0.6, y: 0}
+  attackBoxSize: {x: 2, y: 0.8}
+  attackBoxOffset: {x: 0, y: 0}
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -51613,7 +51613,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -7499903375110466985, guid: b1e06b5900e39f942b85bcadc3274543, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 40c654f1f609edd4199999896b09efb3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -52162,7 +52162,7 @@ Transform:
   m_GameObject: {fileID: 1700756521}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.7, y: 0, z: 0}
+  m_LocalPosition: {x: 0.6, y: -0.45, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
