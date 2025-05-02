@@ -368,18 +368,23 @@ namespace PlayerStates
 
     public class Attack : State<PlayerController>
     {
+        MovementRigidbody2D movement;
+        
         public override void Enter(PlayerController player)
         {
+            movement = player.GetComponent<MovementRigidbody2D>();
+            
             InputManager.Instance.OnJumpPressed -= player.OnJump;
             InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
             InputManager.Instance.OnHoldPressed -= player.OnHold;
-            
-            player.UpdateMove(0f);
         }
 
         public override void Execute(PlayerController player)
         {
-            
+            if (movement.IsGrounded)
+            {
+                movement.MoveTo(0);
+            }
         }
 
         public override void Exit(PlayerController player)
@@ -387,6 +392,8 @@ namespace PlayerStates
             InputManager.Instance.OnJumpPressed += player.OnJump;
             InputManager.Instance.OnCrouchPressed += player.OnCrouch;
             InputManager.Instance.OnHoldPressed += player.OnHold;
+            
+            
         }
     }
 

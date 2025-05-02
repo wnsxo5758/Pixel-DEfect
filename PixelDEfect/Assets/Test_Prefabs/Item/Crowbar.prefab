@@ -128,7 +128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponName: Crowbar
   damage: 1
-  attackCooldown: 1
+  attackCooldown: 0.6
 --- !u!114 &1604338784081723911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,3 +147,4 @@ MonoBehaviour:
   stickLayers:
     serializedVersion: 2
     m_Bits: 840
+  hitStunDuration: 3

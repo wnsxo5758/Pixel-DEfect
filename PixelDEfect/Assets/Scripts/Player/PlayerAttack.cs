@@ -313,14 +313,21 @@ public class PlayerAttack : MonoBehaviour
         if (lastThrownWeapon != null && canTeleport && !isTeleporting &&
             playerController.GetCurrentState() is not PlayerStates.Climb and not PlayerStates.Hold)
         {
-            StartCoroutine(TeleportCoroutine(lastThrownWeapon));
+            // 텔레포트 전 검증
+            if (IsTeleportPossible(lastThrownWeapon))
+            {
+                StartCoroutine(TeleportCoroutine(lastThrownWeapon));
+            }
+            else
+            {
+                // 텔레포트 불가 표시
+                Debug.Log("텔레포트 불가");
+            }
         }
     }
 
     private IEnumerator TeleportCoroutine(ThrownWeapon targetWeapon)
     {
-        if (targetWeapon == null) yield break;
-
         canTeleport = false;
         isTeleporting = true;
         
@@ -335,11 +342,40 @@ public class PlayerAttack : MonoBehaviour
         {
             isTeleporting = false;
             playerController.ChangeState(new PlayerStates.Idle());
+            StartCoroutine(TeleportCooldownTimer());
             yield break;
         }
 
-        Vector3 teleportPosition = FindSafeTeleportPosition(targetWeapon);
+        Vector3 teleportPosition;
 
+        // 텔레포트 위치 계산
+        if (targetWeapon.IsStuck())
+        {
+            Vector2 contactNormal = targetWeapon.GetContactNormal();
+            Vector2 teleportDirection;
+            float teleportDistance = GetComponent<Collider2D>().bounds.size.x * 1.5f;
+        
+            float absNormalX = Mathf.Abs(contactNormal.x);
+            float absNormalY = Mathf.Abs(contactNormal.y);
+        
+            if (absNormalX > absNormalY)
+            {
+                float diagonalX = Mathf.Sign(contactNormal.x);
+                teleportDirection = new Vector2(diagonalX, 1f).normalized;
+                teleportDistance = GetComponent<Collider2D>().bounds.size.x * 3f;
+            }
+            else
+            {
+                teleportDirection = contactNormal.y < 0 ? Vector2.down : Vector2.up;
+            }
+        
+            teleportPosition = (Vector2)targetWeapon.transform.position + teleportDirection * teleportDistance;
+        }
+        else
+        {
+            teleportPosition = targetWeapon.transform.position;
+        }
+        
         // 무기가 날아가는 중이면 리지드바디 멈추기
         if (!targetWeapon.IsStuck())
         {
@@ -372,20 +408,21 @@ public class PlayerAttack : MonoBehaviour
         isTeleporting = false;
     }
 
-    private Vector3 FindSafeTeleportPosition(ThrownWeapon weapon)
+    private bool IsTeleportPossible(ThrownWeapon weapon)
     {
+        if (weapon == null) return false;
+        
         Vector3 weaponPosition = weapon.transform.position;
-        LayerMask stickLayer = weapon.StickLayers;
         
         Collider2D playerCollider = GetComponent<Collider2D>();
-        if (playerCollider == null) return weaponPosition;
+        if (playerCollider == null) return false;
         
         Vector2 playerSize = playerCollider.bounds.size;
         
         // 무기가 박혀있지 않으면 무기 위치 반환
         if (!weapon.IsStuck())
         {
-            return weaponPosition;
+            return true;
         }
 
         Vector2 contactNormal = weapon.GetContactNormal();
@@ -414,7 +451,56 @@ public class PlayerAttack : MonoBehaviour
         // 텔레포트 위치 계산
         Vector2 basePosition = (Vector2)weaponPosition + teleportDirection * teleportDistance;
 
-        return basePosition;
+        if (!IsSafeLocation(basePosition, weapon.gameObject))
+        {
+            return false;
+        }
+        
+        return true;
+    }
+
+    private bool IsSafeLocation(Vector2 position, GameObject weaponObj)
+    {
+        ThrownWeapon weapon = weaponObj.GetComponent<ThrownWeapon>();
+        if (weapon == null) return false;
+        
+        Vector2 weaponPosition = weapon.transform.position;
+        Vector2 contactNormal = weapon.GetContactNormal();
+
+        float offsetDistance = 0.2f;
+        Vector2 adjustedStartPosition;
+
+        if (weapon.IsStuck() && contactNormal != Vector2.zero)
+        {
+            adjustedStartPosition = weaponPosition - contactNormal * offsetDistance;
+        }
+        else
+        {
+            adjustedStartPosition = weaponPosition;
+        }
+        
+        RaycastHit2D[] pathHits = Physics2D.LinecastAll(adjustedStartPosition, position, weapon.StickLayers);
+
+        foreach (RaycastHit2D hit in pathHits)
+        {
+            if (hit.collider != null && !IsWeaponOrItsParent(hit.collider.gameObject, weaponObj))
+            {
+                Debug.Log($"물체 감지: {hit.collider.gameObject}");
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private bool IsWeaponOrItsParent(GameObject obj, GameObject weapon)
+    {
+        if (obj == weapon) return true;
+
+        Transform weaponParent = weapon.transform.parent;
+        if (weaponParent != null && obj == weaponParent.gameObject) return true;
+
+        return false;
     }
     
     private IEnumerator TeleportCooldownTimer()
@@ -437,6 +523,7 @@ public class PlayerAttack : MonoBehaviour
     {
         if (currentWeapon != null && isAttacking)
         {
+            movement.MoveTo(0);
             playerController.ChangeState(new PlayerStates.Idle());
         }
     }
@@ -444,6 +531,7 @@ public class PlayerAttack : MonoBehaviour
     // 던지기 공격 애니메이션 종료 시 Idle 상태로 변경
     public void FinishedThrowAnim()
     {
+        movement.MoveTo(0);
         playerController.ChangeState(new PlayerStates.Idle());
     }
 
@@ -517,8 +605,8 @@ public class PlayerAttack : MonoBehaviour
             }
         }
         
-        if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || currentState is PlayerStates.Crawl || 
-            currentState is PlayerStates.Jump || currentState is PlayerStates.Roll || currentState is PlayerStates.Teleport)
+        if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || currentState is PlayerStates.Crawl
+            || currentState is PlayerStates.Roll || currentState is PlayerStates.Teleport)
         {
             return false;
         }
@@ -559,22 +647,32 @@ public class PlayerAttack : MonoBehaviour
         if (lastThrownWeapon != null && lastThrownWeapon.IsStuck())
         {
             Vector2 normal = lastThrownWeapon.GetContactNormal();
+            Vector3 weaponPos = lastThrownWeapon.transform.position;
             
             if (normal != Vector2.zero)
             {
                 Gizmos.color = Color.yellow;
-                Gizmos.DrawRay(lastThrownWeapon.transform.position, normal);
+                Gizmos.DrawRay(weaponPos, normal);
+
+                float offsetDistance = 0.2f;
+                Vector2 adjustedStartPosition = (Vector2)weaponPos - normal * offsetDistance;
+                
+                Vector2 teleportDirection;
+                float teleportDistance;
+                Collider2D playerCollider = GetComponent<Collider2D>();
                 
                 // 계산된 텔레포트 방향 시각화
                 float absNormalX = Mathf.Abs(normal.x);
                 float absNormalY = Mathf.Abs(normal.y);
-            
-                Vector2 teleportDirection;
-            
+                
+                Vector2 playerSize = playerCollider.bounds.size;
+                teleportDistance = playerSize.x * 1.5f;
+                
                 if (absNormalX > absNormalY)
                 {
                     float diagonalX = Mathf.Sign(normal.x);
                     teleportDirection = new Vector2(diagonalX, 1f).normalized;
+                    teleportDistance = playerSize.x * 3f;
                     Gizmos.color = Color.magenta;
                 }
                 else
@@ -582,8 +680,11 @@ public class PlayerAttack : MonoBehaviour
                     teleportDirection = normal.y < 0 ? Vector2.down : Vector2.up;
                     Gizmos.color = Color.green;
                 }
-            
-                Gizmos.DrawRay(lastThrownWeapon.transform.position, teleportDirection * 3);
+
+                Vector2 teleportPos = (Vector2)weaponPos + teleportDirection * teleportDistance;
+                
+                Gizmos.DrawLine(adjustedStartPosition, teleportPos);
+                Gizmos.DrawWireSphere(teleportPos, 0.3f);
             }
         }
     }

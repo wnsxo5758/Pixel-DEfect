@@ -8,7 +8,6 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int velocityX = Animator.StringToHash("VelocityX");
     private readonly int velocityY = Animator.StringToHash("VelocityY");
     private readonly int isJump = Animator.StringToHash("IsJump");
-    private readonly int isAttack = Animator.StringToHash("IsAttack");
     private readonly int isConnected = Animator.StringToHash("IsConnected");
     private readonly int isClimbing = Animator.StringToHash("IsClimbing");
     private readonly int isCrouching = Animator.StringToHash("IsCrouching");

@@ -611,7 +611,7 @@ public class EnemyBT : MonoBehaviour
 
     protected virtual float GetAttackRange()
     {
-        // 하위 클래스에서 오버라이드
+        // 하위 클래스에서 오버라이`드
         return 0f;
     }
     
