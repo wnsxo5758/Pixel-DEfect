@@ -39,7 +39,11 @@ public class FlyRangeEnemy : EnemyBT
     [SerializeField] 
     private float rotateSpeed = 5f;
     private Quaternion initialGunRotation;
-    private Vector3 initialGunLocalPosition;
+
+    [SerializeField] private float hitTiltAngle = 45f;
+
+    private Quaternion originalRotation;
+    private bool isTilted = false;
 
     private Vector2 initialPosition;
     private float attackTimer = 0f;
@@ -54,10 +58,9 @@ public class FlyRangeEnemy : EnemyBT
         rb.gravityScale = 0f;
         if (gunPivot != null)
         {
-
-            initialGunLocalPosition = gunPivot.localPosition;
             initialGunRotation = gunPivot.rotation;
         }
+        originalRotation = transform.localRotation;
 
         blackboard.SetValue("AttackRange", attackRange);
         blackboard.SetValue("RetreatRange", retreatRange);
@@ -111,59 +114,12 @@ public class FlyRangeEnemy : EnemyBT
     }
     protected override void Update()
     {
-        // ✅ 공격 쿨다운 처리
-        if (!canAttack)
+        base.Update(); // EnemyBT의 Update 호출
+
+        if (!isHit && isTilted)
         {
-            attackTimer += Time.deltaTime;
-
-            if (attackTimer >= attackCooldown)
-            {
-                canAttack = true;
-                attackTimer = 0f;
-                blackboard.SetValue("CanAttack", true);
-            }
-        }
-
-        // ✅ 피격 처리 (EnemyBT 복사 + 총기 위치 복원 추가)
-        if (isHit)
-        {
-            stunTimer -= Time.deltaTime;
-            blackboard.SetValue("StunTimer", stunTimer);
-
-            if (stunTimer <= 0f)
-            {
-                isHit = false;
-                blackboard.SetValue("IsHit", false);
-
-                if (flashCoroutine != null)
-                {
-                    StopCoroutine(flashCoroutine);
-                    flashCoroutine = null;
-                }
-
-                if (spriteRenderer != null)
-                {
-                    spriteRenderer.color = originalColor;
-                }
-
-                // 총기 위치 복원
-                if (gunPivot != null)
-                {
-                    gunPivot.localPosition = initialGunLocalPosition;
-                }
-            }
-        }
-
-        // 타겟 감지
-        if (!isHit && !isDead)
-        {
-            DetectTarget();
-        }
-
-        // 행동 트리 평가
-        if (behaviorTree != null)
-        {
-            behaviorTree.Evaluate();
+            transform.localRotation = originalRotation;
+            isTilted = false;
         }
 
         //총기 회전
@@ -391,7 +347,7 @@ public class FlyRangeEnemy : EnemyBT
     public override void DecreaseHp(int damage, bool isThrownWeapon = false)
     {
         base.DecreaseHp(damage, isThrownWeapon);
-
+        ApplyBodyTilt(target);
         // 사망했으면 넉백 적용하지 않음
         if (isDead || target == null || rb == null) return;
 
@@ -400,12 +356,17 @@ public class FlyRangeEnemy : EnemyBT
         rb.velocity = Vector2.zero;
         rb.AddForce(knockBackDir * knockBackForce, ForceMode2D.Impulse);
 
-        if (gunPivot != null)
-        {
-            gunPivot.localPosition = new Vector3(-0.71f, -1.35f, 0f);
-        }
     }
+    private void ApplyBodyTilt(Transform target)
+    {
+        if (target == null) return;
 
+        float dir = Mathf.Sign(transform.position.x - target.position.x);
+        float angle = hitTiltAngle * dir;
+
+        transform.localRotation = Quaternion.Euler(0, 0, angle);
+        isTilted = true;
+    }
     protected override NodeState HandleDeath()
     {
         var state = base.HandleDeath();
