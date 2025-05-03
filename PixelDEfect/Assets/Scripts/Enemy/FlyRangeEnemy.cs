@@ -346,27 +346,78 @@ public class FlyRangeEnemy : EnemyBT
 
     public override void DecreaseHp(int damage, bool isThrownWeapon = false)
     {
-        base.DecreaseHp(damage, isThrownWeapon);
-        ApplyBodyTilt(target);
-        // 사망했으면 넉백 적용하지 않음
-        if (isDead || target == null || rb == null) return;
+        if (isDead) return;
 
-        // 넉백 적용: 플레이어 반대 방향으로 밀림
-        Vector2 knockBackDir = ((Vector2)transform.position - (Vector2)target.position).normalized;
-        rb.velocity = Vector2.zero;
-        rb.AddForce(knockBackDir * knockBackForce, ForceMode2D.Impulse);
+        currentHp -= damage;
+        blackboard.SetValue("CurrentHp", currentHp);
 
+        if (currentHp <= 0)
+        {
+            currentHp = 0;
+            isDead = true;
+            blackboard.SetValue("IsDead", true);
+
+            if (flashCoroutine != null)
+            {
+                StopCoroutine(flashCoroutine);
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = originalColor;
+                }
+            }
+
+            return;
+        }
+
+        isHit = true;
+        blackboard.SetValue("IsHit", true);
+
+        stunTimer = isThrownWeapon ? throwStunDuration : normalStunDuration;
+        blackboard.SetValue("StunTimer", stunTimer);
+
+        if (spriteRenderer != null)
+        {
+            if (flashCoroutine != null)
+            {
+                StopCoroutine(flashCoroutine);
+            }
+            flashCoroutine = StartCoroutine(FlashEffect());
+        }
+
+        // ✅ 여기부터 기울기 적용
+        if (!isThrownWeapon)
+        {
+            float tiltDir = transform.position.x - target.position.x;
+            tiltDir = tiltDir == 0 ? 1f : Mathf.Sign(tiltDir);
+
+            transform.localRotation = Quaternion.Euler(0f, 0f, hitTiltAngle * -tiltDir);
+            isTilted = true;
+        }
+
+        // 🔥 넉백 적용
+        if (target != null && rb != null && !isThrownWeapon)
+        {
+            float dirX = transform.position.x - target.position.x;
+            dirX = dirX == 0 ? 1f : Mathf.Sign(dirX);
+            Vector2 knockBack = new Vector2(dirX, 0f).normalized * knockBackForce;
+
+            rb.velocity = Vector2.zero;
+            rb.AddForce(knockBack, ForceMode2D.Impulse);
+        }
     }
-    private void ApplyBodyTilt(Transform target)
+
+    protected override NodeState HandleHit()
     {
-        if (target == null) return;
+        // 움직임 중지 생략하여 넉백 유지
+        if (animator != null)
+        {
+            animator.SetMovementAnim(0);
+            animator.TriggerHitAnim();
+        }
 
-        float dir = Mathf.Sign(transform.position.x - target.position.x);
-        float angle = hitTiltAngle * dir;
-
-        transform.localRotation = Quaternion.Euler(0, 0, angle);
-        isTilted = true;
+        return NodeState.Running;
     }
+
     protected override NodeState HandleDeath()
     {
         var state = base.HandleDeath();

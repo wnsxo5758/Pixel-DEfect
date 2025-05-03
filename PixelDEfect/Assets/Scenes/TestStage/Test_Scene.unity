@@ -529,6 +529,7 @@ MonoBehaviour:
   moveSpeed: 3
   gunPivot: {fileID: 284079590}
   rotateSpeed: 5
+  hitTiltAngle: 10
 --- !u!58 &192780258
 CircleCollider2D:
   m_ObjectHideFlags: 0
