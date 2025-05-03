@@ -39,7 +39,7 @@ public class FlyRangeEnemy : EnemyBT
     [SerializeField] 
     private float rotateSpeed = 5f;
     private Quaternion initialGunRotation;
-
+    private Vector3 initialGunLocalPosition;
 
     private Vector2 initialPosition;
     private float attackTimer = 0f;
@@ -54,6 +54,8 @@ public class FlyRangeEnemy : EnemyBT
         rb.gravityScale = 0f;
         if (gunPivot != null)
         {
+
+            initialGunLocalPosition = gunPivot.localPosition;
             initialGunRotation = gunPivot.rotation;
         }
 
@@ -109,7 +111,7 @@ public class FlyRangeEnemy : EnemyBT
     }
     protected override void Update()
     {
-        // 공격 쿨다운 처리
+        // ✅ 공격 쿨다운 처리
         if (!canAttack)
         {
             attackTimer += Time.deltaTime;
@@ -122,7 +124,49 @@ public class FlyRangeEnemy : EnemyBT
             }
         }
 
-        base.Update();
+        // ✅ 피격 처리 (EnemyBT 복사 + 총기 위치 복원 추가)
+        if (isHit)
+        {
+            stunTimer -= Time.deltaTime;
+            blackboard.SetValue("StunTimer", stunTimer);
+
+            if (stunTimer <= 0f)
+            {
+                isHit = false;
+                blackboard.SetValue("IsHit", false);
+
+                if (flashCoroutine != null)
+                {
+                    StopCoroutine(flashCoroutine);
+                    flashCoroutine = null;
+                }
+
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = originalColor;
+                }
+
+                // 총기 위치 복원
+                if (gunPivot != null)
+                {
+                    gunPivot.localPosition = initialGunLocalPosition;
+                }
+            }
+        }
+
+        // 타겟 감지
+        if (!isHit && !isDead)
+        {
+            DetectTarget();
+        }
+
+        // 행동 트리 평가
+        if (behaviorTree != null)
+        {
+            behaviorTree.Evaluate();
+        }
+
+        //총기 회전
         UpdateGunRotation();
     }
 
@@ -338,6 +382,41 @@ public class FlyRangeEnemy : EnemyBT
         return NodeState.Running;
     }
     protected override float GetAttackRange() => attackRange;
+
+    public override void DecreaseHp(int damage, bool isThrownWeapon = false)
+    {
+        base.DecreaseHp(damage, isThrownWeapon);
+
+        // 사망했으면 넉백 적용하지 않음
+        if (isDead || target == null || rb == null) return;
+
+        // 넉백 적용: 플레이어 반대 방향으로 밀림
+        Vector2 knockBackDir = ((Vector2)transform.position - (Vector2)target.position).normalized;
+        rb.velocity = Vector2.zero;
+        rb.AddForce(knockBackDir * knockBackForce, ForceMode2D.Impulse);
+
+        if (gunPivot != null)
+        {
+            gunPivot.localPosition = new Vector3(-0.71f, -1.35f, 0f);
+        }
+    }
+
+    protected override NodeState HandleDeath()
+    {
+        // 기존 사망 로직 그대로 실행
+        var state = base.HandleDeath();
+
+        //중력 적용
+        if (rb != null)
+        {
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 20f;           // 중력 강하게 설정
+            rb.freezeRotation = false;      // 회전 허용
+            rb.angularVelocity = Random.Range(-200f, 200f); // 랜덤 회전
+        }
+
+        return state;
+    }
 
     protected override void OnDrawGizmosSelected()
     {
