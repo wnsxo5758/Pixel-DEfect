@@ -192,7 +192,6 @@ public class FlyRangeEnemy : EnemyBT
 
         for (int i = 0; i < shotCount; i++)
         {
-            // 총알 생성 및 발사
             if (bulletPrefab != null && firePoint != null)
             {
                 GameObject bullet = bulletPool.ActivePoolItem();
@@ -204,7 +203,7 @@ public class FlyRangeEnemy : EnemyBT
                     BulletBase bulletScript = bullet.GetComponent<BulletBase>();
                     if (bulletScript != null)
                     {
-                        Vector2 fireDirection = firePoint.right.normalized; // or gunTransform.right
+                        Vector2 fireDirection = ((Vector2)target.position - (Vector2)firePoint.position).normalized;
                         bulletScript.SetUp(fireDirection, bulletPool);
                     }
                 }
@@ -213,7 +212,7 @@ public class FlyRangeEnemy : EnemyBT
             yield return new WaitForSeconds(interval);
         }
 
-        // 쿨다운 대기
+        // 쿨타임 대기
         yield return new WaitForSeconds(attackCooldown);
 
         canAttack = true;
@@ -249,26 +248,28 @@ public class FlyRangeEnemy : EnemyBT
 
     private void UpdateGunRotation()
     {
-        if (gunPivot == null) return;
-        if (isDead) return;
+        if (gunPivot == null || isDead) return;
 
         bool playerDetected = blackboard.GetValue<bool>("PlayerDetected");
         Transform target = blackboard.GetValue<Transform>("Target");
 
-        Quaternion targetRotation;
-
-        if (playerDetected && target != null)
+        if (!playerDetected || target == null)
         {
-            Vector2 dir = ((Vector2)target.position - (Vector2)gunPivot.position).normalized;
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        }
-        else
-        {
-            targetRotation = initialGunRotation;
+            gunPivot.rotation = Quaternion.Lerp(gunPivot.rotation, initialGunRotation, Time.deltaTime * rotateSpeed);
+            return;
         }
 
-        // 부드러운 회전 보간
+        // 🔁 방향 계산
+        Vector2 dir = ((Vector2)target.position - (Vector2)gunPivot.position).normalized;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        // 👈 flip된 경우 회전 보정
+        if (transform.localScale.x < 0)
+        {
+            angle += 180f;
+        }
+
+        Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
         gunPivot.rotation = Quaternion.Lerp(gunPivot.rotation, targetRotation, Time.deltaTime * rotateSpeed);
     }
 
