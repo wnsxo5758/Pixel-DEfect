@@ -73,6 +73,7 @@ public class FlyRangeEnemy : EnemyBT
     {
         base.Start();
         bulletPool = new MemoryPool(bulletPrefab);
+        SetupFlyRangeBehaviorTree();
     }
     private void SetupFlyRangeBehaviorTree()
     {

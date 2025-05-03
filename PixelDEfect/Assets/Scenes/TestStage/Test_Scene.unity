@@ -499,7 +499,7 @@ MonoBehaviour:
   maxHp: 3
   normalStunDuration: 0.5
   throwStunDuration: 3
-  knockBackForce: 3
+  knockBackForce: 5
   deathDelay: 2
   detectionRange: 7
   loseTargetRange: 8
