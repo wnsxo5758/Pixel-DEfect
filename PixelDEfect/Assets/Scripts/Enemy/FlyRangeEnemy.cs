@@ -5,27 +5,39 @@ using UnityEngine;
 public class FlyRangeEnemy : EnemyBT
 {
     [Header("원거리 공격 설정")]
-    [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private Transform firePoint;
-    [SerializeField] private float attackRange = 5f;
-    [SerializeField] private float attackCooldown = 2f;
-    [SerializeField] private int bulletDamage = 1;
-    [SerializeField] private float bulletSpeed = 10f;
+    [SerializeField]
+    private GameObject bulletPrefab;
+    [SerializeField] 
+    private Transform firePoint;
+    [SerializeField] 
+    private float attackRange = 5f;
+    [SerializeField]
+    private float attackCooldown = 2f;
+    [SerializeField] 
+    private int bulletDamage = 1;
+    [SerializeField]
+    private float bulletSpeed = 10f;
 
     [Header("후퇴 설정")]
-    [SerializeField] private float retreatRange = 2f;
-    [SerializeField] private float retreatSpeedMultiplier = 0.5f;
+    [SerializeField] 
+    private float retreatRange = 2f;
+    [SerializeField] 
+    private float retreatSpeedMultiplier = 0.5f;
 
     [Header("복귀 설정")]
-    [SerializeField] private float returnSpeed = 2f;
+    [SerializeField]
+    private float returnSpeed = 2f;
 
     [Header("이동 설정")]
-    [SerializeField] protected float moveSpeed = 3f;
+    [SerializeField] 
+    protected float moveSpeed = 3f;
+
 
 
     [Header("총기 오브젝트")]
     [SerializeField] private Transform gunPivot; // 총기 회전 중심이 될 부모 객체
-    [SerializeField] private float rotateSpeed = 5f;
+    [SerializeField] 
+    private float rotateSpeed = 5f;
     private Quaternion initialGunRotation;
 
 
@@ -116,20 +128,18 @@ public class FlyRangeEnemy : EnemyBT
 
     protected override Node CreateAttackSequence()
     {
-        Selector attackSelector = new Selector();
-
-        // 후퇴 시퀀스
         Sequence retreatSequence = new Sequence();
+        retreatSequence.AddChild(new ConditionNode(() => !isAttacking)); // 공격 중엔 후퇴하지 않음
         retreatSequence.AddChild(new ConditionNode(() => IsTargetInRetreatRange()));
         retreatSequence.AddChild(new ActionNode(RetreatFromTarget));
 
-        // 공격 시퀀스
         Sequence attackSequence = new Sequence();
         attackSequence.AddChild(new ConditionNode(() => !isHit));
         attackSequence.AddChild(new ConditionNode(() => IsTargetInAttackRange()));
         attackSequence.AddChild(new ConditionNode(() => canAttack));
         attackSequence.AddChild(new ActionNode(PerformRangedAttack));
 
+        Selector attackSelector = new Selector();
         attackSelector.AddChild(retreatSequence);
         attackSelector.AddChild(attackSequence);
 
@@ -156,7 +166,6 @@ public class FlyRangeEnemy : EnemyBT
     private NodeState PerformRangedAttack()
     {
         if (isDead || isHit || !canAttack || isAttacking) return NodeState.Failure;
-
         isAttacking = true; // 중복 호출 방지
 
         canAttack = false;
@@ -187,6 +196,9 @@ public class FlyRangeEnemy : EnemyBT
             yield break;
         }
 
+        Vector2 fixedTargetPosition = target.position;
+        Vector2 fireDirection = (fixedTargetPosition - (Vector2)firePoint.position).normalized;
+
         int shotCount = 3;
         float interval = 0.3f;
 
@@ -203,7 +215,6 @@ public class FlyRangeEnemy : EnemyBT
                     BulletBase bulletScript = bullet.GetComponent<BulletBase>();
                     if (bulletScript != null)
                     {
-                        Vector2 fireDirection = ((Vector2)target.position - (Vector2)firePoint.position).normalized;
                         bulletScript.SetUp(fireDirection, bulletPool);
                     }
                 }
@@ -212,9 +223,11 @@ public class FlyRangeEnemy : EnemyBT
             yield return new WaitForSeconds(interval);
         }
 
-        // 쿨타임 대기
         yield return new WaitForSeconds(attackCooldown);
-
+        if (gunPivot != null)
+        {
+            gunPivot.rotation = initialGunRotation;
+        }
         canAttack = true;
         blackboard.SetValue("CanAttack", true);
         isAttacking = false;
@@ -222,7 +235,7 @@ public class FlyRangeEnemy : EnemyBT
 
     protected override NodeState Patrol()
     {
-        if (isHit || isDead) return NodeState.Failure;
+        if (isHit || isDead || isAttacking) return NodeState.Failure;
 
         float direction = blackboard.GetValue<float>("PatrolDirection");
 
@@ -239,9 +252,7 @@ public class FlyRangeEnemy : EnemyBT
             SetDirection(direction);
         }
 
-        // 공중 이동 → 직접 속도 설정
         rb.velocity = new Vector2(direction * moveSpeed, 0f);
-
         return NodeState.Running;
     }
 
@@ -249,7 +260,7 @@ public class FlyRangeEnemy : EnemyBT
     private void UpdateGunRotation()
     {
         if (gunPivot == null || isDead) return;
-
+        if (isAttacking) return;
         bool playerDetected = blackboard.GetValue<bool>("PlayerDetected");
         Transform target = blackboard.GetValue<Transform>("Target");
 
@@ -275,7 +286,7 @@ public class FlyRangeEnemy : EnemyBT
 
     private NodeState RetreatFromTarget()
     {
-        if (isDead || isHit) return NodeState.Failure;
+        if (isDead || isHit || isAttacking) return NodeState.Failure;
 
         Transform target = blackboard.GetValue<Transform>("Target");
         if (target == null) return NodeState.Failure;
@@ -284,7 +295,6 @@ public class FlyRangeEnemy : EnemyBT
         float retreatSpeed = moveSpeed * retreatSpeedMultiplier;
 
         rb.velocity = retreatDir * retreatSpeed;
-
         return NodeState.Running;
     }
 
@@ -306,21 +316,24 @@ public class FlyRangeEnemy : EnemyBT
     }
     protected override NodeState ChaseTarget()
     {
-        if (isHit || isDead) return NodeState.Failure;
+        if (isHit || isDead || isAttacking) return NodeState.Failure;
 
         Transform target = blackboard.GetValue<Transform>("Target");
         if (target == null) return NodeState.Failure;
 
-        Vector2 dir = ((Vector2)target.position - (Vector2)transform.position).normalized;
+        float distance = Vector2.Distance(transform.position, target.position);
 
-        // Rigidbody2D를 사용해 2D 자유 이동
+        if (distance <= attackRange)
+        {
+            rb.velocity = Vector2.zero;
+            return NodeState.Success;
+        }
+
+        Vector2 dir = ((Vector2)target.position - (Vector2)transform.position).normalized;
         rb.velocity = dir * moveSpeed;
 
-        // 스프라이트 방향 전환 (X축 기준)
         if (dir.x != 0)
-        {
             SetDirection(Mathf.Sign(dir.x));
-        }
 
         return NodeState.Running;
     }
