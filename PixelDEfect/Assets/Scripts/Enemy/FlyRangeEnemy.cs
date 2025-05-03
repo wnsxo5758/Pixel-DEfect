@@ -22,6 +22,13 @@ public class FlyRangeEnemy : EnemyBT
     [Header("이동 설정")]
     [SerializeField] protected float moveSpeed = 3f;
 
+
+    [Header("총기 오브젝트")]
+    [SerializeField] private Transform gunPivot; // 총기 회전 중심이 될 부모 객체
+    [SerializeField] private float rotateSpeed = 5f;
+    private Quaternion initialGunRotation;
+
+
     private Vector2 initialPosition;
     private float attackTimer = 0f;
     private bool canAttack = true;
@@ -32,8 +39,11 @@ public class FlyRangeEnemy : EnemyBT
         base.Awake();
         initialPosition = transform.position;
         // 중력 제거 - 공중 적은 중력 영향 받지 않음
-        rb.gravityScale = 0f; 
-
+        rb.gravityScale = 0f;
+        if (gunPivot != null)
+        {
+            initialGunRotation = gunPivot.rotation;
+        }
 
         blackboard.SetValue("AttackRange", attackRange);
         blackboard.SetValue("RetreatRange", retreatRange);
@@ -101,6 +111,7 @@ public class FlyRangeEnemy : EnemyBT
         }
 
         base.Update();
+        UpdateGunRotation();
     }
 
     protected override Node CreateAttackSequence()
@@ -193,8 +204,8 @@ public class FlyRangeEnemy : EnemyBT
                     BulletBase bulletScript = bullet.GetComponent<BulletBase>();
                     if (bulletScript != null)
                     {
-                        Vector2 dir = ((Vector2)target.position - (Vector2)firePoint.position).normalized;
-                        bulletScript.SetUp(dir, bulletPool);
+                        Vector2 fireDirection = firePoint.right.normalized; // or gunTransform.right
+                        bulletScript.SetUp(fireDirection, bulletPool);
                     }
                 }
             }
@@ -235,6 +246,31 @@ public class FlyRangeEnemy : EnemyBT
         return NodeState.Running;
     }
 
+
+    private void UpdateGunRotation()
+    {
+        if (gunPivot == null) return;
+        if (isDead) return;
+
+        bool playerDetected = blackboard.GetValue<bool>("PlayerDetected");
+        Transform target = blackboard.GetValue<Transform>("Target");
+
+        Quaternion targetRotation;
+
+        if (playerDetected && target != null)
+        {
+            Vector2 dir = ((Vector2)target.position - (Vector2)gunPivot.position).normalized;
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        }
+        else
+        {
+            targetRotation = initialGunRotation;
+        }
+
+        // 부드러운 회전 보간
+        gunPivot.rotation = Quaternion.Lerp(gunPivot.rotation, targetRotation, Time.deltaTime * rotateSpeed);
+    }
 
     private NodeState RetreatFromTarget()
     {
