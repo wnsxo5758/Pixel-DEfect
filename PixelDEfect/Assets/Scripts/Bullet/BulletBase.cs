@@ -57,6 +57,16 @@ public class BulletBase : MonoBehaviour
 
     private  void OnTriggerEnter2D(Collider2D collision)
     {
+
+        if (collision.CompareTag("Player"))
+        {
+            PlayerHp playerHp = collision.GetComponent<PlayerHp>();
+            if (playerHp != null)
+            {
+                playerHp.DecreaseHp(damage);
+            }
+        }
+
         if ((hitLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
             StartCoroutine(nameof(DestoryBullet));

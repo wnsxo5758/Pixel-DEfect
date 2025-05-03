@@ -210,22 +210,27 @@ public class FlyRangeEnemy : EnemyBT
     private NodeState PerformRangedAttack()
     {
         if (isDead || isHit || !canAttack || isAttacking) return NodeState.Failure;
-        isAttacking = true; // 중복 호출 방지
 
+        isAttacking = true;
         canAttack = false;
         attackTimer = 0f;
         blackboard.SetValue("CanAttack", false);
 
-        // 공격 시 멈춤
         rb.velocity = Vector2.zero;
 
-        // 공격 애니메이션 (선택)
+        // ✅ 방향 설정 (플레이어 기준)
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target != null)
+        {
+            float dirX = Mathf.Sign(target.position.x - transform.position.x);
+            SetDirection(dirX);
+        }
+
         if (animator != null)
         {
             animator.TriggerAttackAnim();
         }
 
-        // 3연속 사격 시작
         StartCoroutine(PerformTripleShot());
 
         return NodeState.Success;
@@ -412,7 +417,10 @@ public class FlyRangeEnemy : EnemyBT
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.gravityScale = 20f;           // 중력 강하게 설정
             rb.freezeRotation = false;      // 회전 허용
-            rb.angularVelocity = Random.Range(-200f, 200f); // 랜덤 회전
+            rb.angularDrag = 1f;            // 회전 감속
+
+            //회전도 랜덤하게 부여
+            rb.angularVelocity = Random.Range(-250f, 250f);
         }
 
         return state;
