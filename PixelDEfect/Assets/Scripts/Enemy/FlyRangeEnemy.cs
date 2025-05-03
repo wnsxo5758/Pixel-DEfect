@@ -202,7 +202,7 @@ public class FlyRangeEnemy : EnemyBT
         }
 
         Vector2 fixedTargetPosition = target.position;
-        Vector2 fireDirection = (fixedTargetPosition - (Vector2)firePoint.position).normalized;
+        Vector2 fireDirection = (firePoint.position - gunPivot.position).normalized;
 
         int shotCount = 3;
         float interval = 0.3f;
@@ -384,7 +384,6 @@ public class FlyRangeEnemy : EnemyBT
             flashCoroutine = StartCoroutine(FlashEffect());
         }
 
-        // ✅ 여기부터 기울기 적용
         if (!isThrownWeapon)
         {
             float tiltDir = transform.position.x - target.position.x;
@@ -394,7 +393,7 @@ public class FlyRangeEnemy : EnemyBT
             isTilted = true;
         }
 
-        // 🔥 넉백 적용
+        // 넉백 적용
         if (target != null && rb != null && !isThrownWeapon)
         {
             float dirX = transform.position.x - target.position.x;
@@ -441,7 +440,22 @@ public class FlyRangeEnemy : EnemyBT
 
         return state;
     }
+    private void OnDrawGizmos()
+    {
+        if (firePoint != null && gunPivot != null)
+        {
+            if (firePoint == null || gunPivot == null)
+                return;
 
+            Gizmos.color = Color.black;
+
+            // firePoint → 총기 끝 방향 기준으로 선 그리기
+            Vector3 direction = (firePoint.position - gunPivot.position).normalized;
+            float length = 20f;
+
+            Gizmos.DrawLine(firePoint.position, firePoint.position + direction * length);
+        }
+    }
     protected override void OnDrawGizmosSelected()
     {
         base.OnDrawGizmosSelected();
