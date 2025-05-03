@@ -408,19 +408,23 @@ public class FlyRangeEnemy : EnemyBT
 
     protected override NodeState HandleDeath()
     {
-        // 기존 사망 로직 그대로 실행
         var state = base.HandleDeath();
 
-        //중력 적용
         if (rb != null)
         {
             rb.bodyType = RigidbodyType2D.Dynamic;
-            rb.gravityScale = 20f;           // 중력 강하게 설정
-            rb.freezeRotation = false;      // 회전 허용
-            rb.angularDrag = 1f;            // 회전 감속
+            rb.gravityScale = 25f;
+            rb.freezeRotation = false;
+            rb.constraints = RigidbodyConstraints2D.None;
+            rb.angularDrag = 1f;
 
-            //회전도 랜덤하게 부여
-            rb.angularVelocity = Random.Range(-250f, 250f);
+            // 방향 확인
+            float dirX = transform.localScale.x;
+
+            //회전 방향: 오른쪽 보면 음수(시계방향), 왼쪽 보면 양수(반시계)
+            float spinDirection = dirX >= 0 ? -1f : 1f;
+            rb.angularVelocity = spinDirection * 300f; // 꼬꾸라지는 느낌용 속도
+
         }
 
         return state;
