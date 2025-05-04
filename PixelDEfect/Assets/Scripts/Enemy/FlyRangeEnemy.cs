@@ -175,7 +175,7 @@ public class FlyRangeEnemy : EnemyBT
 
         rb.velocity = Vector2.zero;
 
-        // ✅ 방향 설정 (플레이어 기준)
+        //
         Transform target = blackboard.GetValue<Transform>("Target");
         if (target != null)
         {
@@ -202,7 +202,6 @@ public class FlyRangeEnemy : EnemyBT
             yield break;
         }
 
-        Vector2 fixedTargetPosition = target.position;
         Vector2 fireDirection = (firePoint.position - gunPivot.position).normalized;
 
         int shotCount = 3;
@@ -265,10 +264,10 @@ public class FlyRangeEnemy : EnemyBT
 
     private void UpdateGunRotation()
     {
-        if (gunPivot == null || isDead) return;
-        if (isAttacking) return;
-        bool playerDetected = blackboard.GetValue<bool>("PlayerDetected");
+        if (gunPivot == null || isDead || isAttacking) return;
+
         Transform target = blackboard.GetValue<Transform>("Target");
+        bool playerDetected = blackboard.GetValue<bool>("PlayerDetected");
 
         if (!playerDetected || target == null)
         {
@@ -276,17 +275,16 @@ public class FlyRangeEnemy : EnemyBT
             return;
         }
 
-        // 🔁 방향 계산
-        Vector2 dir = ((Vector2)target.position - (Vector2)gunPivot.position).normalized;
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        // 🔁 방향 계산: firePoint에서 target을 바라보도록
+        Vector2 direction = ((Vector2)target.position - (Vector2)firePoint.position).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        // 👈 flip된 경우 회전 보정
-        if (transform.localScale.x < 0)
+        if (transform.localScale.x < 0f)
         {
             angle += 180f;
         }
 
-        Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
+        Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
         gunPivot.rotation = Quaternion.Lerp(gunPivot.rotation, targetRotation, Time.deltaTime * rotateSpeed);
     }
 
