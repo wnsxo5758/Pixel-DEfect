@@ -108,7 +108,7 @@ public class EnemyAnimator : MonoBehaviour
             animator.SetTrigger(deathTrigger);
         }
     }
-
+    
     private void OnAttackEvent()
     {
         EnemyBT enemy = transform.GetComponentInParent<EnemyBT>();
@@ -119,5 +119,13 @@ public class EnemyAnimator : MonoBehaviour
     {
         EnemyBT enemy = transform.GetComponentInParent<EnemyBT>();
         enemy.OnAttackAnimationFinished();
+    }
+
+    public void PauseAnimation(bool isPause)
+    {
+        if (animator != null)
+        {
+            animator.speed = isPause ? 0f : 1f;
+        }
     }
 }

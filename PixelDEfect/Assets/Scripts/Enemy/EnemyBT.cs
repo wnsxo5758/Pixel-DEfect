@@ -347,13 +347,10 @@ public class EnemyBT : MonoBehaviour
         // 공격 범위 밖에 있으면 추적
         else
         {
-            bool isWallAhead = CheckWall(directionToTarget);
-            float moveDirection = isWallAhead ? 0 : directionToTarget;
-            
             // 이동
             if (movement != null)
             {
-                movement.MoveToFast(moveDirection);
+                movement.MoveToFast(directionToTarget);
             }
         }
         
@@ -627,8 +624,15 @@ public class EnemyBT : MonoBehaviour
 
         return Vector2.Distance(transform.position, currentTarget.position);
     }
-
-
+    
+    public void PauseEnemy(bool isPaused)
+    {
+        // 애니메이션 일시정지
+        if (animator != null)
+        {
+            animator.PauseAnimation(isPaused);
+        }
+    }
 
     protected virtual void OnDrawGizmosSelected()
     {

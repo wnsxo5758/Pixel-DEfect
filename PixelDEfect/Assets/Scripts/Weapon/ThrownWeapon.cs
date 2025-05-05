@@ -14,7 +14,7 @@ public class ThrownWeapon : MonoBehaviour
     
     private WeaponBase weaponData;
     private Rigidbody2D rb;
-    private BoxCollider2D boxCollider;
+    private CircleCollider2D circleCollider;
     private SpriteRenderer spriteRenderer;
     
     private bool isStuck = false;
@@ -36,12 +36,12 @@ public class ThrownWeapon : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        boxCollider = GetComponent<BoxCollider2D>();
+        circleCollider = GetComponent<CircleCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        if (boxCollider == null)
+        if (circleCollider == null)
         {
-            boxCollider = gameObject.AddComponent<BoxCollider2D>();
+            circleCollider = gameObject.AddComponent<CircleCollider2D>();
         }
     }
 
@@ -60,8 +60,9 @@ public class ThrownWeapon : MonoBehaviour
             spriteRenderer.flipX = direction.x < 0;
             
             // 콜라이더 크기 설정
-            boxCollider.size = spriteRenderer.bounds.size * 0.8f;
-            boxCollider.offset = Vector2.zero;
+            float radius = Mathf.Max(spriteRenderer.bounds.size.x, spriteRenderer.bounds.size.y) * 0.4f;
+            circleCollider.radius = radius;
+            circleCollider.offset = Vector2.zero;
         }
         
         // Rigidbody 설정
@@ -137,7 +138,7 @@ public class ThrownWeapon : MonoBehaviour
         rb.gravityScale = 0f;
         rb.isKinematic = true;
         
-        boxCollider.isTrigger = true;
+        circleCollider.isTrigger = true;
         
         // 위치 & 회전 보정
         transform.position = impactPoint;
@@ -235,8 +236,8 @@ public class ThrownWeapon : MonoBehaviour
             transform.SetParent(null);
             transform.position = position;
             
-            boxCollider.isTrigger = false;
-            boxCollider.enabled = true;
+            circleCollider.isTrigger = false;
+            circleCollider.enabled = true;
 
             rb.isKinematic = false;
             rb.gravityScale = 1f;
