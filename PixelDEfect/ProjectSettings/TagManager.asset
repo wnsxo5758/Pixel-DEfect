@@ -80,3 +80,6 @@ TagManager:
   - name: PassTilemap
     uniqueID: 2101903407
     locked: 0
+  - name: ChatBox
+    uniqueID: 3154235317
+    locked: 0
