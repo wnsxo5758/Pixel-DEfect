@@ -353,7 +353,9 @@ public class PlayerAttack : MonoBehaviour
         {
             Vector2 contactNormal = targetWeapon.GetContactNormal();
             Vector2 teleportDirection;
-            float teleportDistance = GetComponent<Collider2D>().bounds.size.x * 1.5f;
+
+            Vector2 playerSize = GetComponent<Collider2D>().bounds.size;
+            float teleportDistance = playerSize.x * 3f;
         
             float absNormalX = Mathf.Abs(contactNormal.x);
             float absNormalY = Mathf.Abs(contactNormal.y);
@@ -362,11 +364,12 @@ public class PlayerAttack : MonoBehaviour
             {
                 float diagonalX = Mathf.Sign(contactNormal.x);
                 teleportDirection = new Vector2(diagonalX, 1f).normalized;
-                teleportDistance = GetComponent<Collider2D>().bounds.size.x * 3f;
+                teleportDistance = playerSize.x * 3f;
             }
             else
             {
                 teleportDirection = contactNormal.y < 0 ? Vector2.down : Vector2.up;
+                teleportDistance = playerSize.y;
             }
         
             teleportPosition = (Vector2)targetWeapon.transform.position + teleportDirection * teleportDistance;
@@ -431,7 +434,7 @@ public class PlayerAttack : MonoBehaviour
         float absNormalY = Mathf.Abs(contactNormal.y);
 
         Vector2 teleportDirection;
-        float teleportDistance = playerSize.x * 1.5f;
+        float teleportDistance;
 
         // 법선 벡터가 수평 방향인 경우
         if (absNormalX > absNormalY)
@@ -446,6 +449,8 @@ public class PlayerAttack : MonoBehaviour
         else
         {
             teleportDirection = contactNormal.y < 0 ? Vector2.down : Vector2.up;
+
+            teleportDistance = playerSize.y;
         }
         
         // 텔레포트 위치 계산
@@ -666,7 +671,6 @@ public class PlayerAttack : MonoBehaviour
                 float absNormalY = Mathf.Abs(normal.y);
                 
                 Vector2 playerSize = playerCollider.bounds.size;
-                teleportDistance = playerSize.x * 1.5f;
                 
                 if (absNormalX > absNormalY)
                 {
@@ -678,13 +682,14 @@ public class PlayerAttack : MonoBehaviour
                 else
                 {
                     teleportDirection = normal.y < 0 ? Vector2.down : Vector2.up;
+                    teleportDistance = playerSize.y;
                     Gizmos.color = Color.green;
                 }
 
                 Vector2 teleportPos = (Vector2)weaponPos + teleportDirection * teleportDistance;
                 
                 Gizmos.DrawLine(adjustedStartPosition, teleportPos);
-                Gizmos.DrawWireSphere(teleportPos, 0.3f);
+                Gizmos.DrawWireSphere(teleportPos, 0.4f);
             }
         }
     }
