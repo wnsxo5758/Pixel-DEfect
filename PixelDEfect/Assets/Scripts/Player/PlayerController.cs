@@ -81,17 +81,6 @@ public class PlayerController : MonoBehaviour
             movement.Jump();
             ChangeState(new Jump());
         }
-        
-        /* 롱점프 구현 시
-         if (Input.GetKey(jumpKeyCode))
-        {
-            movement.IsLongJump = true;
-        }
-        else if (Input.GetKeyUp(jumpKeyCode))
-        {
-            movement.IsLongJump = false;
-        }
-        */
     }
 
     public void OnCrouch() // 웅크리기 입력
@@ -149,6 +138,31 @@ public class PlayerController : MonoBehaviour
         canRoll = false;
         yield return new WaitForSeconds(rollCooldown);
         canRoll = true;
+    }
+
+    public bool CanTakeDamage(GameObject damageSource)
+    {
+        // 구르기 중이 아니면 항상 데미지를 받음
+        if (GetCurrentState() is not Roll) return true;
+        
+        // 구르기 중일 때 타격 주체 판단
+        if (damageSource != null)
+        {
+            // 적 투사체나 적의 공격은 회피
+            if (damageSource.CompareTag("Enemy") || 
+                damageSource.CompareTag("EnemyProjectile"))
+            {
+                return false;
+            }
+
+            // 환경 장애물은 회피 불가
+            if (damageSource.CompareTag("Obstacle"))
+            {
+                return true;
+            }
+        }
+
+        return true;
     }
     
     public void UpdateMove(float x) // 이동

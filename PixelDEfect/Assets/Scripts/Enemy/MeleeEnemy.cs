@@ -200,7 +200,7 @@ public class MeleeEnemy : EnemyBT
             PlayerHp playerHp = hitPlayer.GetComponent<PlayerHp>();
             if (playerHp != null)
             {
-                playerHp.DecreaseHp(attackDamage);
+                playerHp.DecreaseHp(attackDamage, this.gameObject);
                 
                 // 히트 효과
             }

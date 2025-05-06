@@ -161,8 +161,11 @@ namespace PlayerStates
         private float rollTimer;
         private float rollDirection;
         private int playerLayer;
+        
+        // 회피 관련 레이어
         private int enemyLayer;
-        private bool wasCollisionEnabled;
+        private int enemyProjectileLayer;
+        private int obstacleLayer; // 밤해물 레이어
         
         // 벽 감지 변수
         private bool isWallDetected = false; 
@@ -170,6 +173,7 @@ namespace PlayerStates
         private float wallHitDelay = 0.15f; // 벽 충돌 후 지연 시간
         private float wallHitTimer = 0f; // 벽 충돌 후 경과시간
         private LayerMask wallLayer; // 벽 레이어
+        
         
         public override void Enter(PlayerController player)
         {
@@ -182,18 +186,14 @@ namespace PlayerStates
             
             // 무적 처리 (레이어)
             playerLayer = player.gameObject.layer;
-            enemyLayer = LayerMask.NameToLayer("Enemy");
-            
-            // 적의 투사체 레이어가 있다면
-            /*
-            int projectileLayer = LayerMask.NameToLayer("EnemyProjectile");
-            if (projectileLayer != -1)
-            {
-                Physics2D.IgnoreLayerCollision(playerLayer, projectileLayer, true);
-            } 
-            */
-
+            enemyProjectileLayer = LayerMask.NameToLayer("EnemyBullet");
             wallLayer = LayerMask.GetMask("Ground", "Platform", "Object");
+            
+            // 충돌 레이어 비활성화
+            if (enemyProjectileLayer != -1)
+            {
+                Physics2D.IgnoreLayerCollision(playerLayer, enemyProjectileLayer, true);
+            }
             
             InputManager.Instance.OnJumpPressed -= player.OnJump;
             InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
@@ -253,7 +253,11 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
-            // 충돌 활성화 (구현 예정)
+            // 충돌 복원
+            if (enemyProjectileLayer != -1)
+            {
+                Physics2D.IgnoreLayerCollision(playerLayer, enemyProjectileLayer, false);
+            }
             
             InputManager.Instance.OnJumpPressed += player.OnJump;
             InputManager.Instance.OnCrouchPressed += player.OnCrouch;
@@ -438,6 +442,7 @@ namespace PlayerStates
             InputManager.Instance.OnHoldPressed += player.OnHold;
         }
     }
+    
     public class StateGlobal : State<PlayerController>
     {
         

@@ -26,7 +26,7 @@ public class PlayerHp : MonoBehaviour
     
     private bool isDead = false;
     private bool isHealing = false; // 회복 중인가?
-    private bool isInvincibility = false; // 무적인가
+    private bool isInvincible = false; // 무적인가
 
     public event Action OnPlayerDeath;
     public int CurrentHp => currentHp;
@@ -47,9 +47,9 @@ public class PlayerHp : MonoBehaviour
         originColor = spriteRenderer.color;
     }
 
-    public void DecreaseHp(int damage)
+    public void DecreaseHp(int damage, GameObject damageSource = null)
     {
-        if (isInvincibility || isDead || player.IsRolling) return;
+        if (isInvincible || isDead || !player.CanTakeDamage(damageSource)) return;
 
         currentHp -= damage;
         currentHp = Mathf.Max(currentHp, 0); // 음수 방지
@@ -97,7 +97,7 @@ public class PlayerHp : MonoBehaviour
     
     public void OnInvincibility(float time) // 무적상태
     {
-        if (isInvincibility)
+        if (isInvincible)
         {
             invincibilityTime += time;
         }
@@ -110,7 +110,7 @@ public class PlayerHp : MonoBehaviour
 
     private IEnumerator Invincibility() // 무적상태, 캐릭터 깜빡이는 효과
     {
-        isInvincibility = true;
+        isInvincible = true;
         float blinkSpeed = 10;
 
         while (invincibilityTime > 0)
@@ -124,7 +124,7 @@ public class PlayerHp : MonoBehaviour
         }
 
         spriteRenderer.color = originColor;
-        isInvincibility = false;
+        isInvincible = false;
     }
     
     public void IncreaseHp()  // 체력 회복
