@@ -161,11 +161,7 @@ namespace PlayerStates
         private float rollTimer;
         private float rollDirection;
         private int playerLayer;
-        
-        // 회피 관련 레이어
-        private int enemyLayer;
-        private int enemyProjectileLayer;
-        private int obstacleLayer; // 밤해물 레이어
+        private bool isInvulnerable = false;
         
         // 벽 감지 변수
         private bool isWallDetected = false; 
@@ -184,16 +180,7 @@ namespace PlayerStates
             rollDirection = player.transform.localScale.x > 0 ? 1 : -1;
             rollTimer = rollDuration;
             
-            // 무적 처리 (레이어)
-            playerLayer = player.gameObject.layer;
-            enemyProjectileLayer = LayerMask.NameToLayer("EnemyBullet");
             wallLayer = LayerMask.GetMask("Ground", "Platform", "Object");
-            
-            // 충돌 레이어 비활성화
-            if (enemyProjectileLayer != -1)
-            {
-                Physics2D.IgnoreLayerCollision(playerLayer, enemyProjectileLayer, true);
-            }
             
             InputManager.Instance.OnJumpPressed -= player.OnJump;
             InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
@@ -201,13 +188,13 @@ namespace PlayerStates
             
             // 구르기 애니메이션
             animator.StartRollAnim();
-            player.IsRolling = true;
             
             // 구르기
             player.StartCoroutine(player.StartRollCoroutine());
             
             isWallDetected = false;
             wallHitTimer = 0f;
+            isInvulnerable = true;
         }
 
         public override void Execute(PlayerController player)
@@ -253,19 +240,13 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
-            // 충돌 복원
-            if (enemyProjectileLayer != -1)
-            {
-                Physics2D.IgnoreLayerCollision(playerLayer, enemyProjectileLayer, false);
-            }
-            
             InputManager.Instance.OnJumpPressed += player.OnJump;
             InputManager.Instance.OnCrouchPressed += player.OnCrouch;
             InputManager.Instance.OnHoldPressed += player.OnHold;
             
             // 구르기 종료
-            player.IsRolling = false;
             player.UpdateMove(0);
+            isInvulnerable = false;
         }
 
         private bool CheckForWall(PlayerController player)
@@ -278,6 +259,21 @@ namespace PlayerStates
             Debug.DrawRay(rayOrigin, rayDirection* wallCheckDistance, hit ? Color.red : Color.green, 0.5f);
 
             return hit.collider != null;
+        }
+
+        public bool CheckDodgeAndTriggerTimeStop()
+        {
+            if (isInvulnerable)
+            {
+                // 시간 정지 스킬이 있다면 발동
+                if (TimeManager.Instance.HasTimeStopAbility())
+                {
+                    TimeManager.Instance.TriggerTimeStopOnDodge(movement.transform.position);
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
     

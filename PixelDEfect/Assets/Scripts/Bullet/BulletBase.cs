@@ -16,17 +16,18 @@ public class BulletBase : MonoBehaviour
 
 
     private Vector2 moveDir;
+    private Vector2 lastVelocity;
 
     Rigidbody2D rigid;
 
-    protected AudioSource audioSoruce;
+    protected AudioSource audioSource;
     protected Animator animator;
     private MemoryPool memoryPool;
     private Collider2D collider2D;
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
-        audioSoruce = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
         animator = GetComponentInChildren<Animator>();
         collider2D = GetComponent<Collider2D>();
     }
@@ -69,12 +70,12 @@ public class BulletBase : MonoBehaviour
 
         if ((hitLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
-            StartCoroutine(nameof(DestoryBullet));
+            StartCoroutine(nameof(DestroyBullet));
         }
     }
 
-    //총알 비활성화(Destory 아님)
-    protected virtual IEnumerator DestoryBullet()
+    //총알 비활성화(Destroy 아님)
+    protected virtual IEnumerator DestroyBullet()
     {
         GetComponent<Collider2D>().enabled = false;
         yield return null;
@@ -84,9 +85,9 @@ public class BulletBase : MonoBehaviour
     //사운두
     private void PlaySound(AudioClip _clip)
     {
-        audioSoruce.Stop();
-        audioSoruce.clip = _clip;
-        audioSoruce.Play();
+        audioSource.Stop();
+        audioSource.clip = _clip;
+        audioSource.Play();
     }
     
     // 총알 회전시 슬프라이트 회전

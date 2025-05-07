@@ -15,7 +15,7 @@ public class PlayerHp : MonoBehaviour
     private int maxMedicKit = 3; // 최대 회복약
     private int currentMedicKit; // 현재 회복약
     private int healAmount = 1; //회복약 사용시 회복양
-
+    
     [Header("UI")]
     [SerializeField] private UIPlayerData uiPlayer;
     
@@ -45,19 +45,35 @@ public class PlayerHp : MonoBehaviour
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         originColor = spriteRenderer.color;
+        
     }
 
     public void DecreaseHp(int damage, GameObject damageSource = null)
     {
-        if (isInvincible || isDead || !player.CanTakeDamage(damageSource)) return;
+        bool dodged = false;
 
+        if (damageSource != null)
+        {
+            Collider2D damageCollider = damageSource.GetComponent<Collider2D>();
+            if (damageCollider != null && player != null)
+            {
+                dodged = player.OnAttackReceived();
+            }
+        }
+
+        // 무적 or 회피 상태 체크
+        if (isInvincible || dodged)
+        {
+            return;
+        }
+        
         currentHp -= damage;
-        currentHp = Mathf.Max(currentHp, 0); // 음수 방지
 
         if (currentHp <= 0)
         {
             Debug.Log("플레이어 사망");
-
+            
+            currentHp = 0;
             Die();
         }
         else
@@ -65,6 +81,8 @@ public class PlayerHp : MonoBehaviour
             Debug.Log("플레이어에게 " + damage + "데미지");
             
             OnInvincibility(1.5f);
+            
+            // 피격 애니메이션 및 사운드 재생
         }
 
         uiPlayer.SetHpAll(currentHp); // 여기서 전체 갱신

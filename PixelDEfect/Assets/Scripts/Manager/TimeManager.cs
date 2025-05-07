@@ -1,29 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class TimeManager : MonoBehaviour
 {
     public static TimeManager Instance { get; private set; }
 
     [Header("시간 정지 설정")] 
-    [SerializeField] private float timeStopDuration = 4f;
-    [SerializeField] private float timeScale = 0f;
+    [SerializeField] private float timeFreezeRadius = 20f;
+    [SerializeField] private float timeFreezeDuration = 5f;
+    [SerializeField] private float timeFreezeCooldown = 15f;
+    [SerializeField] private LayerMask timeAffectedLayers;
 
-    [Header("이펙트 설정")] 
-    [SerializeField] private GameObject timeStopEffectPrefab;
-    [SerializeField] private GameObject screenFilterObject;
-
-    // 이벤트 콜백
-    public UnityEvent onTimeStop = new UnityEvent();
-    public UnityEvent onTimeResume = new UnityEvent();
-
-    private bool isTimeStopped = false;
-    private Coroutine timeStopCoroutine;
-    private List<Rigidbody2D> frozenRigidbodies = new List<Rigidbody2D>();
-    private Dictionary<Rigidbody2D, Vector2> savedVelocities = new Dictionary<Rigidbody2D, Vector2>();
-    private Dictionary<Rigidbody2D, float> savedAngularVelocities = new Dictionary<Rigidbody2D, float>();
+    [Header("시각 효과")] 
+    [SerializeField] private GameObject timeFreezeVFXPrefab;
+    [SerializeField] private GameObject screenOverlayPrefab;
+    
+    // 상태 변수
+    private bool isTimeFrozen = false;
+    private float timeFreezeTimer = 0f;
+    private float cooldownTimer = 0f;
+    private List<ITimeAffected> affectedEntities = new List<ITimeAffected>();
+    private GameObject currentVFX;
+    private GameObject currentOverlay;
+    
+    // 스킬 상태
+    private bool hasTimeStopAbility = false;
+    
+    // 이벤트
+    public System.Action OnTimeStopBegin;
+    public System.Action OnTimeStopEnd;
+    public System.Action<float> OnCooldownUpdate; // 쿨다운 업데이트 0~1
     
     private void Awake()
     {
@@ -36,169 +43,137 @@ public class TimeManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        
-        // 화면 필터 초기화
-        if (screenFilterObject != null)
-        {
-            screenFilterObject.SetActive(false);
-        }
     }
 
-    public void StopTime()
+    private void Update()
     {
-        if (isTimeStopped) return;
-
-        isTimeStopped = true;
-
-        // 기존 코루틴 종료
-        if (timeStopCoroutine != null)
+        // 쿨다운 업데이트
+        if (cooldownTimer > 0)
         {
-            StopCoroutine(timeStopCoroutine);
+            cooldownTimer -= Time.deltaTime;
+            OnCooldownUpdate?.Invoke(1 - (cooldownTimer / timeFreezeCooldown));
         }
         
-        // 새 코루틴 시작
-        timeStopCoroutine = StartCoroutine(TimeStopRoutine());
+        // 시간 정지 타이머 업데이트
+        if (isTimeFrozen)
+        {
+            timeFreezeTimer -= Time.deltaTime;
+            if (timeFreezeTimer <= 0)
+            {
+                ResumeTime();
+            }
+        }
+    }
+    
+    // 시간 정지 스킬 획득
+    public void UnlockTimeStopAbility()
+    {
+        hasTimeStopAbility = true;
+    }
+    
+    // 플레이어의 회피 성공 시 호출될 메서드
+    public void TriggerTimeStopOnDodge(Vector3 position)
+    {
+        if (!hasTimeStopAbility || isTimeFrozen || cooldownTimer > 0)
+            return;
+
+        FreezeTime(position);
+    }
+    
+    // 시간 정지 실행
+    public void FreezeTime(Vector3 originPosition)
+    {
+        if (isTimeFrozen || cooldownTimer > 0)
+            return;
+
+        isTimeFrozen = true;
+        timeFreezeTimer = timeFreezeDuration;
+        
+        // 영향 범위 내 모든 개체 찾기
+        FindAndRegisterTimeAffectedEntities(originPosition);
+        
+        // 시각 효과 생성
+        CreateVisualEffects(originPosition);
         
         // 이벤트 호출
-        onTimeStop.Invoke();
-        
-        // 시간 정지 사운드 재생
+        OnTimeStopBegin?.Invoke();
     }
-
+    
+    // 시간 재개
     public void ResumeTime()
     {
-        if (!isTimeStopped) return;
+        if (!isTimeFrozen)
+            return;
 
-        isTimeStopped = false;
+        isTimeFrozen = false;
+        cooldownTimer = timeFreezeCooldown;
         
-        // 코루틴 종료
-        if (timeStopCoroutine != null)
+        // 모든 개체 시간 재개
+        foreach (var entity in affectedEntities)
         {
-            StopCoroutine(timeStopCoroutine);
-            timeStopCoroutine = null;
+            entity.OnTimeResume();
         }
         
-        // 시간 스케일 복원
-        Time.timeScale = 1f;
+        // 시각 효과 제거
+        RemoveVisualEffects();
         
-        // 저장된 물리 상태 복원
-        RestorePhysics();
-        
-        // 이펙트 제거
-        DisableTimeStopEffects();
+        // 목록 초기화
+        affectedEntities.Clear();
         
         // 이벤트 호출
-        onTimeResume.Invoke();
-        
-        // 시간 복원 사운드 재생
-    }
-
-    private IEnumerator TimeStopRoutine()
-    {
-        // 물리 객체 상태 저장
-        FreezePhysics();
-        
-        // 시간 정지 이펙트 활성화
-        EnableTimeStopEffects();
-        
-        // 시간 정지
-        Time.timeScale = timeScale;
-        
-        // 정지 시간만큼 대기
-        float elapsedRealTime = 0f;
-        while (elapsedRealTime < timeStopDuration)
-        {
-            elapsedRealTime += Time.unscaledDeltaTime;
-            yield return null;
-        }
-        
-        // 시간 복원
-        ResumeTime();
+        OnTimeStopEnd?.Invoke();
     }
     
-    // 모든 물리 객체 정지
-    private void FreezePhysics()
+    // 시간 정지 중 데미지 적용
+    public void ApplyDamageInFrozenTime(ITimeAffected target, int damage, Vector2 direction)
     {
-        // 모든 Rigidbody2D 찾기
-        Rigidbody2D[] allRigidbodies = FindObjectsOfType<Rigidbody2D>();
-
-        frozenRigidbodies.Clear();
-        savedVelocities.Clear();
-        savedAngularVelocities.Clear();
-
-        foreach (Rigidbody2D rb in allRigidbodies)
-        {
-            // 플레이어 제외
-            if (rb.CompareTag("Player")) continue;
-            
-            // 현재 상태 저장
-            savedVelocities[rb] = rb.velocity;
-            savedAngularVelocities[rb] = rb.angularVelocity;
-            
-            // 모든 움직임 정지
-            rb.velocity = Vector2.zero;
-            rb.angularVelocity = 0f;
-            rb.Sleep();
-            
-            // 리스트에 추가
-            frozenRigidbodies.Add(rb);
-        }
+        if (!isTimeFrozen || !affectedEntities.Contains(target))
+            return;
         
-        // 모든 적 애니메이션 정지
-        foreach (var enemy in FindObjectsOfType<EnemyBT>())
-        {
-            enemy.PauseEnemy(true);
-        }
+        target.ReceiveDamageInFrozenTime(damage, direction);
     }
     
-    // 물리 객체 상태 복원
-    private void RestorePhysics()
+    // 영향 받는 개체 찾기 및 등록
+    private void FindAndRegisterTimeAffectedEntities(Vector3 originPosition)
     {
-        foreach (Rigidbody2D rb in frozenRigidbodies)
+        affectedEntities.Clear();
+        
+        // 레이어 마스크를 이용한 효율적인 개체 검색
+        Collider2D[] colliders = 
+            Physics2D.OverlapCircleAll(originPosition, timeFreezeRadius, timeAffectedLayers);
+
+        foreach (var collider in colliders)
         {
-            if (rb == null) continue;
-            
-            // 속도 복원
-            if (savedVelocities.ContainsKey(rb))
+            // ITimeAffected 인터페이스를 구현한 컴포넌트 검색
+            ITimeAffected[] entities = collider.GetComponents<ITimeAffected>();
+
+            foreach (var entity in entities)
             {
-                rb.velocity = savedVelocities[rb];
+                if (entity.IsInTimeFreezeRange(originPosition, timeFreezeRadius))
+                {
+                    affectedEntities.Add(entity);
+                    entity.OnTimeStop();
+                }
             }
-            
-            // 각속도 복원
-            if (savedAngularVelocities.ContainsKey(rb))
-            {
-                rb.angularVelocity = savedAngularVelocities[rb];
-            }
-            
-            rb.WakeUp();
         }
-        
-        // 모든 적 애니메이션 재개
-        foreach (var enemy in FindObjectsOfType<EnemyBT>())
-        {
-            enemy.PauseEnemy(false);
-        }
-        
-        frozenRigidbodies.Clear();
-        savedVelocities.Clear();
-        savedAngularVelocities.Clear();
     }
     
-    // 시간 정지 이펙트 활성화
-    private void EnableTimeStopEffects()
+    // 시각 효과 생성
+    private void CreateVisualEffects(Vector3 position)
     {
         
     }
     
-    // 시간 정지 이펙트 비활성화
-    private void DisableTimeStopEffects()
+    // 시각 효과 제거
+    private void RemoveVisualEffects()
     {
         
     }
-
-    public bool IsTimeStopped()
-    {
-        return isTimeStopped;
-    }
+    
+    // 상태 확인 메서드들
+    public bool IsTimeFrozen() => isTimeFrozen;
+    public bool HasTimeStopAbility() => hasTimeStopAbility;
+    public float GetCooldownPercentage() => cooldownTimer > 0 ? cooldownTimer / timeFreezeCooldown : 0f;
+    public float GetRemainingFreezeDuration() => timeFreezeTimer;
 }
     

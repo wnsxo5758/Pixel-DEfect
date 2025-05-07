@@ -4,26 +4,26 @@ using UnityEngine;
 
 public class TurretBullet : BulletBase
 {
-    private Vector2 direction; // ÃÑ¾ËÀÌ ³¯¾Æ°¥ ¹æÇâ
+    private Vector2 direction; // ï¿½Ñ¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Æ°ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    public void SetUp(Vector2 targetPosition) // ÇÃ·¹ÀÌ¾î À§Ä¡¸¦ ¹Þ¾Æ ¹æÇâ ¼³Á¤
+    public void SetUp(Vector2 targetPosition) // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Þ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     {
-        direction = (targetPosition - (Vector2)transform.position).normalized; // ¹æÇâ º¤ÅÍ ¼³Á¤
-        RotateToTarget(direction); // ¹æÇâ¿¡ ¸ÂÃç È¸Àü
+        direction = (targetPosition - (Vector2)transform.position).normalized; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        RotateToTarget(direction); // ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½
     }
 
     private void Update()
     {
-        transform.position += (Vector3)(direction * speed * Time.deltaTime); // ¼³Á¤µÈ ¹æÇâÀ¸·Î ÀÌµ¿
+        transform.position += (Vector3)(direction * speed * Time.deltaTime); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½
     }
 
-    private void RotateToTarget(Vector2 dir) // ÃÑ¾ËÀÌ ³¯¾Æ°¡´Â ¹æÇâÀ¸·Î È¸Àü
+    private void RotateToTarget(Vector2 dir) // ï¿½Ñ¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½
     {
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
     }
 
-    protected override IEnumerator DestoryBullet()
+    protected override IEnumerator DestroyBullet()
     {
         direction = Vector2.zero;
         Collider2D collider = GetComponent<Collider2D>();

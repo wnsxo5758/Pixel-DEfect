@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyAnimator : MonoBehaviour
@@ -16,7 +17,7 @@ public class EnemyAnimator : MonoBehaviour
     private readonly string hitTrigger = "Hit";
     private readonly string deathTrigger = "Death";
     private readonly string chasingParam = "IsChasing";
-    
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -25,20 +26,22 @@ public class EnemyAnimator : MonoBehaviour
 
     public void UpdateAnimation(float x)
     {
-        if (isDeath) return;  // 사망시 애니메이션 작동 X
+        if (isDeath) return; // 사망시 애니메이션 작동 X
 
         if (x != 0)
         {
             SpriteFlipX(x);
         }
-        if(isAttack)
+
+        if (isAttack)
         {
             animator.SetBool("isAttack", true);
         }
-        else if(!isAttack)
+        else if (!isAttack)
         {
             animator.SetBool("isAttack", false);
         }
+
         animator.SetBool("isJump", !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
         if (movement.IsGrounded) // 땅에 있는 경우
         {
@@ -46,9 +49,10 @@ public class EnemyAnimator : MonoBehaviour
         }
         else // 땅에 없는 경우
         {
-            animator.SetFloat("velocityY", movement.Velocity.y);  // Y 값에 따라 상태 변경
+            animator.SetFloat("velocityY", movement.Velocity.y); // Y 값에 따라 상태 변경
         }
     }
+
     public void Attack()
     {
         animator.SetBool("isAttack", true);
@@ -66,7 +70,7 @@ public class EnemyAnimator : MonoBehaviour
         transform.parent.localScale = new Vector3((x < 0 ? -1 : 1), 1, 1);
     }
 
-    
+
     // 새로운 animation 메소드
 
     public void SetMovementAnim(float speed)
@@ -84,7 +88,7 @@ public class EnemyAnimator : MonoBehaviour
             animator.SetBool(chasingParam, isChasing);
         }
     }
-    
+
     public void TriggerAttackAnim()
     {
         if (animator != null)
@@ -92,7 +96,7 @@ public class EnemyAnimator : MonoBehaviour
             animator.SetTrigger(attackTrigger);
         }
     }
-    
+
     public void TriggerHitAnim()
     {
         if (animator != null)
@@ -108,7 +112,7 @@ public class EnemyAnimator : MonoBehaviour
             animator.SetTrigger(deathTrigger);
         }
     }
-    
+
     private void OnAttackEvent()
     {
         EnemyBT enemy = transform.GetComponentInParent<EnemyBT>();
@@ -119,13 +123,5 @@ public class EnemyAnimator : MonoBehaviour
     {
         EnemyBT enemy = transform.GetComponentInParent<EnemyBT>();
         enemy.OnAttackAnimationFinished();
-    }
-
-    public void PauseAnimation(bool isPause)
-    {
-        if (animator != null)
-        {
-            animator.speed = isPause ? 0f : 1f;
-        }
     }
 }

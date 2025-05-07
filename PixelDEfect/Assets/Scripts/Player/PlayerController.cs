@@ -13,17 +13,17 @@ public class PlayerController : MonoBehaviour
 
     [Header("구르기")] 
     [SerializeField] private float rollCooldown = 1f;
-    private bool canRoll = true;
     
     private MovementRigidbody2D movement;
     private PlayerHp playerHp;
     private PlayerAttack playerAttack;
     private PlayerInteraction playerInteraction;
     private PlayerStateMachine<PlayerController> stateMachine;
+    
+    private bool canRoll = true;
 
     public bool IsOnLadder { get; set; } //사다리 
     public bool IsCrouching { get; set; } //웅크리기
-    public bool IsRolling { get; set; }
     
     private void Awake()
     {
@@ -140,31 +140,16 @@ public class PlayerController : MonoBehaviour
         canRoll = true;
     }
 
-    public bool CanTakeDamage(GameObject damageSource)
+    public bool OnAttackReceived()
     {
-        // 구르기 중이 아니면 항상 데미지를 받음
-        if (GetCurrentState() is not Roll) return true;
-        
-        // 구르기 중일 때 타격 주체 판단
-        if (damageSource != null)
+        if (GetCurrentState() is Roll rollState)
         {
-            // 적 투사체나 적의 공격은 회피
-            if (damageSource.CompareTag("Enemy") || 
-                damageSource.CompareTag("EnemyProjectile"))
-            {
-                return false;
-            }
-
-            // 환경 장애물은 회피 불가
-            if (damageSource.CompareTag("Obstacle"))
-            {
-                return true;
-            }
+            return rollState.CheckDodgeAndTriggerTimeStop();
         }
 
-        return true;
+        return false;
     }
-    
+
     public void UpdateMove(float x) // 이동
     {
         if (IsCrouching)

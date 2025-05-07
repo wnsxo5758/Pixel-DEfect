@@ -50434,6 +50434,7 @@ GameObject:
   - component: {fileID: 1141360396}
   - component: {fileID: 1141360395}
   - component: {fileID: 1141360397}
+  - component: {fileID: 1141360398}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -50489,6 +50490,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94a584fd7f451c546bb5cac93d7a2c6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1141360398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141360394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee6acb31f9db54c41936bf2ebc7e1ad5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeStopDuration: 4
+  timeScale: 0.01
+  timeStopEffectPrefab: {fileID: 0}
+  screenFilterObject: {fileID: 0}
+  onTimeStop:
+    m_PersistentCalls:
+      m_Calls: []
+  onTimeResume:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1144608363
 GameObject:
   m_ObjectHideFlags: 0

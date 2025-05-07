@@ -43,6 +43,7 @@ public class EnemyBT : MonoBehaviour
     protected bool isHit = false;
     protected bool isDead = false;
     protected float stunTimer = 0f;
+    protected bool isTimeFrozen = false; // 시간 정지 관련 변수
     
     protected virtual void Awake()
     {
@@ -76,14 +77,6 @@ public class EnemyBT : MonoBehaviour
         SetDirection(patrolDirection);
     }
 
-    public virtual void OnAttackAnimationEvent()
-    {
-        
-    }
-
-    public virtual void OnAttackAnimationFinished()
-    { }
-
     protected virtual void Start()
     {
         // 기본 행동 트리 설정
@@ -92,6 +85,10 @@ public class EnemyBT : MonoBehaviour
 
     protected virtual void Update()
     {
+        // 시간 정지 상태라면 아무 행동도 하지 않음
+        if (isTimeFrozen)
+            return;
+        
         // 피격 상태 처리
         if (isHit)
         {
@@ -632,14 +629,53 @@ public class EnemyBT : MonoBehaviour
         return Vector2.Distance(transform.position, currentTarget.position);
     }
     
-    public void PauseEnemy(bool isPaused)
+    public void FreezeTime()
     {
-        // 애니메이션 일시정지
-        if (animator != null)
+        isTimeFrozen = true;
+        
+        // 물리 객체 정지 
+        if (rb != null)
         {
-            animator.PauseAnimation(isPaused);
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.Sleep();
+        }
+        
+        // 이동 관련 동작 중지
+        if (movement != null)
+        {
+            movement.MoveTo(0f);
+        }
+
+        if (behaviorTree != null)
+        {
+            behaviorTree.Pause();
         }
     }
+
+    public void UnFreezeTime()
+    {
+        isTimeFrozen = false;
+        
+        // 물리 객체 깨우기
+        if (rb != null)
+        {
+            rb.WakeUp();
+        }
+
+        if (behaviorTree != null)
+        {
+            behaviorTree.Resume();
+        }
+    }
+    
+    public virtual void OnAttackAnimationEvent()
+    {
+        
+    }
+
+    public virtual void OnAttackAnimationFinished()
+    { }
 
     protected virtual void OnDrawGizmosSelected()
     {
