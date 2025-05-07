@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a85211991747b114f98d2f6eb0b8b889, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 3
+  maxHp: 4
   normalStunDuration: 0.5
   throwStunDuration: 3
   knockBackForce: 3
@@ -347,6 +347,9 @@ MonoBehaviour:
   - "\uBB34\uB9AC \uBB34...\uB9AC"
   chatTr: {fileID: 8611589551106598280}
   chatBoxPrefab: {fileID: 6296424888039983329, guid: f2f78ed955551c147a29f83167d07c1e, type: 3}
+  player: {fileID: 0}
+  distanceThreshold: 12
+  sentenceDelay: 2
 --- !u!1 &7051463966096081597
 GameObject:
   m_ObjectHideFlags: 0
