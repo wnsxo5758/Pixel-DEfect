@@ -207,8 +207,8 @@ MonoBehaviour:
   throwStunDuration: 3
   knockBackForce: 3
   deathDelay: 2
-  detectionRange: 5
-  loseTargetRange: 7
+  detectionRange: 9
+  loseTargetRange: 12
   target: {fileID: 0}
   targetLayer:
     serializedVersion: 2
@@ -342,6 +342,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sentences:
   - "\uCE68\uC785\uC790...\uCC98\uB2E8"
+  - "\uC8FD\uC5EC"
+  deathSentences:
+  - "\uBB34\uB9AC \uBB34...\uB9AC"
   chatTr: {fileID: 8611589551106598280}
   chatBoxPrefab: {fileID: 6296424888039983329, guid: f2f78ed955551c147a29f83167d07c1e, type: 3}
 --- !u!1 &7051463966096081597

@@ -502,6 +502,13 @@ public class EnemyBT : MonoBehaviour
             isDead = true;
             blackboard.SetValue("IsDead", true);
 
+            // EnemySentence 스크립트에서 사망 대사 호출
+            EnemySentence enemySentence = GetComponent<EnemySentence>();
+            if (enemySentence != null)
+            {
+                enemySentence.ShowDeathDialogue();
+            }
+
             if (flashCoroutine != null)
             {
                 StopCoroutine(flashCoroutine);
