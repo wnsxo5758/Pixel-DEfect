@@ -116,6 +116,7 @@ public class PlayerAttack : MonoBehaviour
                 nearbyWeapon = pickup;
                 InputManager.Instance.SetCanPickup(true);
                 InputManager.Instance.SetCanHold(false);
+                InputManager.Instance.SetCanInteract(false);
             }
         }
         else
@@ -126,6 +127,7 @@ public class PlayerAttack : MonoBehaviour
             {
                 InputManager.Instance.SetCanPickup(false);
                 InputManager.Instance.SetCanHold(true);
+                InputManager.Instance.SetCanInteract(true);
             }
         }
     }
@@ -586,12 +588,28 @@ public class PlayerAttack : MonoBehaviour
         foreach (Collider2D enemyCollider in results)
         {
             EnemyBT enemy = enemyCollider.GetComponent<EnemyBT>();
+            ITimeAffected timeAffected = enemyCollider.GetComponent<ITimeAffected>();
+            
             if (enemy != null)
             {
-                enemy.DecreaseHp((int)currentWeapon.Damage);
-                Debug.Log("Hit enemy");
-                // 히트 이펙트
-                CameraController.Instance.ShakeScreen();
+                // 공격 방향 계산
+                Vector2 attackDirection = (enemyCollider.transform.position - transform.position).normalized;
+                int damage = currentWeapon.Damage;
+                
+                // 시간이 정지된 상태인지 확인
+                if (TimeManager.Instance.IsTimeFrozen() && timeAffected != null)
+                {
+                    // 시간 정지 중 데미지 적용
+                    TimeManager.Instance.ApplyDamageInFrozenTime(timeAffected, damage, attackDirection);
+                    
+                    // 시각 효과만 표시
+                    CameraController.Instance.ShakeScreen(0.1f, 0.05f, 0.05f);
+                }
+                else
+                {
+                    enemy.DecreaseHp(damage);
+                    CameraController.Instance.ShakeScreen();
+                }
             }
         }
     }
@@ -611,7 +629,7 @@ public class PlayerAttack : MonoBehaviour
         }
         
         if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || currentState is PlayerStates.Crawl
-            || currentState is PlayerStates.Roll || currentState is PlayerStates.Teleport)
+            || currentState is PlayerStates.Roll || currentState is PlayerStates.Teleport || currentState is PlayerStates.Valve)
         {
             return false;
         }

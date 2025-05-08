@@ -49352,6 +49352,7 @@ GameObject:
   - component: {fileID: 501646890}
   - component: {fileID: 501646889}
   - component: {fileID: 501646888}
+  - component: {fileID: 501646893}
   m_Layer: 8
   m_Name: Melee
   m_TagString: Enemy
@@ -49514,6 +49515,18 @@ Transform:
   - {fileID: 1700756522}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &501646893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 501646887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6efeca90de21d498e82715c72f71d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &502969835
 GameObject:
   m_ObjectHideFlags: 0
@@ -50456,7 +50469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jumpKey: 32
   holdKey: 102
-  interactKey: 103
+  interactKey: 102
   crouchKey: 274
   rollKey: 304
   pickupKey: 102
@@ -50502,16 +50515,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee6acb31f9db54c41936bf2ebc7e1ad5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeStopDuration: 4
-  timeScale: 0.01
-  timeStopEffectPrefab: {fileID: 0}
-  screenFilterObject: {fileID: 0}
-  onTimeStop:
-    m_PersistentCalls:
-      m_Calls: []
-  onTimeResume:
-    m_PersistentCalls:
-      m_Calls: []
+  timeFreezeRadius: 20
+  timeFreezeDuration: 5
+  timeFreezeCooldown: 15
+  timeAffectedLayers:
+    serializedVersion: 2
+    m_Bits: 131328
+  timeFreezeVFXPrefab: {fileID: 0}
+  screenOverlayPrefab: {fileID: 0}
 --- !u!1 &1144608363
 GameObject:
   m_ObjectHideFlags: 0
@@ -51238,6 +51249,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c9388fe2285d4f4085573b61fb39a1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1352825979 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3521060120655573095, guid: 8ec2c8a821ca9ff4f89777c263cf3524, type: 3}
+  m_PrefabInstance: {fileID: 9017158778846227206}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1352825985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1352825979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6efeca90de21d498e82715c72f71d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1501194609
 GameObject:
   m_ObjectHideFlags: 0
@@ -51425,67 +51453,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1685164394}
   m_SourcePrefab: {fileID: 100100000, guid: dea75fdca3ebc9947941c4d91e8a0317, type: 3}
---- !u!1001 &1534424829
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 9.08
-      objectReference: {fileID: 0}
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.65
-      objectReference: {fileID: 0}
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.28410715
-      objectReference: {fileID: 0}
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2289955622137545050, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4581915079527951143, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_Name
-      value: MeleeRobot
-      objectReference: {fileID: 0}
-    - target: {fileID: 4581915079527951143, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 3bf2e1048aa99104ca8c5e3b45797576, type: 3}
 --- !u!114 &1572002630 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3904754959215155260, guid: c0d4942e7645ed34c8c6c55d7f397865, type: 3}
@@ -54624,7 +54591,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3521060120655573095, guid: 8ec2c8a821ca9ff4f89777c263cf3524, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1352825985}
   m_SourcePrefab: {fileID: 100100000, guid: 8ec2c8a821ca9ff4f89777c263cf3524, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -54676,6 +54646,5 @@ SceneRoots:
   - {fileID: 43769905}
   - {fileID: 71671600}
   - {fileID: 637559127}
-  - {fileID: 1534424829}
   - {fileID: 501646892}
   - {fileID: 9017158778846227206}

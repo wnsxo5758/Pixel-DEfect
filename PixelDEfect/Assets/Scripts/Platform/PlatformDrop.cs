@@ -16,6 +16,11 @@ public class PlatformDrop : PlatformBase
     private Animator animator;
     private AudioSource audioSource;
     private SpriteRenderer sprite;
+
+    public bool IsTriggered { get; private set; } = false;
+    public float DropTimer { get; private set; } = 0f;
+    private bool isPaused = false;
+    
     private void Awake()
     {
         boxCollider2D = GetComponent<BoxCollider2D>();
@@ -121,5 +126,13 @@ public class PlatformDrop : PlatformBase
         }
 
         sprite.color = new Color(startColor.r, startColor.g, startColor.b, 1);
+    }
+    
+    //  시간 정지 관련 메서드
+    public void PauseDrop()
+    {
+        isPaused = true;
+        
+        // 드롭 코루틴 중지 등 필요한 처리
     }
 }

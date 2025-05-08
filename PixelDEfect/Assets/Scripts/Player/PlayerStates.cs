@@ -438,6 +438,36 @@ namespace PlayerStates
             InputManager.Instance.OnHoldPressed += player.OnHold;
         }
     }
+
+    public class Valve : State<PlayerController>
+    {
+        private MovementRigidbody2D movement;
+        private PlayerAnimator animator;
+        
+        public override void Enter(PlayerController player)
+        {
+            movement = player.GetComponent<MovementRigidbody2D>();
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            
+            movement.MoveTo(0f);
+            
+            InputManager.Instance.OnJumpPressed -= player.OnJump;
+            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
+            InputManager.Instance.OnHoldPressed -= player.OnHold;
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            InputManager.Instance.OnJumpPressed += player.OnJump;
+            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
+            InputManager.Instance.OnHoldPressed += player.OnHold;
+        }
+    }
     
     public class StateGlobal : State<PlayerController>
     {

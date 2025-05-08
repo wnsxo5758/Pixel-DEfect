@@ -8,7 +8,7 @@ public class ThrownWeapon : MonoBehaviour
     [Header("Weapon Settings")] 
     [SerializeField] private float rotationSpeed = 720f;
     [SerializeField] private float stuckDuration = 0.5f;
-    [SerializeField] private float extraDamageMultiplier = 1.5f;
+    [SerializeField] private int extraDamageMultiplier = 2;
     [SerializeField] private LayerMask stickLayers;
     [SerializeField] private float hitStunDuration = 3f; // 던진 무기 피격 시간
     
@@ -97,11 +97,23 @@ public class ThrownWeapon : MonoBehaviour
         if (canDealDamage && collision.transform.CompareTag("Enemy"))
         {
             EnemyBT enemy = collision.transform.GetComponent<EnemyBT>();
+            ITimeAffected timeAffected = collision.transform.GetComponent<ITimeAffected>();
+            
             if (enemy != null)
             {
-                float damage = weaponData.Damage;
-                enemy.DecreaseHp((int)damage, true);
-                Debug.Log($"Hit enemy with thrown weapon for {damage} damage");
+                int damage = weaponData.Damage;
+                Vector2 impactDirection = (collision.transform.position - transform.position).normalized;
+                
+                // 시간 정지 상태인지 확인
+                if (TimeManager.Instance.IsTimeFrozen() && timeAffected != null)
+                {
+                    // 시간 정지 중 데미지 적용
+                    TimeManager.Instance.ApplyDamageInFrozenTime(timeAffected, damage, impactDirection);
+                }
+                else
+                {
+                    enemy.DecreaseHp(damage, true);
+                }
                 
                 canDealDamage = false;
             }
@@ -219,12 +231,20 @@ public class ThrownWeapon : MonoBehaviour
         if (isStuck && stuckTarget != null && stuckTarget.CompareTag("Enemy"))
         {
             EnemyBT enemy = stuckTarget.GetComponent<EnemyBT>();
+            ITimeAffected timeAffected = stuckTarget.GetComponent<ITimeAffected>();
+            
             if (enemy != null)
             {
-                float extraDamage = weaponData.Damage * extraDamageMultiplier;
-                
-                enemy.DecreaseHp((int)extraDamage);
-                Debug.Log($"Extra damage dealt for {extraDamage} damage");
+                int extraDamage = weaponData.Damage * extraDamageMultiplier;
+
+                if (TimeManager.Instance.IsTimeFrozen() && timeAffected != null)
+                {
+                    TimeManager.Instance.ApplyDamageInFrozenTime(timeAffected, extraDamage, Vector2.zero);
+                }
+                else
+                {
+                    enemy.DecreaseHp(extraDamage);
+                }
             }
         }
     }

@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
         }
         
         InputManager.Instance.SetCanHold(true);
+        TimeManager.Instance.UnlockTimeStopAbility();
     }
     
     private void Update()

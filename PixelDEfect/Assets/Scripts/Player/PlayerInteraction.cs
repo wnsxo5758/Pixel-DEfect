@@ -77,7 +77,12 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (valve != null)
         {
-            if(!valve.isPressing) valve.isPressing = true;
+            if (!valve.isPressing)
+            {
+                valve.isPressing = true;
+                player.ChangeState(new PlayerStates.Valve());
+            }
+            
         }
     }
 
@@ -85,7 +90,15 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (valve != null)
         {
-            if(valve.isPressing) valve.isPressing = false;
+            if (valve.isPressing)
+            {
+                valve.isPressing = false;
+                player.ChangeState(new PlayerStates.Idle());
+            }
+        }
+        else
+        {
+            player.ChangeState(new PlayerStates.Idle());
         }
     }
     
@@ -110,11 +123,13 @@ public class PlayerInteraction : MonoBehaviour
                 HoldObject holdObject = detectedObject.GetComponent<HoldObject>();
                 if (holdObject)
                 {
+                    InputManager.Instance.SetCanInteract(false);
                     return true;
                 }
             }
         }
 
+        InputManager.Instance.SetCanInteract(true);
         return false;
     }
         

@@ -5,16 +5,18 @@ using UnityEngine;
 public class PlatformMoving : MonoBehaviour
 {
     [SerializeField]
-    private Transform target;//¿òÁ÷ÀÌ´Â ¹ßÆÇ
+    private Transform target;//ï¿½ï¿½ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½
     [SerializeField]
-    private Transform[] wayPoints; // ÀÌµ¿ ÁöÁ¡
+    private Transform[] wayPoints; // ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½
     [SerializeField]
-    private float waitTime; // ´ë±â½Ã°£
+    private float waitTime; // ï¿½ï¿½ï¿½Ã°ï¿½
     [SerializeField]
-    private float timeOffset; // ÀÌµ¿½Ã°£ = °Å¸® * timeOffset
+    private float timeOffset; // ï¿½Ìµï¿½ï¿½Ã°ï¿½ = ï¿½Å¸ï¿½ * timeOffset
 
-    private int wayPointCount; // ÀÌµ¿ °¡´ÉÇÑ wayPoint °³¼ö
-    private int currentIndex = 0; // ÇöÀç wayPoint ÀÎµ¦½º
+    private int wayPointCount; // ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ wayPoint ï¿½ï¿½ï¿½ï¿½
+    private int currentIndex = 0; // ï¿½ï¿½ï¿½ï¿½ wayPoint ï¿½Îµï¿½ï¿½ï¿½
+
+    public bool IsMoving { get; private set; } = true;
 
     private void Awake()
     {
@@ -49,6 +51,19 @@ public class PlatformMoving : MonoBehaviour
             target.position = Vector3.Lerp(start, end, percent);
             yield return null;
         }
+    }
+
+    // ì‹œê°„ ì •ì§€ ê´€ë ¨ ë©”ì„œë“œ
+    public void PauseMovement()
+    {
+        IsMoving = false;
+        
+        // í˜„ì¬ ì´ë™ ì¤‘ì¸ ì½”ë£¨í‹´ ì¤‘ì§€ ë“± í•„ìš”í•œ ì²˜ë¦¬
+    }
+
+    public void ResumeMovement()
+    {
+        IsMoving = true;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

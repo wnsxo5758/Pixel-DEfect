@@ -8,7 +8,7 @@ public class InputManager : MonoBehaviour
     [Header("조작키")]
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode holdKey = KeyCode.F;
-    [SerializeField] private KeyCode interactKey = KeyCode.G;
+    [SerializeField] private KeyCode interactKey = KeyCode.F;
     [SerializeField] private KeyCode crouchKey = KeyCode.DownArrow;
     [SerializeField] private KeyCode rollKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode pickupKey = KeyCode.F;
@@ -18,8 +18,9 @@ public class InputManager : MonoBehaviour
     
 
     private bool canPickup = false;
-    private bool canHold = false;
+    private bool canHold = true;
     private bool canTeleport = false;
+    private bool canInteract = true;
     
     public float HorizontalInput => Input.GetAxisRaw("Horizontal");
     public float VerticalInput => Input.GetAxisRaw("Vertical");
@@ -72,26 +73,26 @@ public class InputManager : MonoBehaviour
         // 구르기 입력
         if(Input.GetKeyDown(rollKey))
             OnRollPressed?.Invoke();
-            
-        // 끌기 입력
-        if (Input.GetKeyDown(holdKey) && canHold)
-            OnHoldPressed?.Invoke();
-        
-        // 상호작용 입력
-        if (Input.GetKeyDown(interactKey))
-            OnInteractPressed?.Invoke();
-        
-        // 밸브 입력
-        if (Input.GetKey(interactKey))
-            OnValvePressed?.Invoke();
-        if (Input.GetKeyUp(interactKey))
-            OnValveReleased?.Invoke();
         
         // 공격 입력
         if (Input.GetKeyDown(pickupKey) && canPickup)
             OnPickupPressed?.Invoke();
         if (Input.GetKeyDown(meleeAttackKey))
             OnMeleeAttackPressed?.Invoke();
+        
+        // 끌기 입력
+        if (Input.GetKeyDown(holdKey) && canHold)
+            OnHoldPressed?.Invoke();
+        
+        // 상호작용 입력
+        if (Input.GetKeyDown(interactKey) && canInteract)
+            OnInteractPressed?.Invoke();
+        
+        // 밸브 입력
+        if (Input.GetKey(interactKey) && canInteract)
+            OnValvePressed?.Invoke();
+        if (Input.GetKeyUp(interactKey) && canInteract)
+            OnValveReleased?.Invoke();
 
         // 텔레포트 입력
         if (Input.GetKeyDown(teleportKey) && canTeleport)
@@ -117,4 +118,5 @@ public class InputManager : MonoBehaviour
     public void SetCanPickup(bool value) => canPickup = value;
     public void SetCanHold(bool value) => canHold = value;
     public void SetCanTeleport(bool value) => canTeleport = value;
+    public void SetCanInteract(bool value) => canInteract = value;
 }
