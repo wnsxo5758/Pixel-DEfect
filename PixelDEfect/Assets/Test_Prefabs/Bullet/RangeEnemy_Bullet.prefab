@@ -221,7 +221,7 @@ MonoBehaviour:
   hitSound: {fileID: 0}
   hitLayer:
     serializedVersion: 2
-    m_Bits: 136
+    m_Bits: 712
 --- !u!82 &699353740223439771
 AudioSource:
   m_ObjectHideFlags: 0

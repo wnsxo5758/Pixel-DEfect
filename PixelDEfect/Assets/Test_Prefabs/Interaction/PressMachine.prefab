@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2883664473655631774}
   - component: {fileID: 5223733379813912195}
   - component: {fileID: 1697479395241054532}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: HitCollider
   m_TagString: DieInstantly
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4857954687406794368}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -105,6 +105,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fa625c113ea8834e8966047daeaede4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  normalLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
   impactPrefab:
   - {fileID: 7075850266487279244, guid: 48ae48c14134bea41b7106302d6294f2, type: 3}
   - {fileID: 7075850266487279244, guid: 48ae48c14134bea41b7106302d6294f2, type: 3}
