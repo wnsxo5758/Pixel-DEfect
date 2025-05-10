@@ -148,12 +148,14 @@ public class Ladder : MonoBehaviour
                 }
                 else if (Mathf.Abs(vertical) > 0f)
                 {
+                    if (vertical < 0F && player.IsGrounded()) return;
+                    
                     topPlatform.isTrigger = false;
                     
                     player.transform.localScale =
                         new Vector3(PlayerFlipX(player.transform.localScale.x) * Mathf.Abs(player.transform.localScale.x),
                             player.transform.localScale.y, player.transform.localScale.z);
-
+                    
                     CenterPlayerOnLadder(player);
                     
                     player.IsOnLadder = true;
@@ -181,7 +183,7 @@ public class Ladder : MonoBehaviour
     private void CenterPlayerOnLadder(PlayerController player)
     {
         // 사다리 중앙 X 좌표
-        float ladderCenterX = ladderCollider.offset.x;
+        float ladderCenterX = transform.TransformPoint(ladderCollider.offset).x - Mathf.Sign(transform.localScale.x) * 0.1f;
         
         // 플레이어 현재 위치
         Vector3 playerPos = player.transform.position;

@@ -80,7 +80,7 @@ public class PlayerAttack : MonoBehaviour
     // PlayerController에서 호출되는 근접 공격
     public void PerformMeleeAttack()
     {
-        if (CanPlayerAttack())
+        if (CanPlayerAttack() && !isAttacking)
         {
             isAttacking = true;
             
@@ -206,6 +206,8 @@ public class PlayerAttack : MonoBehaviour
     private IEnumerator ThrowCooldownTimer()
     {
         canThrow = false;
+        yield return new WaitForSeconds(0.2f);
+        canTeleport = true;
         yield return new WaitForSeconds(throwCooldown);
         canThrow = true;
     }
@@ -274,8 +276,8 @@ public class PlayerAttack : MonoBehaviour
                 thrownWeapon.Initialize(currentWeapon, throwForceVector, direction, transform.position);
 
                 lastThrownWeapon = thrownWeapon;
-
-                canTeleport = true;
+                
+                canTeleport = false;
                 
                 UnEquipWeapon();
             }

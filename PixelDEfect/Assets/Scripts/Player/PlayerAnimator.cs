@@ -10,7 +10,6 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int velocityY = Animator.StringToHash("VelocityY");
     private readonly int jump = Animator.StringToHash("Jump");
     private readonly int isGrounded = Animator.StringToHash("IsGrounded");
-    private readonly int land = Animator.StringToHash("Land");
     private readonly int isCrouching = Animator.StringToHash("IsCrouching");
     private readonly int roll = Animator.StringToHash("Roll");
     private readonly int stopRoll = Animator.StringToHash("StopRoll");
@@ -30,10 +29,7 @@ public class PlayerAnimator : MonoBehaviour
     private float pnpDirection;
     
     // 상태 추적
-    private bool isPlayingJumpAnimation = false;
     private bool isPlayingClimbingAnimation = false;
-    private bool wasGrounded = true;
-    private bool wasJumping = false;
     
     private void Awake()
     {
@@ -58,25 +54,7 @@ public class PlayerAnimator : MonoBehaviour
                 
                 // 지면 상태 설정
                 animator.SetBool(isGrounded, currentlyGrounded);
-                
-                // 착지 감지
-                DetectLanding(currentlyGrounded);
             }
-            
-            // 이전 상태 저장
-            wasGrounded = currentlyGrounded;
-            wasJumping = !currentlyGrounded && verticalVelocity != 0;
-        }
-    }
-    
-    // 착지 감지
-    private void DetectLanding(bool currentlyGrounded)
-    {
-        // 점프 중에서 땅에 착지한 경우
-        if (!wasGrounded && currentlyGrounded && wasJumping)
-        {
-            animator.SetTrigger(land);
-            isPlayingJumpAnimation = false;
         }
     }
     
@@ -89,7 +67,6 @@ public class PlayerAnimator : MonoBehaviour
     public void JumpAnim()
     {
         animator.SetTrigger(jump);
-        isPlayingJumpAnimation = true;
     }
 
     public void LadderJumpAnim()
@@ -97,7 +74,6 @@ public class PlayerAnimator : MonoBehaviour
         SetClimbAnim(false);
         
         animator.SetTrigger(jump);
-        isPlayingJumpAnimation = true;
     }
     
     public void SetClimbAnim(bool isOnLadder)
@@ -134,6 +110,7 @@ public class PlayerAnimator : MonoBehaviour
     public void StartRollAnim()
     {
         animator.SetTrigger(roll);
+        animator.ResetTrigger(stopRoll);
     }
 
     public void StopRollAnim()

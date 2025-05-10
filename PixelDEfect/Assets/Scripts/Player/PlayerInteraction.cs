@@ -5,141 +5,207 @@ using System.Collections.Generic;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [Header("»óÈ£ÀÛ¿ë ¼³Á¤")] 
+    [Header("ìƒí˜¸ì‘ìš© ì„¤ì •")] 
     [SerializeField] private float interactionRadius = 1.5f;
     [SerializeField] private Transform interactionPoint;
     [SerializeField] private LayerMask interactableLayer;
     [SerializeField] private GameObject interactionPrompt;
 
-    [Header("È¦µå ¼³Á¤")] 
+    [Header("í™€ë“œ ì„¤ì •")] 
     [SerializeField] private float holdDistance = 1f;
     [SerializeField] private LayerMask holdableLayer;
-    [SerializeField] private float autoReleaseDelay = 0.1f; // Áö¸é¿¡¼­ ¶³¾îÁ³À» ¶§ µô·¹ÀÌ
+    [SerializeField] private float autoReleaseDelay = 0.1f; // ì§€ë©´ì—ì„œ ë–¨ì–´ì¡Œì„ ë•Œ ë”œë ˆì´
+    [SerializeField] private Vector2 raycastOffset;
     
-    // ÇöÀç °¨ÁöµÈ »óÈ£ÀÛ¿ë ¿ÀºêÁ§Æ®µé
-    private List<GameObject> detectedInteractables = new List<GameObject>();
-    private ButtonBase currentButton;
+    // Trigger ë°©ì‹ìœ¼ë¡œ ê°ì§€í•  ì˜¤ë¸Œì íŠ¸ë“¤
     private ValveButton currentValve;
+    private ButtonBase currentButton;
     private DoorBase currentDoor;
+    
+    // Raycastë¡œ ê°ì§€í•  ì˜¤ë¸Œì íŠ¸
     private HoldObject currentHoldObject;
+    
+    // ì›í˜• ë²”ìœ„ë¡œ ê°ì§€í•  ì˜¤ë¸Œì íŠ¸ë“¤(ë¬´ê¸°)
     private WeaponPickup nearbyWeapon;
     private ThrownWeapon nearbyThrownWeapon;
+    
     private FixedJoint2D holdJoint;
     private bool isHolding = false;
     private float groundCheckTimer = 0f;
     
-    // »óÈ£ÀÛ¿ë Å¸ÀÔ ¿­°ÅÇü
+    // ìƒí˜¸ì‘ìš© íƒ€ì… ì—´ê±°í˜•
     public enum InteractionType
     {
         None,
         WeaponPickup,
         ThrownWeapon,
-        Button,
+        Holdable,
         Valve,
-        Door,
-        Holdable
+        Button,
+        Door
     }
     
-    // ÇöÀç »óÈ£ÀÛ¿ë Å¸ÀÔ
+    // í˜„ì¬ ìƒí˜¸ì‘ìš© íƒ€ì…
     private InteractionType currentInteractionType = InteractionType.None;
 
     private void Awake()
     {
-        // »óÈ£ÀÛ¿ë Æ÷ÀÎÆ®°¡ ¾øÀ¸¸é ÀÚ½ÅÀÇ À§Ä¡·Î ¼³Á¤
+        // ìƒí˜¸ì‘ìš© í¬ì¸íŠ¸ê°€ ì—†ìœ¼ë©´ ìì‹ ì˜ ìœ„ì¹˜ë¡œ ì„¤ì •
         if (interactionPoint == null)
             interactionPoint = transform;
         
-        // »óÈ£ÀÛ¿ë ÇÁ·ÒÇÁÆ® ÃÊ±â »óÅÂ
+        // ìƒí˜¸ì‘ìš© í”„ë¡¬í”„íŠ¸ ì´ˆê¸° ìƒíƒœ
         if (interactionPrompt != null)
             interactionPrompt.SetActive(false);
+
+        raycastOffset = new Vector2(0, interactionPoint.localPosition.y);
     }
     
     private void Update()
     {
-        // ÁÖº¯ »óÈ£ÀÛ¿ë °¡´É ¿ÀºêÁ§Æ® °¨Áö
-        DetectedInteractables();
+        DetectWeapons();
+        
+        DetectHoldableObject();
+        
+        DetermineInteractionType();
         
         CheckHoldObjectGrounded();
     }
 
-    // »óÈ£ÀÛ¿ë ¿ÀºêÁ§Æ® °¨Áö
-    private void DetectedInteractables()
+    private void DetectWeapons()
     {
-        // ÀÌÀü °¨Áö ¸ñ·Ï ÃÊ±âÈ­
-        detectedInteractables.Clear();
-        currentInteractionType = InteractionType.None;
-        currentButton = null;
-        currentValve = null;
-        currentDoor = null;
-        
-        if (!isHolding)
-        {
-            currentHoldObject = null;
-        }
-        
         nearbyWeapon = null;
         nearbyThrownWeapon = null;
         
-        // ÁÖº¯ ¿ÀºêÁ§Æ® °¨Áö
+        // ì£¼ë³€ ì˜¤ë¸Œì íŠ¸ ê°ì§€
         Collider2D[] colliders = Physics2D.OverlapCircleAll(
             interactionPoint.position, interactionRadius, interactableLayer);
 
-        if (colliders.Length > 0)
+        foreach (Collider2D collider in colliders)
         {
-            // °¢ Äİ¶óÀÌ´õ¸¦ È®ÀÎÇÏ°í ¿ì¼±¼øÀ§¿¡ µû¶ó Ã³¸®
-            foreach (Collider2D collider in colliders)
+            // ë¬´ê¸° í”½ì—…
+            WeaponPickup weaponPickup = collider.GetComponent<WeaponPickup>();
+            if (weaponPickup != null)
             {
-                detectedInteractables.Add(collider.gameObject);
-                
-                // ¿ì¼±¼øÀ§¿¡ µû¶ó »óÈ£ÀÛ¿ë Å¸ÀÔ ¼³Á¤
-                DetermineInteractionType(collider);
+                nearbyWeapon = weaponPickup;
+                continue;
             }
             
-            // »óÈ£ÀÛ¿ë ÇÁ·ÒÇÁÆ® Ç¥½Ã
-            if (interactionPrompt != null && currentInteractionType != InteractionType.None)
+            // ë˜ì ¸ì§„ ë¬´ê¸°
+            ThrownWeapon thrownWeapon = collider.GetComponent<ThrownWeapon>();
+            if (thrownWeapon != null && thrownWeapon.IsStuck())
             {
-                interactionPrompt.SetActive(true);
-                
-                // ÇÁ·ÒÇÁÆ® À§Ä¡ ¼³Á¤
-                GameObject targetObject = null;
-                switch (currentInteractionType)
-                {
-                    case InteractionType.WeaponPickup:
-                        targetObject = nearbyWeapon?.gameObject;
-                        break;
-                    case InteractionType.ThrownWeapon:
-                        targetObject = nearbyThrownWeapon?.gameObject;
-                        break;
-                    case InteractionType.Button:
-                        targetObject = currentButton?.gameObject;
-                        break;
-                    case InteractionType.Valve:
-                        targetObject = currentValve?.gameObject;
-                        break;
-                    case InteractionType.Door:
-                        targetObject = currentDoor?.gameObject;
-                        break;
-                    case InteractionType.Holdable:
-                        targetObject = currentHoldObject?.gameObject;
-                        break;
-                }
-
-                if (targetObject != null)
-                {
-                    interactionPrompt.transform.position = targetObject.transform.position + Vector3.up * 0.5f;
-                }
+                nearbyThrownWeapon = thrownWeapon;
             }
         }
-        else
+    }
+
+    private void DetectHoldableObject()
+    {
+        // í™€ë”© ì¤‘ì´ë©´ ìŠ¤í‚µ
+        if (isHolding) return;
+        
+        Vector2 raycastDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+        Vector2 raycastOrigin = (Vector2)transform.position + raycastOffset;
+        
+        RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, raycastDirection, holdDistance, holdableLayer);
+        Debug.DrawRay(raycastOrigin, raycastDirection * holdDistance, Color.red);
+
+        if (hit.collider != null)
         {
-            // °¨ÁöµÈ ¿ÀºêÁ§Æ®°¡ ¾øÀ¸¸é ÇÁ·ÒÇÁÆ® ¼û±â±â
-            if (interactionPrompt != null)
+            HoldObject holdObject = hit.collider.GetComponent<HoldObject>();
+            if (holdObject != null && holdObject.IsGrounded)
             {
-                interactionPrompt.SetActive(false);
+                currentHoldObject = holdObject;
+                return;
             }
         }
         
-        // PlayerController¿¡ »óÈ£ÀÛ¿ë °¡´É ¿©ºÎ ¾Ë¸²
+        currentHoldObject = null;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player")) return;
+        
+        // ë°¸ë¸Œ
+        if (other.CompareTag("Valve"))
+        {
+            currentValve = other.GetComponent<ValveButton>();
+        }
+        // ë²„íŠ¼
+        else if(other.CompareTag("Button"))
+        {
+            currentButton = other.GetComponent<ButtonBase>();
+        }
+        // ë¬¸
+        else if (other.CompareTag("Door"))
+        {
+            currentDoor = other.GetComponent<DoorBase>();
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player")) return;
+
+        if (other.CompareTag("Valve"))
+        {
+            currentValve = null;
+        }
+        else if (other.CompareTag("Button"))
+        {
+            currentButton = null;
+        }
+        else if (other.CompareTag("Door"))
+        {
+            currentDoor = null;
+        }
+        
+    }
+    // ìƒí˜¸ì‘ìš© íƒ€ì… ê²°ì • (ìš°ì„ ìˆœìœ„ ì„¤ì •)
+    private void DetermineInteractionType()
+    {
+        if (currentInteractionType == InteractionType.Valve && currentValve != null && currentValve.isPressing)
+        {
+            return;
+        }
+
+        if (currentInteractionType == InteractionType.Holdable && isHolding)
+        {
+            return;
+        }
+        
+        // ìš°ì„ ìˆœìœ„ì— ë”°ë¼ ìƒí˜¸ì‘ìš© íƒ€ì… ê²°ì •
+        if (nearbyWeapon != null)
+        {
+            currentInteractionType = InteractionType.WeaponPickup;
+        }
+        else if (nearbyThrownWeapon != null)
+        {
+            currentInteractionType = InteractionType.ThrownWeapon;
+        }
+        else if (currentHoldObject != null)
+        {
+            currentInteractionType = InteractionType.Holdable;
+        }
+        else if (currentValve != null)
+        {
+            currentInteractionType = InteractionType.Valve;
+        }
+        else if (currentButton != null)
+        {
+            currentInteractionType = InteractionType.Button;
+        }
+        else if (currentDoor != null)
+        {
+            currentInteractionType = InteractionType.Door;
+        }
+        else
+        {
+            currentInteractionType = InteractionType.None;
+        }
+        
         PlayerController controller = GetComponent<PlayerController>();
         if (controller != null)
         {
@@ -147,98 +213,49 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // Àâ°í ÀÖ´Â ¹°Ã¼ÀÇ Áö¸é Á¢ÃË È®ÀÎ
-    private void CheckHoldObjectGrounded()
+    // í”„ë¡¬í”„íŠ¸ ì—…ë°ì´íŠ¸
+    private void UpdateInteractionPrompt()
     {
-        if (isHolding && currentHoldObject != null)
+        if (interactionPrompt == null) return;
+
+        if (currentInteractionType != InteractionType.None)
         {
-            // Áö¸é¿¡ ´ê¾ÆÀÖÁö ¾ÊÀ¸¸é
-            if (!currentHoldObject.IsGrounded)
+            interactionPrompt.SetActive(true);
+
+            GameObject targetObject = GetCurrentInteractionTarget();
+            if (targetObject != null)
             {
-                // Å¸ÀÌ¸Ó Áõ°¡
-                groundCheckTimer += Time.deltaTime;
-                
-                // ÀÏÁ¤ ½Ã°£ ÀÌ»ó Áö¸é¿¡¼­ ¶³¾îÁ® ÀÖÀ¸¸é ¿¬°á ÇØÁ¦
-                if (groundCheckTimer >= autoReleaseDelay)
-                {
-                    StopHolding();
-                }
+                interactionPrompt.transform.position = targetObject.transform.position + Vector3.up * 0.5f;
             }
-            else
-            {
-                groundCheckTimer = 0f;
-            }
+        }
+        else
+        {
+            interactionPrompt.SetActive(false);
+        }
+    }
+
+    private GameObject GetCurrentInteractionTarget()
+    {
+        switch (currentInteractionType)
+        {
+            case InteractionType.WeaponPickup:
+                return nearbyWeapon?.gameObject;
+            case InteractionType.ThrownWeapon:
+                return nearbyThrownWeapon?.gameObject;
+            case InteractionType.Holdable:
+                return currentHoldObject?.gameObject;
+            case InteractionType.Valve:
+                return currentValve?.gameObject;
+            case InteractionType.Button:
+                return currentButton?.gameObject;
+            case InteractionType.Door:
+                return currentDoor?.gameObject;
+            default:
+                return null;
         }
     }
     
-    // »óÈ£ÀÛ¿ë Å¸ÀÔ °áÁ¤ (¿ì¼±¼øÀ§ ¼³Á¤)
-    private void DetermineInteractionType(Collider2D collider)
-    {
-        // 1¼øÀ§: ¹«±â Áİ±â
-        WeaponPickup weaponPickup = collider.GetComponent<WeaponPickup>();
-        if (weaponPickup != null)
-        {
-            currentInteractionType = InteractionType.WeaponPickup;
-            nearbyWeapon = weaponPickup;
-            return;
-        }
-        if (currentInteractionType == InteractionType.WeaponPickup) return;
-
-        // 2¼øÀ§: ´øÁ®Áø ¹«±â ÇÈ¾÷
-        ThrownWeapon thrownWeapon = collider.GetComponent<ThrownWeapon>();
-        if (thrownWeapon != null && thrownWeapon.IsStuck())
-        {
-            currentInteractionType = InteractionType.ThrownWeapon;
-            nearbyThrownWeapon = thrownWeapon;
-            return;
-        }
-        if (currentInteractionType == InteractionType.ThrownWeapon) return;
-
-        
-        // 3¼øÀ§: ¹öÆ° »óÈ£ÀÛ¿ë
-        ButtonBase button = collider.GetComponent<ButtonBase>();
-        if (button != null)
-        {
-            currentInteractionType = InteractionType.Button;
-            currentButton = button;
-            return;
-        }
-        if (currentInteractionType == InteractionType.Button) return;
-
-
-        // 4¼øÀ§: ¹ëºê »óÈ£ÀÛ¿ë
-        ValveButton valve = collider.GetComponent<ValveButton>();
-        if (valve != null)
-        {
-            currentInteractionType = InteractionType.Valve;
-            currentValve = valve;
-            return;
-        }
-        if (currentInteractionType == InteractionType.Valve) return;
-
-        // 5¼øÀ§: ¹®
-        DoorBase door = collider.GetComponent<DoorBase>();
-        if (door != null)
-        {
-            currentInteractionType = InteractionType.Door;
-            currentDoor = door;
-            return;
-        }
-        if (currentInteractionType == InteractionType.Door) return;
-        
-        // 6¼øÀ§: È¦µå ¿ÀºêÁ§Æ®
-        if (!isHolding)
-        {
-            HoldObject holdObject = collider.GetComponent<HoldObject>();
-            if (holdObject != null && holdObject.IsGrounded)
-            {
-                currentInteractionType = InteractionType.Holdable;
-                currentHoldObject = holdObject;
-            }
-        }
-    }
-    
-    // PlayerController¿¡¼­ È£ÃâµÇ´Â »óÈ£ÀÛ¿ë ¸Ş¼­µå
+    // PlayerControllerì—ì„œ í˜¸ì¶œë˜ëŠ” ìƒí˜¸ì‘ìš© ë©”ì„œë“œ
     public void ProcessInteraction(InputAction.CallbackContext context)
     {
         if (context.phase == InputActionPhase.Started)
@@ -251,17 +268,17 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // »óÈ£ÀÛ¿ë ½ÃÀÛ Ã³¸®
+    // ìƒí˜¸ì‘ìš© ì‹œì‘ ì²˜ë¦¬
     private void HandleInteractionStart()
     {
-        // Àâ°í ÀÖ´Â ¹°Ã¼°¡ ÀÖ°í, ¹®ÀÌ³ª ¹ëºê »óÈ£ÀÛ¿ëÀÌ ÀÖ´Â °æ¿ì ¹°Ã¼ ³õ±â
+        // ì¡ê³  ìˆëŠ” ë¬¼ì²´ê°€ ìˆê³ , ë¬¸ì´ë‚˜ ë°¸ë¸Œ ìƒí˜¸ì‘ìš©ì´ ìˆëŠ” ê²½ìš° ë¬¼ì²´ ë†“ê¸°
         if (isHolding && (currentInteractionType == InteractionType.Door ||
                           currentInteractionType == InteractionType.Valve))
         {
             StopHolding();
         }
         
-        // »óÈ£ÀÛ¿ë Å¸ÀÔ¿¡ µû¶ó ´Ù¸¥ Ã³¸®
+        // ìƒí˜¸ì‘ìš© íƒ€ì…ì— ë”°ë¼ ë‹¤ë¥¸ ì²˜ë¦¬
         switch (currentInteractionType)
         {
             case InteractionType.WeaponPickup:
@@ -269,26 +286,34 @@ public class PlayerInteraction : MonoBehaviour
                 PickupWeapon();
                 break;
             
-            case InteractionType.Button:
-                // ¹öÆ° ´©¸£±â
-                if (currentButton != null)
+            case InteractionType.Holdable:
+                // ë¬¼ì²´ ì¡ê¸° ì‹œì‘
+                if (!isHolding && currentHoldObject != null && currentHoldObject.IsGrounded)
                 {
-                    currentButton.ButtonTrigger();
+                    StartHolding();
                 }
                 break;
             
             case InteractionType.Valve:
-                // ¹ëºê È¸Àü ½ÃÀÛ
+                // ë°¸ë¸Œ íšŒì „ ì‹œì‘
                 if (currentValve != null)
                 {
                     currentValve.isPressing = true;
                     
-                    // ¹ëºê »óÅÂ·Î ÀüÈ¯
+                    // ë°¸ë¸Œ ìƒíƒœë¡œ ì „í™˜
                     PlayerController controller = GetComponent<PlayerController>();
                     if (controller != null)
                     {
                         controller.ChangeState(new PlayerStates.Valve());
                     }
+                }
+                break;
+
+            case InteractionType.Button:
+                // ë²„íŠ¼ ëˆ„ë¥´ê¸°
+                if (currentButton != null)
+                {
+                    currentButton.ButtonTrigger();
                 }
                 break;
             
@@ -298,26 +323,18 @@ public class PlayerInteraction : MonoBehaviour
                     currentDoor.ActiveDoor(gameObject);
                 }
                 break;
-            
-            case InteractionType.Holdable:
-                // ¹°Ã¼ Àâ±â ½ÃÀÛ
-                if (!isHolding && currentHoldObject != null && currentHoldObject.IsGrounded)
-                {
-                    StartHolding();
-                }
-                break;
         }
     }
     
-    // »óÈ£ÀÛ¿ë Á¾·á Ã³¸®
+    // ìƒí˜¸ì‘ìš© ì¢…ë£Œ ì²˜ë¦¬
     private void HandleInteractionEnd()
     {
-        // ÇöÀç ¹ëºê¸¦ µ¹¸®°í ÀÖ¾ú´Ù¸é
-        if (currentValve != null)
+        // í˜„ì¬ ë°¸ë¸Œë¥¼ ëŒë¦¬ê³  ìˆì—ˆë‹¤ë©´
+        if (currentValve != null && currentValve.isPressing)
         {
             currentValve.isPressing = false;
             
-            // ¹ëºê »óÅÂ Á¾·á
+            // ë°¸ë¸Œ ìƒíƒœ ì¢…ë£Œ
             PlayerController controller = GetComponent<PlayerController>();
             if (controller != null && controller.GetCurrentState() is PlayerStates.Valve)
             {
@@ -325,45 +342,22 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
         
-        // ¹°Ã¼¸¦ Àâ°í ÀÖ¾ú´Ù¸é
+        // ë¬¼ì²´ë¥¼ ì¡ê³  ìˆì—ˆë‹¤ë©´
         if (isHolding)
         {
             StopHolding();
         }
     }
     
-    // ¹«±â Áİ±â
-    private void PickupWeapon()
-    {
-        // PlayerAttack ÄÄÆ÷³ÍÆ®¿¡ ¹«±â ÇÈ¾÷ ¿äÃ»
-        PlayerAttack playerAttack = GetComponent<PlayerAttack>();
-        if (playerAttack != null)
-        {
-            playerAttack.ProcessWeaponPickup(nearbyWeapon, nearbyThrownWeapon);
-        }
-    }
-    
-    // ¹°Ã¼ Àâ±â ½ÃÀÛ
+    // ë¬¼ì²´ ì¡ê¸° ì‹œì‘
     private void StartHolding()
     {
         if (currentHoldObject == null || !currentHoldObject.IsGrounded) return;
         
-        // ÇÃ·¹ÀÌ¾î¿Í ¹°Ã¼ »çÀÌÀÇ °Å¸® È®ÀÎ
-        float distance = Vector2.Distance(transform.position, currentHoldObject.transform.position);
-        
-        // ³Ê¹« ¸Ö¸é Àâ±â ºÒ°¡
-        if (distance > holdDistance)
-        {
-            return;
-        }
-        
-        // ÇÃ·¹ÀÌ¾î°¡ ¹°Ã¼¸¦ ÇâÇØ ¹æÇâ ÀüÈ¯
-        FaceTowardsObject(currentHoldObject.transform.position);
-        
         isHolding = true;
         groundCheckTimer = 0f;
         
-        // ¹°¸® ¿¬°á »ı¼º
+        // ë¬¼ë¦¬ ì—°ê²° ìƒì„±
         if (holdJoint == null)
         {
             holdJoint = gameObject.AddComponent<FixedJoint2D>();
@@ -372,14 +366,21 @@ public class PlayerInteraction : MonoBehaviour
         Rigidbody2D targetRb = currentHoldObject.GetComponent<Rigidbody2D>();
         if (targetRb != null)
         {
+            holdJoint.autoConfigureConnectedAnchor = true;
             holdJoint.connectedBody = targetRb;
             holdJoint.enabled = true;
             
-            // ¹°Ã¼ È¸Àü °íÁ¤
-            targetRb.freezeRotation = true;
+            // ë¬¼ì²´ íšŒì „ ê³ ì •
+            targetRb.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
         
-        // »óÅÂ ÀüÈ¯
+        MovementRigidbody2D movement = GetComponent<MovementRigidbody2D>();
+        if (movement != null)
+        {
+            movement.InteractSpeed = targetRb.mass;
+        }
+        
+        // ìƒíƒœ ì „í™˜
         PlayerController controller = GetComponent<PlayerController>();
         if (controller != null)
         {
@@ -387,19 +388,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
     
-    // ÇÃ·¹ÀÌ¾î°¡ ¹°Ã¼¸¦ ÇâÇØ ¹æÇâ ÀüÈ¯
-    private void FaceTowardsObject(Vector3 objectPosition)
-    {
-        // ¹°Ã¼°¡ ÇÃ·¹ÀÌ¾î ±âÁØ ¾î´À ¹æÇâ¿¡ ÀÖ´ÂÁö °è»ê
-        float directionToObject = objectPosition.x - transform.position.x;
-        
-        // ÇÃ·¹ÀÌ¾î ¹æÇâ ¼³Á¤
-        Vector3 newScale = transform.localScale;
-        newScale.x = Mathf.Abs(newScale.x) * Mathf.Sign(directionToObject);
-        transform.localScale = newScale;
-    }
-    
-    // ¹°Ã¼ Àâ±â Á¾·á
+    // ë¬¼ì²´ ì¡ê¸° ì¢…ë£Œ
     private void StopHolding()
     {
         if (!isHolding) return;
@@ -413,9 +402,22 @@ public class PlayerInteraction : MonoBehaviour
             holdJoint = null;
         }
         
+        Rigidbody2D targetRb = currentHoldObject.GetComponent<Rigidbody2D>();
+        if (targetRb != null)
+        {
+            // ë¬¼ì²´ íšŒì „ ê³ ì •
+            targetRb.constraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
+        }
+        
         currentHoldObject = null;
         
-        // »óÅÂ ÀüÈ¯
+        MovementRigidbody2D movement = GetComponent<MovementRigidbody2D>();
+        if (movement != null)
+        {
+            movement.InteractSpeed = 1;
+        }
+        
+        // ìƒíƒœ ì „í™˜
         PlayerController controller = GetComponent<PlayerController>();
         if (controller != null && controller.GetCurrentState() is PlayerStates.Hold)
         {
@@ -423,42 +425,54 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // ÇöÀç Àâ°í ÀÖ´Â »óÅÂÀÎÁö È®ÀÎ
-    public bool IsHolding()
+    // ì¡ê³  ìˆëŠ” ë¬¼ì²´ì˜ ì§€ë©´ ì ‘ì´‰ í™•ì¸
+    private void CheckHoldObjectGrounded()
     {
-        return isHolding;
+        if (isHolding && currentHoldObject != null)
+        {
+            // ì§€ë©´ì— ë‹¿ì•„ìˆì§€ ì•Šìœ¼ë©´
+            if (!currentHoldObject.IsGrounded)
+            {
+                // íƒ€ì´ë¨¸ ì¦ê°€
+                groundCheckTimer += Time.deltaTime;
+                
+                // ì¼ì • ì‹œê°„ ì´ìƒ ì§€ë©´ì—ì„œ ë–¨ì–´ì ¸ ìˆìœ¼ë©´ ì—°ê²° í•´ì œ
+                if (groundCheckTimer >= autoReleaseDelay)
+                {
+                    StopHolding();
+                }
+            }
+            else
+            {
+                groundCheckTimer = 0f;
+            }
+        }
     }
 
-    // ¹ëºê °¨Áö ¿©ºÎ È®ÀÎ
-    public bool IsNearValve()
+    // ë¬´ê¸° ì¤ê¸°
+    private void PickupWeapon()
     {
-        return currentInteractionType == InteractionType.Valve && currentValve != null;
+        // PlayerAttack ì»´í¬ë„ŒíŠ¸ì— ë¬´ê¸° í”½ì—… ìš”ì²­
+        PlayerAttack playerAttack = GetComponent<PlayerAttack>();
+        if (playerAttack != null)
+        {
+            playerAttack.ProcessWeaponPickup(nearbyWeapon, nearbyThrownWeapon);
+        }
     }
     
-    // °¨ÁöµÈ ¹«±â Á¤º¸ ¹İÈ¯
-    public bool HasNearbyWeapon()
-    {
-        return currentInteractionType == InteractionType.WeaponPickup ||
-               currentInteractionType == InteractionType.ThrownWeapon;
-    }
-
-    // ´øÁ®Áø ¹«±â Á¤º¸ ¹İÈ¯
-    public ThrownWeapon GetNearbyThrownWeapon()
-    {
-        return nearbyThrownWeapon;
-    }
-
-    // ÀÏ¹İ ¹«±â Á¤º¸ ¹İÈ¯
-    public WeaponPickup GetNearbyWeaponPickup()
-    {
-        return nearbyWeapon;
-    }
-    
-    // µğ¹ö±× ½Ã°¢È­
+    // ë””ë²„ê·¸ ì‹œê°í™”
     private void OnDrawGizmosSelected()
     {
+        // ë¬´ê¸° ê°ì§€ ë²”ìœ„
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(interactionPoint != null ?
             interactionPoint.position : transform.position, interactionRadius);
     }
+    
+    public bool IsHolding() => isHolding;
+    public bool IsNearValve() => currentInteractionType == InteractionType.Valve && currentValve != null;
+    public bool HasNearbyWeapon() => currentInteractionType == InteractionType.WeaponPickup ||
+                                    currentInteractionType == InteractionType.ThrownWeapon;
+    public ThrownWeapon GetNearbyThrownWeapon() => nearbyThrownWeapon;
+    public WeaponPickup GetNearbyWeaponPickup() => nearbyWeapon;
 }

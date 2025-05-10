@@ -1,5 +1,4 @@
 using System.Collections;
-using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -28,7 +27,7 @@ public class PlayerController : MonoBehaviour
     private PlayerInteraction.InteractionType currentInteractionType = PlayerInteraction.InteractionType.None;
     private bool canInteract = false;
     private bool canRoll = true;
-
+    
     public bool IsOnLadder { get; set; } //사다리 
     
     private void Awake()
@@ -64,31 +63,7 @@ public class PlayerController : MonoBehaviour
     // Move 이벤트
     public void OnMove(InputAction.CallbackContext context)
     {
-        // performed, canceled 단계에서만 처리
-        if (context.phase == InputActionPhase.Performed ||
-            context.phase == InputActionPhase.Canceled)
-        {
-            moveInput = context.ReadValue<Vector2>();
-            
-            // 이동 처리
-            if (GetCurrentState() is PlayerStates.Idle && moveInput.x != 0)
-            {
-                ChangeState(new PlayerStates.Run());
-            }
-            
-            // 애니메이션 업데이트
-            if (animator != null)
-            {
-                animator.MovementAnim(moveInput.x);
-            }
-            
-            UpdateMove(moveInput.x);
-
-            if (moveInput.x != 0)
-            {
-                SpriteFlipX(moveInput.x);
-            }
-        }
+        moveInput = context.ReadValue<Vector2>();
     }
     
     // Jump 이벤트
@@ -140,7 +115,7 @@ public class PlayerController : MonoBehaviour
         {
             if (GetCurrentState() is PlayerStates.Idle || GetCurrentState() is PlayerStates.Run)
             {
-                if (movement.IsGrounded)
+                if (movement.IsGrounded && canRoll)
                 {
                     ChangeState(new PlayerStates.Roll());
                 }
@@ -173,6 +148,18 @@ public class PlayerController : MonoBehaviour
         }
     }
     
+    // 텔레포트 이벤트
+    public void OnTeleport(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Performed)
+        {
+            if (playerAttack != null)
+            {
+                playerAttack.PerformTeleport();
+            }
+        }
+    }
+    
     // ThrowWeapon 이벤트
     public void OnThrowWeapon(InputAction.CallbackContext context)
     {
@@ -185,17 +172,6 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    // 텔레포트 이벤트
-    public void OnTeleport(InputAction.CallbackContext context)
-    {
-        if (context.phase == InputActionPhase.Performed)
-        {
-            if (playerAttack != null)
-            {
-                playerAttack.PerformTeleport();
-            }
-        }
-    }
     
     // 이동 업데이트
     public void UpdateMove(float input) // 이동
@@ -355,6 +331,8 @@ public class PlayerController : MonoBehaviour
         return stateMachine.CurrentState;
     }
 
+    public bool IsGrounded() => movement.IsGrounded;
+    
     void OnGUI()
     {
         GUI.Label(new Rect(1000, 50, 300, 20),

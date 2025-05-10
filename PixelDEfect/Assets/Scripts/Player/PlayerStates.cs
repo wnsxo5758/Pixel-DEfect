@@ -18,6 +18,14 @@ namespace PlayerStates
 
         public override void Execute(PlayerController player)
         {
+            float horizontal = player.HorizontalInput();
+
+            if (Mathf.Abs(horizontal) > 0.01f)
+            {
+                player.ChangeState(new Run());
+                return;
+            }
+            
             // 지면 체크
             if (!player.GetComponent<MovementRigidbody2D>().IsGrounded)
             {
@@ -32,18 +40,30 @@ namespace PlayerStates
 
     public class Run : State<PlayerController>
     {
+        private PlayerAnimator animator;
+        
         public override void Enter(PlayerController player)
         {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
         }
 
         public override void Execute(PlayerController player)
         {
-            float input = player.HorizontalInput();
+            float horizontal = player.HorizontalInput();
             
-            // 움직임이 멈추면 Idle 상태로 전환
-            if (Mathf.Approximately(input, 0f))
+            player.UpdateMove(horizontal);
+            
+            animator.MovementAnim(horizontal);
+
+            if (horizontal != 0)
+            {
+                player.SpriteFlipX(horizontal);
+            }
+
+            if (Mathf.Abs(horizontal) < 0.01f)
             {
                 player.ChangeState(new Idle());
+                return;
             }
             
             // 지면 체크
@@ -318,7 +338,10 @@ namespace PlayerStates
             if (player.IsOnLadder)
             {
                 if (movement.IsGrounded && vertical < 0f)
+                {
+                    player.IsOnLadder = false;
                     player.ChangeState(new Idle());
+                }
             }
         }
 
@@ -393,11 +416,13 @@ namespace PlayerStates
 
     public class Valve : State<PlayerController>
     {
+        private PlayerInteraction interaction;
         private MovementRigidbody2D movement;
         private PlayerAnimator animator;
         
         public override void Enter(PlayerController player)
         {
+            interaction = player.GetComponent<PlayerInteraction>();
             movement = player.GetComponent<MovementRigidbody2D>();
             animator = player.GetComponentInChildren<PlayerAnimator>();
             
@@ -406,7 +431,10 @@ namespace PlayerStates
 
         public override void Execute(PlayerController player)
         {
-            
+            if (!interaction.IsNearValve())
+            {
+                player.ChangeState(new Idle());
+            }
         }
 
         public override void Exit(PlayerController player)
