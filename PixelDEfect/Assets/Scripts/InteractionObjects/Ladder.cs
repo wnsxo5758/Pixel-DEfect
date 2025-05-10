@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using PlayerStates;
 using UnityEngine;
 
 public class Ladder : MonoBehaviour
@@ -144,7 +143,7 @@ public class Ladder : MonoBehaviour
                                 player.transform.localScale.y, player.transform.localScale.z);
                         
                         player.IsOnLadder = true;
-                        player.ChangeState(new Climb());
+                        player.ChangeState(new PlayerStates.Climb());
                     }
                 }
                 else if (Mathf.Abs(vertical) > 0f)
@@ -155,8 +154,10 @@ public class Ladder : MonoBehaviour
                         new Vector3(PlayerFlipX(player.transform.localScale.x) * Mathf.Abs(player.transform.localScale.x),
                             player.transform.localScale.y, player.transform.localScale.z);
 
+                    CenterPlayerOnLadder(player);
+                    
                     player.IsOnLadder = true;
-                    player.ChangeState(new Climb());
+                    player.ChangeState(new PlayerStates.Climb());
                 }
             }
         }
@@ -170,13 +171,25 @@ public class Ladder : MonoBehaviour
 
             if (player.IsOnLadder)
             {
-                player.ChangeState(new Idle());
+                player.ChangeState(new PlayerStates.Idle());
             }
             
             topPlatform.isTrigger = false;
         }
     }
 
+    private void CenterPlayerOnLadder(PlayerController player)
+    {
+        // 사다리 중앙 X 좌표
+        float ladderCenterX = ladderCollider.offset.x;
+        
+        // 플레이어 현재 위치
+        Vector3 playerPos = player.transform.position;
+        
+        // X 좌표만 수정
+        player.transform.position = new Vector3(ladderCenterX, playerPos.y, playerPos.z);
+    }
+    
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

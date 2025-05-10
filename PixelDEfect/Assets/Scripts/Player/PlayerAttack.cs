@@ -1,14 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerAttack : MonoBehaviour
 {
-    [Header("무기 감지")]
-    [SerializeField] private float weaponDetectionRadius = 1f;
-    [SerializeField] private LayerMask pickupLayer;
-    [SerializeField] private LayerMask weaponLayer;
-
     [Header("근접 공격 설정")] 
     [SerializeField] private Vector2 attackOffset = new Vector2(0, 0.6f);
     [SerializeField] private PolygonCollider2D attackCollider;
@@ -35,8 +31,6 @@ public class PlayerAttack : MonoBehaviour
     private PlayerController playerController;
     private PlayerAnimator playerAnimator;
     private MovementRigidbody2D movement;
-    private WeaponPickup nearbyWeapon;
-    private ThrownWeapon nearbyThrownWeapon;
     private ThrownWeapon lastThrownWeapon;
     private GameObject attackColliderObject;
     
@@ -82,122 +76,80 @@ public class PlayerAttack : MonoBehaviour
 
         attackColliderObject.SetActive(false);
     }
-
-    private void Start()
+    
+    // PlayerController에서 호출되는 근접 공격
+    public void PerformMeleeAttack()
     {
-        InputManager.Instance.OnPickupPressed += OnPickupWeapon;
-        InputManager.Instance.OnTeleportPressed += OnTeleportToWeapon;
-    }
-
-    private void Update()
-    {
-        DetectNearbyWeapon();
-        DetectNearbyThrownWeapon();
+        if (CanPlayerAttack())
+        {
+            isAttacking = true;
+            
+            MeleeAttackAnimation();
+            StartCoroutine(AttackCooldownTimer());
+            
+            playerController.ChangeState(new PlayerStates.Attack());
+        }
     }
     
-    // 무기 감지 메소드
-    private void DetectNearbyWeapon()
+    // PlayerController에서 호출되는 던지기
+    public void PerformThrowWeapon()
     {
-        Collider2D pickupCollider = Physics2D.OverlapCircle(transform.position + (Vector3)attackOffset, 
-            weaponDetectionRadius, pickupLayer);
-
-        if (pickupCollider != null)
+        if (hasWeapon && !isAttacking && canThrow && CanPlayerAttack())
         {
-            WeaponPickup pickup = pickupCollider.GetComponent<WeaponPickup>();
-
-            if (pickup != null)
-            {
-                if (playerController.GetCurrentState() is PlayerStates.Hold)
-                {
-                    InputManager.Instance.SetCanPickup(false);
-                    return;
-                }
-                
-                nearbyWeapon = pickup;
-                InputManager.Instance.SetCanPickup(true);
-                InputManager.Instance.SetCanHold(false);
-                InputManager.Instance.SetCanInteract(false);
-            }
-        }
-        else
-        {
-            nearbyWeapon = null;
-
-            if (nearbyThrownWeapon == null)
-            {
-                InputManager.Instance.SetCanPickup(false);
-                InputManager.Instance.SetCanHold(true);
-                InputManager.Instance.SetCanInteract(true);
-            }
+            ThrowWeapon();
         }
     }
-
-    // 던져진 무기 감지 메소드
-    private void DetectNearbyThrownWeapon()
+    
+    // PlayerController에서 호출되는 텔레포트
+    public void PerformTeleport()
     {
-        Collider2D weaponCollider = Physics2D.OverlapCircle(transform.position + (Vector3)attackOffset,
-            weaponDetectionRadius, weaponLayer);
-
-        if (weaponCollider != null)
+        if (lastThrownWeapon != null && canTeleport && !isTeleporting &&
+            playerController.GetCurrentState() is not PlayerStates.Climb and not PlayerStates.Hold and not PlayerStates.Valve)
         {
-            ThrownWeapon thrownWeapon = weaponCollider.GetComponent<ThrownWeapon>();
-
-            if (thrownWeapon != null && thrownWeapon.IsStuck())
+            // 텔레포트 전 검증
+            if (IsTeleportPossible(lastThrownWeapon))
             {
-                if (playerController.GetCurrentState() is PlayerStates.Hold)
-                {
-                    InputManager.Instance.SetCanPickup(false);
-                    return;
-                }
-                
-                nearbyThrownWeapon = thrownWeapon;
-                InputManager.Instance.SetCanPickup(true);
-                InputManager.Instance.SetCanHold(false);
+                StartCoroutine(TeleportCoroutine(lastThrownWeapon));
+            }
+            else
+            {
+                // 텔레포트 불가
+                Debug.Log("텔레포트 불가");
             }
         }
-        else
-        {
-            nearbyThrownWeapon = null;
-
-            if (nearbyWeapon == null)
-            {
-                InputManager.Instance.SetCanPickup(false);
-                InputManager.Instance.SetCanHold(true);
-            }
-        }
-    }
+    } 
     
     // 무기 픽업 메소드
-    private void OnPickupWeapon()
+    public void ProcessWeaponPickup(WeaponPickup weaponPickup, ThrownWeapon thrownWeapon)
     {
         // 던져진 무기 픽업
-        if (nearbyThrownWeapon != null && canThrow)
+        if (thrownWeapon != null && canThrow)
         {
-            WeaponBase weaponData = nearbyThrownWeapon.GetWeaponData();
+            WeaponBase weaponData = thrownWeapon.GetWeaponData();
             
             // 적에게 박힌 무기라면 추가 데미지 적용
-            nearbyThrownWeapon.PullOutFromEnemy();
+            thrownWeapon.PullOutFromEnemy();
 
             if (weaponData != null)
             {
                 EquipWeapon(weaponData);
-                Destroy(nearbyThrownWeapon.gameObject);
+                Destroy(thrownWeapon.gameObject);
                 return;
             }
         }
         
         // 일반 무기 픽업
-        if (nearbyWeapon != null)
+        if (weaponPickup != null)
         {
-            WeaponBase weaponData = nearbyWeapon.GetWeaponData();
+            WeaponBase weaponData = weaponPickup.GetWeaponData();
 
             if (weaponData != null)
             {
                 Debug.Log("Pickup");
 
-                thrownWeaponPrefab = nearbyWeapon.GetWeaponPrefab();
+                thrownWeaponPrefab = weaponPickup.GetWeaponPrefab();
                 EquipWeapon(weaponData);
-                Destroy(nearbyWeapon.gameObject);
+                Destroy(weaponPickup.gameObject);
             }
         }
     }
@@ -218,18 +170,14 @@ public class PlayerAttack : MonoBehaviour
         {
             attackColliderObject.SetActive(true);
         }
-        
-        InputManager.Instance.OnMeleeAttackPressed += OnMeleeAttack;
-        InputManager.Instance.OnThrowWeaponPressed += OnThrowWeapon;
-        
-        InputManager.Instance.SetCanTeleport(false);
+
+        canTeleport = false;
         
         // 무기 장착 상태 애니메이션 변경
         if (playerAnimator != null)
         {
             playerAnimator.SetHasWeapon(true);
         }
-        // GUI에 무기 정보 표시
     }
 
     private void UnEquipWeapon()
@@ -238,10 +186,7 @@ public class PlayerAttack : MonoBehaviour
         {
             currentWeapon = null;
             hasWeapon = false;
-
-            InputManager.Instance.OnMeleeAttackPressed -= OnMeleeAttack;
-            InputManager.Instance.OnThrowWeaponPressed -= OnThrowWeapon;
-
+            
             // 무기 해제 상태 애니메이션 변경
             if (playerAnimator != null)
             {
@@ -264,32 +209,6 @@ public class PlayerAttack : MonoBehaviour
         yield return new WaitForSeconds(throwCooldown);
         canThrow = true;
     }
-    
-    // 공격 입력 처리
-    private void OnMeleeAttack()
-    {
-        if (currentWeapon != null && !isAttacking)
-        {
-            if (CanPlayerAttack())
-            {
-                isAttacking = true;
-                
-                MeleeAttackAnimation();
-                StartCoroutine(AttackCooldownTimer());
-                
-                playerController.ChangeState(new PlayerStates.Attack());
-            }
-        }
-    }
-
-    // 무기 던지기 입력 처리
-    private void OnThrowWeapon()
-    {
-        if (hasWeapon && !isAttacking && canThrow && CanPlayerAttack())
-        {
-            ThrowWeapon();
-        }
-    }
 
     // 무기 던지기 메소드
     private void ThrowWeapon()
@@ -309,21 +228,94 @@ public class PlayerAttack : MonoBehaviour
         StartCoroutine(ThrowCooldownTimer());
     }
     
-    // 텔레포트 메소드
-    private void OnTeleportToWeapon()
+    // 근접 공격 애니메이션 재생
+    private void MeleeAttackAnimation()
     {
-        if (lastThrownWeapon != null && canTeleport && !isTeleporting &&
-            playerController.GetCurrentState() is not PlayerStates.Climb and not PlayerStates.Hold)
+        if (playerAnimator != null)
         {
-            // 텔레포트 전 검증
-            if (IsTeleportPossible(lastThrownWeapon))
+            playerAnimator.TriggerAttackAnim();
+        }
+    }
+
+    // 근접 공격 애니메이션 종료 시 Idle 상태로 변경
+    public void FinishedMeleeAttackAnim()
+    {
+        if (currentWeapon != null && isAttacking)
+        {
+            movement.MoveTo(0);
+            playerController.ChangeState(new PlayerStates.Idle());
+        }
+    }
+
+    // 던지기 공격 애니메이션 종료 시 Idle 상태로 변경
+    public void FinishedThrowAnim()
+    {
+        movement.MoveTo(0);
+        playerController.ChangeState(new PlayerStates.Idle());
+    }
+
+    // 무기 던지기 수행
+    private void ExecuteThrow()
+    {
+        // 던져진 무기 생성
+        if (thrownWeaponPrefab != null && currentWeapon != null)
+        {
+            Vector2 direction = new Vector2(transform.localScale.x, 0).normalized;
+            Vector2 spawnPosition = (Vector2)transform.position + attackOffset;
+            
+            GameObject thrownWeaponObj = Instantiate(thrownWeaponPrefab, spawnPosition, Quaternion.identity);
+            ThrownWeapon thrownWeapon = thrownWeaponObj.GetComponent<ThrownWeapon>();
+
+            if (thrownWeapon != null)
             {
-                StartCoroutine(TeleportCoroutine(lastThrownWeapon));
+                // 던지는 힘 계산 (포물선)
+                Vector2 throwForceVector = direction * throwForce + Vector2.up * throwUpwardForce;
+                
+                thrownWeapon.Initialize(currentWeapon, throwForceVector, direction, transform.position);
+
+                lastThrownWeapon = thrownWeapon;
+
+                canTeleport = true;
+                
+                UnEquipWeapon();
             }
-            else
+        }
+    }
+
+    public void HandleAttackCollision()
+    {
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.SetLayerMask(enemyLayer);
+        filter.useTriggers = true;
+
+        List<Collider2D> results = new List<Collider2D>();
+        attackCollider.OverlapCollider(filter, results);
+
+        foreach (Collider2D enemyCollider in results)
+        {
+            EnemyBT enemy = enemyCollider.GetComponent<EnemyBT>();
+            ITimeAffected timeAffected = enemyCollider.GetComponent<ITimeAffected>();
+            
+            if (enemy != null)
             {
-                // 텔레포트 불가 표시
-                Debug.Log("텔레포트 불가");
+                // 공격 방향 계산
+                Vector2 attackDirection = (enemyCollider.transform.position - transform.position).normalized;
+                int damage = currentWeapon.Damage;
+                
+                // 시간이 정지된 상태인지 확인
+                if (TimeManager.Instance.IsTimeFrozen() && timeAffected != null)
+                {
+                    // 시간 정지 중 데미지 적용
+                    TimeManager.Instance.ApplyDamageInFrozenTime(timeAffected, damage, attackDirection);
+                    
+                    // 시각 효과만 표시
+                    CameraController.Instance.ShakeScreen(0.1f, 0.05f, 0.05f);
+                }
+                else
+                {
+                    enemy.DecreaseHp(damage);
+                    CameraController.Instance.ShakeScreen();
+                }
             }
         }
     }
@@ -516,110 +508,12 @@ public class PlayerAttack : MonoBehaviour
         canTeleport = true;
     }
     
-    // 근접 공격 애니메이션 재생
-    private void MeleeAttackAnimation()
-    {
-        if (playerAnimator != null)
-        {
-            playerAnimator.TriggerAttackAnim();
-        }
-    }
-
-    // 근접 공격 애니메이션 종료 시 Idle 상태로 변경
-    public void FinishedMeleeAttackAnim()
-    {
-        if (currentWeapon != null && isAttacking)
-        {
-            movement.MoveTo(0);
-            playerController.ChangeState(new PlayerStates.Idle());
-        }
-    }
-
-    // 던지기 공격 애니메이션 종료 시 Idle 상태로 변경
-    public void FinishedThrowAnim()
-    {
-        movement.MoveTo(0);
-        playerController.ChangeState(new PlayerStates.Idle());
-    }
-
-    // 근접 공격 수행
-    public void PerformMeleeAttack()
-    {
-        HandleAttackCollision();
-    }
-
-    // 무기 던지기 수행
-    private void ExecuteThrow()
-    {
-        // 던져진 무기 생성
-        if (thrownWeaponPrefab != null && currentWeapon != null)
-        {
-            Vector2 direction = new Vector2(transform.localScale.x, 0).normalized;
-            Vector2 spawnPosition = (Vector2)transform.position + attackOffset;
-            
-            GameObject thrownWeaponObj = Instantiate(thrownWeaponPrefab, spawnPosition, Quaternion.identity);
-            ThrownWeapon thrownWeapon = thrownWeaponObj.GetComponent<ThrownWeapon>();
-
-            if (thrownWeapon != null)
-            {
-                // 던지는 힘 계산 (포물선)
-                Vector2 throwForceVector = direction * throwForce + Vector2.up * throwUpwardForce;
-                
-                thrownWeapon.Initialize(currentWeapon, throwForceVector, direction, transform.position);
-
-                lastThrownWeapon = thrownWeapon;
-                
-                InputManager.Instance.SetCanTeleport(true);
-                
-                UnEquipWeapon();
-            }
-        }
-    }
-
-    private void HandleAttackCollision()
-    {
-        ContactFilter2D filter = new ContactFilter2D();
-        filter.SetLayerMask(enemyLayer);
-        filter.useTriggers = true;
-
-        List<Collider2D> results = new List<Collider2D>();
-        attackCollider.OverlapCollider(filter, results);
-
-        foreach (Collider2D enemyCollider in results)
-        {
-            EnemyBT enemy = enemyCollider.GetComponent<EnemyBT>();
-            ITimeAffected timeAffected = enemyCollider.GetComponent<ITimeAffected>();
-            
-            if (enemy != null)
-            {
-                // 공격 방향 계산
-                Vector2 attackDirection = (enemyCollider.transform.position - transform.position).normalized;
-                int damage = currentWeapon.Damage;
-                
-                // 시간이 정지된 상태인지 확인
-                if (TimeManager.Instance.IsTimeFrozen() && timeAffected != null)
-                {
-                    // 시간 정지 중 데미지 적용
-                    TimeManager.Instance.ApplyDamageInFrozenTime(timeAffected, damage, attackDirection);
-                    
-                    // 시각 효과만 표시
-                    CameraController.Instance.ShakeScreen(0.1f, 0.05f, 0.05f);
-                }
-                else
-                {
-                    enemy.DecreaseHp(damage);
-                    CameraController.Instance.ShakeScreen();
-                }
-            }
-        }
-    }
-    
     // 플레이어가 공격 가능한 상태인지 확인
     private bool CanPlayerAttack()
     {
         var currentState = playerController.GetCurrentState();
 
-        // 떨어지는 동시에 공격 시 공격이 불가능 하도록 설정(state 버그 수정)
+        // 낙하 중에는 공격 불가
         if (currentState is PlayerStates.Idle || currentState is PlayerStates.Run)
         {
             if (!movement.IsGrounded)
@@ -628,8 +522,10 @@ public class PlayerAttack : MonoBehaviour
             }
         }
         
-        if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || currentState is PlayerStates.Crawl
-            || currentState is PlayerStates.Roll || currentState is PlayerStates.Teleport || currentState is PlayerStates.Valve)
+        // 공격 가능한 상태 확인
+        if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || 
+            currentState is PlayerStates.Crawl || currentState is PlayerStates.Roll || 
+            currentState is PlayerStates.Teleport || currentState is PlayerStates.Valve)
         {
             return false;
         }
@@ -648,25 +544,9 @@ public class PlayerAttack : MonoBehaviour
     {
         return currentWeapon;
     }
-    
-    // 이벤트 구독 해제
-    private void OnDestroy()
-    {
-        if (InputManager.Instance != null)
-        {
-            InputManager.Instance.OnPickupPressed -= OnPickupWeapon;
-            InputManager.Instance.OnMeleeAttackPressed -= OnMeleeAttack;
-            InputManager.Instance.OnThrowWeaponPressed -= OnThrowWeapon;
-            InputManager.Instance.OnTeleportPressed -= OnTeleportToWeapon;
-        }
-    }
 
     private void OnDrawGizmosSelected()
     {
-        // 무기 감지 범위
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position + (Vector3)attackOffset, weaponDetectionRadius);
-
         if (lastThrownWeapon != null && lastThrownWeapon.IsStuck())
         {
             Vector2 normal = lastThrownWeapon.GetContactNormal();

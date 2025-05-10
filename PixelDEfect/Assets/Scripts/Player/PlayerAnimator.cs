@@ -5,27 +5,36 @@ using UnityEngine;
 
 public class PlayerAnimator : MonoBehaviour
 {
+    // 파라미터 상수
     private readonly int velocityX = Animator.StringToHash("VelocityX");
     private readonly int velocityY = Animator.StringToHash("VelocityY");
-    private readonly int isJump = Animator.StringToHash("IsJump");
-    private readonly int isConnected = Animator.StringToHash("IsConnected");
-    private readonly int isClimbing = Animator.StringToHash("IsClimbing");
+    private readonly int jump = Animator.StringToHash("Jump");
+    private readonly int isGrounded = Animator.StringToHash("IsGrounded");
+    private readonly int land = Animator.StringToHash("Land");
     private readonly int isCrouching = Animator.StringToHash("IsCrouching");
     private readonly int roll = Animator.StringToHash("Roll");
     private readonly int stopRoll = Animator.StringToHash("StopRoll");
-    private readonly int death = Animator.StringToHash("Death");
-    
-    // 공격 애니메이션
+    private readonly int isClimbing = Animator.StringToHash("IsClimbing");
+    private readonly int isConnected = Animator.StringToHash("IsConnected");
     private readonly int hasWeapon = Animator.StringToHash("HasWeapon");
     private readonly int attack = Animator.StringToHash("Attack");
     private readonly int throwWeapon = Animator.StringToHash("Throw");
-
+    private readonly int hit = Animator.StringToHash("Hit");
+    private readonly int death = Animator.StringToHash("Death");
+    
     private Animator animator; // 애니메이션 
     private MovementRigidbody2D movement; // 움직임
     private PlayerAttack playerAttack; // 플레이어 공격
     private PlayerInteraction playerInteraction; // 상호작용
 
     private float pnpDirection;
+    
+    // 상태 추적
+    private bool isPlayingJumpAnimation = false;
+    private bool isPlayingClimbingAnimation = false;
+    private bool wasGrounded = true;
+    private bool wasJumping = false;
+    
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -33,25 +42,88 @@ public class PlayerAnimator : MonoBehaviour
         playerAttack = GetComponentInParent<PlayerAttack>();
         playerInteraction = GetComponentInParent<PlayerInteraction>();
     }
+
+    private void LateUpdate()
+    {
+        if (movement != null)
+        {
+            // 수직 속도 및 지면 상태 업데이트
+            float verticalVelocity = movement.Velocity.y;
+            bool currentlyGrounded = movement.IsGrounded;
+            
+            // 사다리 상태가 아닐 때만 업데이트
+            if (!isPlayingClimbingAnimation)
+            {
+                animator.SetFloat(velocityY, verticalVelocity);
+                
+                // 지면 상태 설정
+                animator.SetBool(isGrounded, currentlyGrounded);
+                
+                // 착지 감지
+                DetectLanding(currentlyGrounded);
+            }
+            
+            // 이전 상태 저장
+            wasGrounded = currentlyGrounded;
+            wasJumping = !currentlyGrounded && verticalVelocity != 0;
+        }
+    }
     
+    // 착지 감지
+    private void DetectLanding(bool currentlyGrounded)
+    {
+        // 점프 중에서 땅에 착지한 경우
+        if (!wasGrounded && currentlyGrounded && wasJumping)
+        {
+            animator.SetTrigger(land);
+            isPlayingJumpAnimation = false;
+        }
+    }
+    
+    // 이동 애니메이션 설정
     public void MovementAnim(float x)
     {
-        if (movement.IsGrounded)
-        {
-            animator.SetFloat(velocityX, Mathf.Abs(x)); // X 값에 따라 변경
-        }
-        else
-        {
-            animator.SetFloat(velocityY, movement.Velocity.y); // Y 값에 따라 변경 -> y가 작으면 공중에서 내려가는 모션, 높으면 올라가는 모션
-        }
-        
-        animator.SetBool(isJump, !movement.IsGrounded); // 땅에 닿은 상태가 아닌 경우
+        animator.SetFloat(velocityX, Mathf.Abs(x));
     }
 
+    public void JumpAnim()
+    {
+        animator.SetTrigger(jump);
+        isPlayingJumpAnimation = true;
+    }
+
+    public void LadderJumpAnim()
+    {
+        SetClimbAnim(false);
+        
+        animator.SetTrigger(jump);
+        isPlayingJumpAnimation = true;
+    }
+    
+    public void SetClimbAnim(bool isOnLadder)
+    {
+        animator.SetBool(isClimbing, isOnLadder);
+        isPlayingClimbingAnimation = isOnLadder;
+        
+        // 사다리를 타고 있을 때는 파라미터 초기화
+        if (isOnLadder)
+        {
+            animator.SetFloat(velocityY, 0f);
+            animator.SetBool(isGrounded, false);
+        }
+    }
+    
+    public void ClimbAnim(float y)
+    {
+        if (isPlayingClimbingAnimation)
+        {
+            animator.SetFloat(velocityY, Mathf.Abs(y));
+        }
+    }
+    
     public void SetCrouchAnim(bool crouching)
     {
         animator.SetBool(isCrouching, crouching);
-        animator.SetBool(isJump, false);
     }
     
     public void CrawlAnim(float x)
@@ -62,7 +134,6 @@ public class PlayerAnimator : MonoBehaviour
     public void StartRollAnim()
     {
         animator.SetTrigger(roll);
-        animator.ResetTrigger(stopRoll);
     }
 
     public void StopRollAnim()
@@ -71,27 +142,15 @@ public class PlayerAnimator : MonoBehaviour
         animator.ResetTrigger(roll);
     }
     
-    public void EnterHoldAnim(float dir)
+    public void SetHoldAnim(float dir)
     {
-        animator.SetBool(isConnected, playerInteraction.IsConnected);
+        animator.SetBool(isConnected, playerInteraction.IsHolding());
         pnpDirection = dir;
     }
     
     public void PushAndPullAnim(float x)
     {
         animator.SetFloat(velocityX, pnpDirection * x);
-        
-        animator.SetBool(isConnected, playerInteraction.IsConnected);
-    }
-
-    public void SetClimbAnim(bool isOnLadder)
-    {
-        animator.SetBool(isClimbing, isOnLadder);
-    }
-    
-    public void ClimbAnim(float y)
-    {
-        animator.SetFloat(velocityY, Mathf.Abs(y));
     }
 
     public void SetHasWeapon(bool weapon)
@@ -117,7 +176,7 @@ public class PlayerAnimator : MonoBehaviour
     // 공격 타이밍 이벤트
     private void HandleAttackEvent()
     {
-        playerAttack.PerformMeleeAttack();
+        playerAttack.HandleAttackCollision();
     }
 
     private void FinishedMeleeAttackEvent()

@@ -1,55 +1,56 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace PlayerStates
 {
     public class Idle : State<PlayerController>
     {
         private PlayerAnimator animator;
+        
         public override void Enter(PlayerController player)
         {
             animator = player.GetComponentInChildren<PlayerAnimator>();
+            
+            animator?.MovementAnim(0f);
+            
+            player.UpdateMove(0);
         }
 
         public override void Execute(PlayerController player)
         {
-            float input = player.HorizontalInput();
-            
-            animator.MovementAnim(input);
-            
-            if (input != 0f)
+            // 지면 체크
+            if (!player.GetComponent<MovementRigidbody2D>().IsGrounded)
             {
-                player.ChangeState(new Run());
+                player.ChangeState(new Jump());
             }
         }
 
         public override void Exit(PlayerController player)
         {
-            
         }
     }
 
     public class Run : State<PlayerController>
     {
-        private PlayerAnimator animator;
-        
         public override void Enter(PlayerController player)
         {
-            animator = player.GetComponentInChildren<PlayerAnimator>();
         }
 
         public override void Execute(PlayerController player)
         {
             float input = player.HorizontalInput();
             
-            animator.MovementAnim(input);
-            
-            if (input == 0f)
+            // 움직임이 멈추면 Idle 상태로 전환
+            if (Mathf.Approximately(input, 0f))
             {
                 player.ChangeState(new Idle());
             }
             
-            player.UpdateMove(input);
-            player.SpriteFlipX(input);
+            // 지면 체크
+            if (!player.GetComponent<MovementRigidbody2D>().IsGrounded)
+            {
+                player.ChangeState(new Jump());
+            }
         }
         
         public override void Exit(PlayerController player)
@@ -61,36 +62,34 @@ namespace PlayerStates
     public class Jump : State<PlayerController>
     {
         private MovementRigidbody2D movement;
-        private PlayerAnimator animator;
         
         public override void Enter(PlayerController player)
         {
             movement = player.GetComponent<MovementRigidbody2D>();
-            animator = player.GetComponentInChildren<PlayerAnimator>();
-            
-            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
-            InputManager.Instance.OnHoldPressed -= player.OnHold;
         }
 
         public override void Execute(PlayerController player)
         {
             float input = player.HorizontalInput();
             
-            animator.MovementAnim(input);
+            player.UpdateMove(input);
             
+            // 방향 설정
+            if (input != 0)
+            {
+                player.SpriteFlipX(input);
+            }
+            
+            // 착지 감지
             if (movement.IsGrounded && movement.Velocity.y <= 0.01f)
             {
                 player.ChangeState(new Idle());
             }
-            
-            player.UpdateMove(input);
-            player.SpriteFlipX(input);
         }
         
         public override void Exit(PlayerController player)
         {
-            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
-            InputManager.Instance.OnHoldPressed += player.OnHold;
+            
         }
     }
     
@@ -108,8 +107,6 @@ namespace PlayerStates
             animator = player.GetComponentInChildren<PlayerAnimator>();
             boxCollider = player.GetComponent<BoxCollider2D>();
             
-            animator.SetCrouchAnim(player.IsCrouching);
-            
             originalColliderSize = boxCollider.size;
             originalColliderOffset = boxCollider.offset;
             
@@ -119,23 +116,23 @@ namespace PlayerStates
             float offsetY = (originalColliderSize.y - crouchColliderSize.y) / 2;
             boxCollider.offset = new Vector2(boxCollider.offset.x, boxCollider.offset.y - offsetY);
             
-            InputManager.Instance.OnCrouchReleased += player.UnCrouch;
-            InputManager.Instance.OnHoldPressed -= player.OnHold;
+            animator.SetCrouchAnim(true);
         }
 
         public override void Execute(PlayerController player)
         {
             float input = player.HorizontalInput();
             
+            // 애니메이션 업데이트
             animator.CrawlAnim(input);
             
+            // 이동 업데이트
             player.UpdateMove(input);
-            player.SpriteFlipX(input);
-
-            // 키 입력 X 상태에서 일어서기 가능할 때
-            if (!InputManager.Instance.IsCrouchKeyPressed() && player.HasSpaceAbove())
+            
+            // 방향 설정
+            if (input != 0)
             {
-                player.UnCrouch();
+                player.SpriteFlipX(input);
             }
         }
 
@@ -144,11 +141,7 @@ namespace PlayerStates
             boxCollider.size = originalColliderSize;
             boxCollider.offset = originalColliderOffset;
             
-            player.IsCrouching = false;
-            animator.SetCrouchAnim(player.IsCrouching);
-            
-            InputManager.Instance.OnCrouchReleased -= player.UnCrouch;
-            InputManager.Instance.OnHoldPressed += player.OnHold;
+            animator.SetCrouchAnim(false);
         }
     }
 
@@ -182,14 +175,10 @@ namespace PlayerStates
             
             wallLayer = LayerMask.GetMask("Ground", "Platform", "Object");
             
-            InputManager.Instance.OnJumpPressed -= player.OnJump;
-            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
-            InputManager.Instance.OnHoldPressed -= player.OnHold;
-            
             // 구르기 애니메이션
             animator.StartRollAnim();
             
-            // 구르기
+            // 구르기 코루틴
             player.StartCoroutine(player.StartRollCoroutine());
             
             isWallDetected = false;
@@ -240,10 +229,6 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
-            InputManager.Instance.OnJumpPressed += player.OnJump;
-            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
-            InputManager.Instance.OnHoldPressed += player.OnHold;
-            
             // 구르기 종료
             player.UpdateMove(0);
             isInvulnerable = false;
@@ -261,14 +246,14 @@ namespace PlayerStates
             return hit.collider != null;
         }
 
-        public bool CheckDodgeAndTriggerTimeStop()
+        public bool CheckDodgeAndTriggerTimeStop(PlayerController player)
         {
             if (isInvulnerable)
             {
                 // 시간 정지 스킬이 있다면 발동
                 if (TimeManager.Instance.HasTimeStopAbility())
                 {
-                    TimeManager.Instance.TriggerTimeStopOnDodge(movement.transform.position);
+                    TimeManager.Instance.TriggerTimeStopOnDodge(player.transform.position);
                     return true;
                 }
             }
@@ -280,18 +265,12 @@ namespace PlayerStates
     public class Hold : State<PlayerController>
     {
         private PlayerAnimator animator;
-        private PlayerInteraction playerInteraction;
         
         public override void Enter(PlayerController player)
         {
             animator = player.GetComponentInChildren<PlayerAnimator>();
-            playerInteraction = player.GetComponent<PlayerInteraction>();
-            animator.EnterHoldAnim(player.transform.localScale.x);
-            playerInteraction.ConnectObject();
             
-            // 입력 비활성화
-            InputManager.Instance.OnJumpPressed -= player.OnJump;
-            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
+            animator.SetHoldAnim(player.transform.localScale.x);
         }
 
         public override void Execute(PlayerController player)
@@ -300,19 +279,14 @@ namespace PlayerStates
             
             animator.PushAndPullAnim(input);
             
+            // 이동 업데이트
             player.UpdateMove(input);
         }
         
         public override void Exit(PlayerController player)
         {
-            playerInteraction.DisconnectObject();
-            
             //애니메이션 트랜지션 처리(임시)
-            animator.PushAndPullAnim(player.transform.localScale.x);
-            
-            // 점프 활성화
-            InputManager.Instance.OnJumpPressed += player.OnJump;
-            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
+            animator.SetHoldAnim(player.transform.localScale.x);
         }
     }
 
@@ -326,13 +300,8 @@ namespace PlayerStates
             movement = player.GetComponent<MovementRigidbody2D>();
             animator = player.GetComponentInChildren<PlayerAnimator>();
             
-            // 입력 관리
-            InputManager.Instance.OnLadderJumpPressed += player.OnLadderJump;
-            InputManager.Instance.OnJumpPressed -= player.OnJump;
-            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
-            InputManager.Instance.OnHoldPressed -= player.OnHold;
-            
-            animator.SetClimbAnim(player.IsOnLadder);
+            // 사다리 모드 설정
+            animator.SetClimbAnim(true);
             movement.DisableGravity();
         }
         
@@ -342,6 +311,7 @@ namespace PlayerStates
             
             //사다리 이동
             movement.Climb(vertical);
+            
             //애니메이션
             animator.ClimbAnim(vertical);
 
@@ -354,14 +324,9 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
-            InputManager.Instance.OnLadderJumpPressed -= player.OnLadderJump;
-            InputManager.Instance.OnJumpPressed += player.OnJump;
-            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
-            InputManager.Instance.OnHoldPressed += player.OnHold;
-            
             player.IsOnLadder = false;
             
-            animator.SetClimbAnim(player.IsOnLadder);
+            animator.SetClimbAnim(false);
             movement.EnableGravity();
         }
     }
@@ -373,26 +338,20 @@ namespace PlayerStates
         public override void Enter(PlayerController player)
         {
             movement = player.GetComponent<MovementRigidbody2D>();
-            
-            InputManager.Instance.OnJumpPressed -= player.OnJump;
-            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
-            InputManager.Instance.OnHoldPressed -= player.OnHold;
-        }
 
-        public override void Execute(PlayerController player)
-        {
             if (movement.IsGrounded)
             {
                 movement.MoveTo(0);
             }
         }
 
+        public override void Execute(PlayerController player)
+        {
+            
+        }
+
         public override void Exit(PlayerController player)
         {
-            InputManager.Instance.OnJumpPressed += player.OnJump;
-            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
-            InputManager.Instance.OnHoldPressed += player.OnHold;
-            
             
         }
     }
@@ -409,11 +368,9 @@ namespace PlayerStates
             
             teleportTimer = teleportDuration;
 
-            InputManager.Instance.OnJumpPressed -= player.OnJump;
-            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
-            InputManager.Instance.OnHoldPressed -= player.OnHold;
-            
+            // 이동 중지
             player.UpdateMove(0f);
+            
             // 임시 애니메이션
             animator.MovementAnim(0f);
         }
@@ -431,11 +388,6 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
-            
-            
-            InputManager.Instance.OnJumpPressed += player.OnJump;
-            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
-            InputManager.Instance.OnHoldPressed += player.OnHold;
         }
     }
 
@@ -450,10 +402,6 @@ namespace PlayerStates
             animator = player.GetComponentInChildren<PlayerAnimator>();
             
             movement.MoveTo(0f);
-            
-            InputManager.Instance.OnJumpPressed -= player.OnJump;
-            InputManager.Instance.OnCrouchPressed -= player.OnCrouch;
-            InputManager.Instance.OnHoldPressed -= player.OnHold;
         }
 
         public override void Execute(PlayerController player)
@@ -463,9 +411,6 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
-            InputManager.Instance.OnJumpPressed += player.OnJump;
-            InputManager.Instance.OnCrouchPressed += player.OnCrouch;
-            InputManager.Instance.OnHoldPressed += player.OnHold;
         }
     }
     

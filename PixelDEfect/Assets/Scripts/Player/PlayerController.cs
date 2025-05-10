@@ -1,6 +1,7 @@
-using PlayerStates;
 using System.Collections;
+using UnityEditor.Timeline;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -19,11 +20,16 @@ public class PlayerController : MonoBehaviour
     private PlayerAttack playerAttack;
     private PlayerInteraction playerInteraction;
     private PlayerStateMachine<PlayerController> stateMachine;
+    private PlayerAnimator animator;
     
+    // 이동 입력 저장용 변수
+    private Vector2 moveInput;
+
+    private PlayerInteraction.InteractionType currentInteractionType = PlayerInteraction.InteractionType.None;
+    private bool canInteract = false;
     private bool canRoll = true;
 
     public bool IsOnLadder { get; set; } //사다리 
-    public bool IsCrouching { get; set; } //웅크리기
     
     private void Awake()
     {
@@ -31,25 +37,20 @@ public class PlayerController : MonoBehaviour
         playerAttack = GetComponent<PlayerAttack>();
         playerHp = GetComponent<PlayerHp>();
         playerInteraction = GetComponent<PlayerInteraction>();
+        animator = GetComponentInChildren<PlayerAnimator>();
+        stateMachine = new PlayerStateMachine<PlayerController>();
     }
 
     private void Start()
     {
-        stateMachine = new PlayerStateMachine<PlayerController>();
-        stateMachine.Setup(this, new Idle());
-        stateMachine.SetGlobalState(new StateGlobal());
-        
-        InputManager.Instance.OnJumpPressed += OnJump;
-        InputManager.Instance.OnCrouchPressed += OnCrouch;
-        InputManager.Instance.OnHoldPressed += OnHold;
-        InputManager.Instance.OnRollPressed += OnRoll;
-
+        // 상태 머신 초기화
+        stateMachine.Setup(this, new PlayerStates.Idle());
+        stateMachine.SetGlobalState(new PlayerStates.StateGlobal());
         if (playerHp != null)
         {
             playerHp.OnPlayerDeath += OnPlayerDeath;
         }
         
-        InputManager.Instance.SetCanHold(true);
         TimeManager.Instance.UnlockTimeStopAbility();
     }
     
@@ -60,77 +61,215 @@ public class PlayerController : MonoBehaviour
         stateMachine.Execute();
     }
 
-    //입력 관련 메소드
-    public float HorizontalInput() // 좌우 입력
+    // Move 이벤트
+    public void OnMove(InputAction.CallbackContext context)
     {
-        return InputManager.Instance.HorizontalInput;
-    }
-
-    public float VerticalInput() // 상하 입력 (사다리)
-    {
-        float y = InputManager.Instance.VerticalInput;
-
-        return y;
-    }
-
-    public void OnJump() // 점프 입력
-    {
-        if (movement.IsGrounded)
+        // performed, canceled 단계에서만 처리
+        if (context.phase == InputActionPhase.Performed ||
+            context.phase == InputActionPhase.Canceled)
         {
-            if (IsCrouching && !HasSpaceAbove()) return;
+            moveInput = context.ReadValue<Vector2>();
             
-            movement.Jump();
-            ChangeState(new Jump());
-        }
-    }
+            // 이동 처리
+            if (GetCurrentState() is PlayerStates.Idle && moveInput.x != 0)
+            {
+                ChangeState(new PlayerStates.Run());
+            }
+            
+            // 애니메이션 업데이트
+            if (animator != null)
+            {
+                animator.MovementAnim(moveInput.x);
+            }
+            
+            UpdateMove(moveInput.x);
 
-    public void OnCrouch() // 웅크리기 입력
-    {
-        if (movement.IsGrounded && !IsCrouching)
-        {
-            IsCrouching = true;
-            ChangeState(new Crawl());
-        }
-    }
-
-    public void UnCrouch() // 웅크리기 해제
-    {
-        if (IsCrouching && HasSpaceAbove())
-        {
-            IsCrouching = false;
-            ChangeState(new Idle());
-        }
-    }
-
-    public void OnRoll() // 구르기 입력
-    {
-        if (canRoll && movement.IsGrounded && !IsStateLimited())
-        {
-            ChangeState(new Roll());
+            if (moveInput.x != 0)
+            {
+                SpriteFlipX(moveInput.x);
+            }
         }
     }
     
-    public void OnHold() // 홀드 입력
+    // Jump 이벤트
+    public void OnJump(InputAction.CallbackContext context)
     {
-        if (playerInteraction.CheckHold())
+        if (context.phase == InputActionPhase.Performed)
         {
-            ChangeState(new Hold());
+            // 현재 상태에 따라 점프 처리
+            if (GetCurrentState() is PlayerStates.Idle || GetCurrentState() is PlayerStates.Run)
+            {
+                if (movement.IsGrounded)
+                {
+                    movement.Jump();
+
+                    if (animator != null)
+                    {
+                        animator.JumpAnim();
+                    }
+                    
+                    ChangeState(new PlayerStates.Jump());
+                }
+            }
+            // 사다리에서 점프하는 경우
+            else if (GetCurrentState() is PlayerStates.Climb)
+            {
+                OnLadderJump();
+            }
+        }
+    }
+
+    // Crouch 이벤트
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        switch (context.phase)
+        {
+            case InputActionPhase.Started:
+                OnCrouchDown();
+                break;
+            case InputActionPhase.Canceled:
+                OnCrouchUp();
+                break;
+        }
+    }
+
+    // Roll 이벤트
+    public void OnRoll(InputAction.CallbackContext context) 
+    {
+        if (context.phase == InputActionPhase.Performed)
+        {
+            if (GetCurrentState() is PlayerStates.Idle || GetCurrentState() is PlayerStates.Run)
+            {
+                if (movement.IsGrounded)
+                {
+                    ChangeState(new PlayerStates.Roll());
+                }
+            }
+        }
+    }
+    
+    // Interact 이벤트
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        if (playerInteraction != null)
+        {
+            if (context.phase == InputActionPhase.Started ||
+                context.phase == InputActionPhase.Canceled)
+            {
+                playerInteraction.ProcessInteraction(context);
+            }
+        }
+    }
+    
+    // 근접 공격 이벤트
+    public void OnMeleeAttack(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Performed)
+        {
+            if (playerAttack != null)
+            {
+                playerAttack.PerformMeleeAttack();
+            }
+        }
+    }
+    
+    // ThrowWeapon 이벤트
+    public void OnThrowWeapon(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Performed)
+        {
+            if (playerAttack != null)
+            {
+                playerAttack.PerformThrowWeapon();
+            }
+        }
+    }
+    
+    // 텔레포트 이벤트
+    public void OnTeleport(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Performed)
+        {
+            if (playerAttack != null)
+            {
+                playerAttack.PerformTeleport();
+            }
+        }
+    }
+    
+    // 이동 업데이트
+    public void UpdateMove(float input) // 이동
+    {
+        if (GetCurrentState() is PlayerStates.Crawl)
+        {
+            movement.Crawl(input);
         }
         else
         {
-            if (playerInteraction.IsConnected)
-            {
-                RevertToPreviousState();
-            }
+            movement.MoveTo(input);
         }
-    } 
-    
-    public void OnLadderJump()
+
+        float xPos = Mathf.Clamp(transform.position.x, stageData.PlayerLimitMinX, stageData.PlayerLimitMaxX);
+        transform.position = new Vector2(xPos, transform.position.y);
+    }
+
+    // 스프라이트 방향 설정
+    public void SpriteFlipX(float direction)
     {
-        if (IsOnLadder)
+        if (direction != 0)
         {
+            transform.localScale = new Vector3(
+                Mathf.Abs(transform.localScale.x) * Mathf.Sign(direction),
+                transform.localScale.y,
+                transform.localScale.z);
+        }
+    }
+    
+    // 수직 입력 값 반환
+    public float VerticalInput()
+    {
+        return moveInput.y;
+    }
+
+    // 수평 입력 값 반환
+    public float HorizontalInput()
+    {
+        return moveInput.x;
+    }
+    
+    // 웅크리기 시작
+    private void OnCrouchDown()
+    {
+        if (GetCurrentState() is PlayerStates.Idle || GetCurrentState() is PlayerStates.Run)
+        {
+            ChangeState(new PlayerStates.Crawl());
+        }
+    }
+    
+    // 웅크리기 종료
+    private void OnCrouchUp()
+    {
+        if (GetCurrentState() is PlayerStates.Crawl && HasSpaceAbove())
+        {
+            ChangeState(new PlayerStates.Idle());
+        }
+    }
+
+    public void SetInteractionAvailable(bool available, PlayerInteraction.InteractionType type)
+    {
+        canInteract = available;
+        currentInteractionType = type;
+    }
+    
+    // 사다리에서 점프
+   private void OnLadderJump()
+    {
+        if (GetCurrentState() is PlayerStates.Climb)
+        {
+            animator.LadderJumpAnim();
             movement.LadderJump(HorizontalInput());
-            ChangeState(new Jump());
+            IsOnLadder = false;
+            ChangeState(new PlayerStates.Jump());
         }
     }
 
@@ -143,30 +282,16 @@ public class PlayerController : MonoBehaviour
 
     public bool OnAttackReceived()
     {
-        if (GetCurrentState() is Roll rollState)
+        if (GetCurrentState() is PlayerStates.Roll rollState)
         {
-            return rollState.CheckDodgeAndTriggerTimeStop();
+            return rollState.CheckDodgeAndTriggerTimeStop(this);
         }
 
         return false;
     }
 
-    public void UpdateMove(float x) // 이동
-    {
-        if (IsCrouching)
-        {
-            movement.Crawl(x);
-        }
-        else
-        {
-            movement.MoveTo(x);
-        }
-
-        float xPos = Mathf.Clamp(transform.position.x, stageData.PlayerLimitMinX, stageData.PlayerLimitMaxX);
-        transform.position = new Vector2(xPos, transform.position.y);
-    }
-
-    public bool HasSpaceAbove() // 웅크리기 상태에서 머리 위에 충분한 공간이 있는지 확인
+    // 위에 공간이 있는지 확인 (웅크리기 해제 가능 여부)
+    public bool HasSpaceAbove() 
     {
         Vector3 rayOrigin = transform.position + new Vector3(0, 1f, 0);
         
@@ -178,7 +303,8 @@ public class PlayerController : MonoBehaviour
         return hit.collider == null;
     }
     
-    public void UpdateBelowCollision() // 바닥이 플랫폼인지 확인
+    // 지면 충돌
+    public void UpdateBelowCollision() 
     {
         if (movement.HitBelowObject != null)
         {
@@ -187,13 +313,6 @@ public class PlayerController : MonoBehaviour
                 platform.UpdateCollision(gameObject);
             }
         }
-    }
-
-    private bool IsStateLimited()
-    {
-        var currentState = stateMachine.CurrentState;
-        return currentState is Crawl || currentState is Hold || currentState is Climb ||
-               currentState is Attack || currentState is Roll;
     }
     
     private void OnPlayerDeath()
@@ -219,23 +338,8 @@ public class PlayerController : MonoBehaviour
         {
             playerInteraction.enabled = false;
         }
-
-        // 입력 이벤트 해제
-        UnSubscribeInputEvents();
     }
 
-    private void UnSubscribeInputEvents()
-    {
-        if (InputManager.Instance != null)
-        {
-            InputManager.Instance.OnJumpPressed -= OnJump;
-            InputManager.Instance.OnHoldPressed -= OnHold;
-            InputManager.Instance.OnCrouchPressed -= OnCrouch;
-            InputManager.Instance.OnCrouchReleased -= UnCrouch;
-            InputManager.Instance.OnLadderJumpPressed -= OnLadderJump;
-        }
-    }
-    
     public void ChangeState(State<PlayerController> newState)
     {
         stateMachine.ChangeState(newState);
@@ -250,13 +354,6 @@ public class PlayerController : MonoBehaviour
     {
         return stateMachine.CurrentState;
     }
-    
-    public void SpriteFlipX(float x)
-    {
-        if (x == 0) return;
-        transform.localScale = new Vector3((x < 0 ? -1.2f : 1.2f), 
-                                                        transform.localScale.y, transform.localScale.z);
-    }
 
     void OnGUI()
     {
@@ -266,15 +363,6 @@ public class PlayerController : MonoBehaviour
 
     public void OnDestroy()
     {
-        if (InputManager.Instance != null)
-        {
-            InputManager.Instance.OnJumpPressed -= OnJump;
-            InputManager.Instance.OnCrouchPressed -= OnCrouch;
-            InputManager.Instance.OnHoldPressed -= OnHold;
-            InputManager.Instance.OnCrouchReleased -= UnCrouch;
-            InputManager.Instance.OnRollPressed -= OnRoll;
-        }
-
         if (playerHp != null)
         {
             playerHp.OnPlayerDeath -= OnPlayerDeath;

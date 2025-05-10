@@ -5,29 +5,29 @@ using UnityEngine;
 public class ObstacleBase : MonoBehaviour
 {
     [SerializeField]
-    private bool isInstantDeath = false; // Áï»çÀÎÁö È®ÀÎ
+    private bool isInstantDeath = false; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
     [SerializeField]
-    private bool continuousDamage; // Áö¼ÓÀûÀÎ µ¥¹ÌÁöÀÎ°¡?
+    private bool continuousDamage; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î°ï¿½?
     [SerializeField]
     private int damage;
     [SerializeField]
-    private bool canDestory = false; // ÇÃ·¹ÀÌ¾î¿Í Á¢ÃË ÈÄ, ÆÄ±«µÇ´ÂÁö
+    private bool canDestory = false; // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½, ï¿½Ä±ï¿½ï¿½Ç´ï¿½ï¿½ï¿½
 
     private Coroutine damageCoroutine;
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Player")) return; // ´ë»óÀÌ ÇÃ·¹ÀÌ¾î°¡ ¾Æ´Ï¶ó¸é return
+        if (!collision.CompareTag("Player")) return; // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Æ´Ï¶ï¿½ï¿½ return
 
         if (isInstantDeath)
         {
-            collision.GetComponent<PlayerInteraction>().MoveToSpawnPoint();
+            // collision.GetComponent<PlayerInteraction>().MoveToSpawnPoint();
             collision.GetComponent<PlayerHp>().DecreaseHp(damage);
         }
         else if (continuousDamage)
         {
             return;
         }
-        else // Áï»ç Àå¾Ö¹°ÀÌ ¾Æ´Ï¶ó¸é Ã¼·Â °¨¼Ò
+        else // ï¿½ï¿½ï¿½ ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ ï¿½Æ´Ï¶ï¿½ï¿½ Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         {
             collision.GetComponent<PlayerHp>().DecreaseHp(damage);
             if(canDestory)
@@ -79,7 +79,7 @@ public class ObstacleBase : MonoBehaviour
         if(animator != null)
         {
             animator.SetTrigger("isDeath");
-            yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // ¾Ö´Ï¸ÞÀÌ¼Ç Á¾·á±îÁö ´ë±â
+            yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         }
         Destroy(gameObject);
 
