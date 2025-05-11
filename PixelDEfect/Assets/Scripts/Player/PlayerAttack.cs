@@ -80,7 +80,7 @@ public class PlayerAttack : MonoBehaviour
     // PlayerController에서 호출되는 근접 공격
     public void PerformMeleeAttack()
     {
-        if (CanPlayerAttack() && !isAttacking)
+        if (CanPlayerAttack() && !isAttacking && currentWeapon != null)
         {
             isAttacking = true;
             
