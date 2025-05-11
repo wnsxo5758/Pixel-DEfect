@@ -140,6 +140,11 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetTrigger(attack);
     }
 
+    public void TriggerHitAnim()
+    {
+        animator.SetTrigger(hit);
+    }
+    
     public void TriggerDeathAnim()
     {
         animator.SetTrigger(death);

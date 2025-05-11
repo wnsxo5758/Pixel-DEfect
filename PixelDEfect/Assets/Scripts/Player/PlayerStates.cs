@@ -285,10 +285,12 @@ namespace PlayerStates
     public class Hold : State<PlayerController>
     {
         private PlayerAnimator animator;
+        private PlayerHp playerHp;
         
         public override void Enter(PlayerController player)
         {
             animator = player.GetComponentInChildren<PlayerAnimator>();
+            playerHp = player.GetComponent<PlayerHp>();
             
             animator.SetHoldAnim(player.transform.localScale.x);
         }
@@ -296,6 +298,11 @@ namespace PlayerStates
         public override void Execute(PlayerController player)
         {
             float input = player.HorizontalInput();
+
+            if (playerHp != null && playerHp.IsHit)
+            {
+                return;
+            }
             
             animator.PushAndPullAnim(input);
             
@@ -314,11 +321,13 @@ namespace PlayerStates
     {
         private MovementRigidbody2D movement;
         private PlayerAnimator animator;
+        private PlayerHp playerHp;
         
         public override void Enter(PlayerController player)
         {
             movement = player.GetComponent<MovementRigidbody2D>();
             animator = player.GetComponentInChildren<PlayerAnimator>();
+            playerHp = player.GetComponent<PlayerHp>();
             
             // 사다리 모드 설정
             animator.SetClimbAnim(true);
@@ -330,7 +339,14 @@ namespace PlayerStates
             float vertical = player.VerticalInput();
             
             //사다리 이동
-            movement.Climb(vertical);
+            if (playerHp.IsHit)
+            {
+                movement.Climb(0f);
+            }
+            else
+            {
+                movement.Climb(vertical);
+            }
             
             //애니메이션
             animator.ClimbAnim(vertical);
@@ -439,6 +455,45 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
+        }
+    }
+
+    public class Hit : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private PlayerHp playerHp;
+        
+        private float hitStunDuration;
+        private float stunTimer;
+        
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            playerHp = player.GetComponent<PlayerHp>();
+            
+            hitStunDuration = playerHp.GetCurrentHitStunDuration();
+            stunTimer = hitStunDuration;
+            
+
+            if (animator != null)
+            {
+                animator.TriggerHitAnim();
+            }
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            stunTimer -= Time.deltaTime;
+
+            if (stunTimer <= 0)
+            {
+                player.ChangeState(new Idle());
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            
         }
     }
     
