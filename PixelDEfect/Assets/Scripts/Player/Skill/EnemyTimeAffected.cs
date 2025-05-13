@@ -65,7 +65,7 @@ public class EnemyTimeAffected : TimeAffectedEntity
         }
         
         // 적 행동 재개
-        enemyBehavior.UnFreezeTime();
+        enemyBehavior.UnfreezeTime();
         
         // 축적된 데미지 적용
         ApplyPendingDamages();

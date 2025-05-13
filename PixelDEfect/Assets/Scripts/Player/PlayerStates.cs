@@ -27,7 +27,7 @@ namespace PlayerStates
             }
             
             // 지면 체크
-            if (!player.GetComponent<MovementRigidbody2D>().IsGrounded)
+            if (!player.IsGrounded())
             {
                 player.ChangeState(new Jump());
             }
@@ -67,7 +67,7 @@ namespace PlayerStates
             }
             
             // 지면 체크
-            if (!player.GetComponent<MovementRigidbody2D>().IsGrounded)
+            if (!player.IsGrounded())
             {
                 player.ChangeState(new Jump());
             }
@@ -101,7 +101,7 @@ namespace PlayerStates
             }
             
             // 착지 감지
-            if (movement.IsGrounded && movement.Velocity.y <= 0.01f)
+            if (player.IsGrounded() && movement.Velocity.y <= 0.01f)
             {
                 player.ChangeState(new Idle());
             }
@@ -153,6 +153,12 @@ namespace PlayerStates
             if (input != 0)
             {
                 player.SpriteFlipX(input);
+            }
+
+            if (player.HasSpaceAbove() && player.WantToStand)
+            {
+                player.ChangeState(new Idle());
+                player.WantToStand = false;
             }
         }
 
@@ -285,12 +291,16 @@ namespace PlayerStates
     public class Hold : State<PlayerController>
     {
         private PlayerAnimator animator;
+        private MovementRigidbody2D movement;
         private PlayerHp playerHp;
+        private PlayerInteraction interaction;
         
         public override void Enter(PlayerController player)
         {
             animator = player.GetComponentInChildren<PlayerAnimator>();
+            movement = player.GetComponent<MovementRigidbody2D>();
             playerHp = player.GetComponent<PlayerHp>();
+            interaction = player.GetComponent<PlayerInteraction>();
             
             animator.SetHoldAnim(player.transform.localScale.x);
         }
@@ -302,6 +312,12 @@ namespace PlayerStates
             if (playerHp != null && playerHp.IsHit)
             {
                 return;
+            }
+
+            // 땅에 떨어질 시
+            if (!player.IsGrounded())
+            {
+                interaction.StopHolding();
             }
             
             animator.PushAndPullAnim(input);
@@ -378,7 +394,7 @@ namespace PlayerStates
         {
             movement = player.GetComponent<MovementRigidbody2D>();
 
-            if (movement.IsGrounded)
+            if (player.IsGrounded())
             {
                 movement.MoveTo(0);
             }
@@ -493,7 +509,7 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
-            
+            playerHp.IsHit = false;
         }
     }
     

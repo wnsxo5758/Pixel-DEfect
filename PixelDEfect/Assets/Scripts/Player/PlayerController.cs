@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
     private bool canRoll = true;
     
     public bool IsOnLadder { get; set; } //사다리 
+    public bool WantToStand { get; set; } // 앉았을 때 일어날 수 있는 상태
     
     private void Awake()
     {
@@ -218,6 +219,7 @@ public class PlayerController : MonoBehaviour
     {
         if (GetCurrentState() is PlayerStates.Idle || GetCurrentState() is PlayerStates.Run)
         {
+            WantToStand = false;
             ChangeState(new PlayerStates.Crawl());
         }
     }
@@ -225,8 +227,15 @@ public class PlayerController : MonoBehaviour
     // 웅크리기 종료
     private void OnCrouchUp()
     {
-        if (GetCurrentState() is PlayerStates.Crawl && HasSpaceAbove())
+        if (GetCurrentState() is PlayerStates.Crawl)
         {
+            if (!HasSpaceAbove())
+            {
+                WantToStand = true;
+                
+                return;
+            }
+            
             ChangeState(new PlayerStates.Idle());
         }
     }
@@ -256,11 +265,16 @@ public class PlayerController : MonoBehaviour
         canRoll = true;
     }
 
-    public bool OnAttackReceived()
+    public bool OnAttackReceived(bool canFreeze)
     {
         if (GetCurrentState() is PlayerStates.Roll rollState)
         {
-            return rollState.CheckDodgeAndTriggerTimeStop(this);
+            if (canFreeze)
+            {
+                return rollState.CheckDodgeAndTriggerTimeStop(this);
+            }
+
+            return true;
         }
 
         return false;
@@ -274,7 +288,7 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up, 
                             crouchCheckDistance, aboveLayer);
         
-        Debug.DrawRay(rayOrigin, Vector2.up * crouchCheckDistance, Color.green);
+        Debug.DrawRay(rayOrigin, Vector2.up * crouchCheckDistance, hit ? Color.red : Color.green);
 
         return hit.collider == null;
     }
@@ -330,7 +344,7 @@ public class PlayerController : MonoBehaviour
     {
         return stateMachine.CurrentState;
     }
-
+    
     public bool IsGrounded() => movement.IsGrounded;
     
     void OnGUI()

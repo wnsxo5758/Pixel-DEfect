@@ -39,7 +39,7 @@ public class PlayerHp : MonoBehaviour
 
     public event Action OnPlayerDeath;
     public int CurrentHp => currentHp;
-    public bool IsHit => isHit;
+    public bool IsHit { get => isHit; set => isHit = value; }
     public bool IsDead => isDead;
     public int CurrentMedicKit
     {
@@ -59,17 +59,15 @@ public class PlayerHp : MonoBehaviour
         originColor = spriteRenderer.color;
     }
 
-    public void DecreaseHp(int damage, GameObject damageSource = null)
+    public void DecreaseHp(int damage, bool canDodge = false, bool canFreeze = false)
     {
+        if (isDead) return;
+        
         bool dodged = false;
 
-        if (damageSource != null)
+        if (canDodge && player != null)
         {
-            Collider2D damageCollider = damageSource.GetComponent<Collider2D>();
-            if (damageCollider != null && player != null)
-            {
-                dodged = player.OnAttackReceived();
-            }
+            dodged = player.OnAttackReceived(canFreeze);
         }
 
         // 무적 or 회피 상태 체크
@@ -91,13 +89,13 @@ public class PlayerHp : MonoBehaviour
         {
             Debug.Log("플레이어에게 " + damage + "데미지");
             
-            HandleHit(damageSource);
+            HandleHit();
         }
 
         uiPlayer.SetHpAll(currentHp); // 여기서 전체 갱신
     }
 
-    private void HandleHit(GameObject attacker)
+    private void HandleHit()
     {
         var currentState = player.GetCurrentState();
         bool isSpecialState = currentState is PlayerStates.Climb || currentState is PlayerStates.Hold;
@@ -107,12 +105,12 @@ public class PlayerHp : MonoBehaviour
         isHit = true;
         
         // 넉백 처리
-        if (!isSpecialState && attacker != null && rb != null)
-        {
-            Vector2 knockBackDirection = (transform.position - attacker.transform.position).normalized;
-            rb.velocity = Vector2.zero;
-            rb.AddForce(knockBackDirection * knockBackForce, ForceMode2D.Impulse);
-        }
+        // if (!isSpecialState && attacker != null && rb != null)
+        // {
+        //     Vector2 knockBackDirection = (transform.position - attacker.transform.position).normalized;
+        //     rb.velocity = Vector2.zero;
+        //     rb.AddForce(knockBackDirection * knockBackForce, ForceMode2D.Impulse);
+        // }
         
         // 피격 효과
         OnInvincibility(1.5f);
@@ -124,6 +122,7 @@ public class PlayerHp : MonoBehaviour
         }
         else
         {
+            movement.MoveTo(0);
             player.ChangeState(new PlayerStates.Hit());
         }
     }

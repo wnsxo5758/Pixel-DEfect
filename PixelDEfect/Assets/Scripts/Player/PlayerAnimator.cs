@@ -84,7 +84,6 @@ public class PlayerAnimator : MonoBehaviour
         // 사다리를 타고 있을 때는 파라미터 초기화
         if (isOnLadder)
         {
-            animator.SetFloat(velocityY, 0f);
             animator.SetBool(isGrounded, false);
         }
     }

@@ -64,7 +64,7 @@ public class BulletBase : MonoBehaviour
             PlayerHp playerHp = collision.GetComponent<PlayerHp>();
             if (playerHp != null)
             {
-                playerHp.DecreaseHp(damage, gameObject);
+                playerHp.DecreaseHp(damage, true, true);
             }
         }
 

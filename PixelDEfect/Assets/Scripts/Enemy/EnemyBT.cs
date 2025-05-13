@@ -50,7 +50,7 @@ public class EnemyBT : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
-        enemyCollider = GetComponent<Collider2D>();
+        enemyCollider = GetComponent<BoxCollider2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         if (spriteRenderer != null)
@@ -247,7 +247,7 @@ public class EnemyBT : MonoBehaviour
         
         // 블랙보드 업데이트
         blackboard.SetValue("PlayerDetected", currentlyDetected);
-            
+        
         // 플레이어 감지 상태가 변경되었으면 애니메이션 업데이트 및 패트롤 방향 설정
         if (previouslyDetected != currentlyDetected)
         {
@@ -629,7 +629,7 @@ public class EnemyBT : MonoBehaviour
         return Vector2.Distance(transform.position, currentTarget.position);
     }
     
-    public void FreezeTime()
+    public virtual void FreezeTime()
     {
         isTimeFrozen = true;
         
@@ -653,7 +653,7 @@ public class EnemyBT : MonoBehaviour
         }
     }
 
-    public void UnFreezeTime()
+    public virtual void UnfreezeTime()
     {
         isTimeFrozen = false;
         

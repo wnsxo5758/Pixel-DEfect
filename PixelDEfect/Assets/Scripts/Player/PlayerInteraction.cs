@@ -389,7 +389,7 @@ public class PlayerInteraction : MonoBehaviour
     }
     
     // 물체 잡기 종료
-    private void StopHolding()
+    public void StopHolding()
     {
         if (!isHolding) return;
 
