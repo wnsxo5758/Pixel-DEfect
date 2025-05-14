@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 926306030021127866}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9933,6 +9933,7 @@ GameObject:
   - component: {fileID: 658921088476211807}
   - component: {fileID: 8312166533425255970}
   - component: {fileID: 869267657480675355}
+  - component: {fileID: 1349480774018210720}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -10083,13 +10084,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba317ef02f609241b7d877efd32f605, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponDetectionRadius: 0.8
-  pickupLayer:
-    serializedVersion: 2
-    m_Bits: 32768
-  weaponLayer:
-    serializedVersion: 2
-    m_Bits: 65536
   attackOffset: {x: 0, y: 0.6}
   attackCollider: {fileID: 0}
   enemyLayer:
@@ -10104,6 +10098,8 @@ MonoBehaviour:
   throwUpwardForce: 1.5
   thrownWeaponPrefab: {fileID: 0}
   throwCooldown: 1
+  teleportDelayTime: 0.5
+  teleportCooldown: 3
 --- !u!114 &8312166533425255970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10120,6 +10116,9 @@ MonoBehaviour:
   currentHp: 0
   healTime: 0
   invincibilityTime: 2
+  hitStunDuration: 0.5
+  specialStunDuration: 0.25
+  knockBackForce: 10
   maxMedicKit: 3
   uiPlayer: {fileID: 0}
 --- !u!114 &869267657480675355
@@ -10134,12 +10133,185 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7213c661733e704ab3b467f2df1e989, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rayDistance: 0.4
+  interactionRadius: 0.5
+  interactionPoint: {fileID: 953488845849280580}
   interactableLayer:
     serializedVersion: 2
+    m_Bits: 98304
+  interactionPrompt: {fileID: 0}
+  holdDistance: 0.4
+  holdableLayer:
+    serializedVersion: 2
     m_Bits: 512
-  interactPoint: {fileID: 953488845849280580}
-  springFrequency: 0
-  springDamping: 0.9
-  springDistance: 1.1
-  respawnPoint: {fileID: 0}
+  autoReleaseDelay: 0.1
+  raycastOffset: {x: 0, y: 0}
+--- !u!114 &1349480774018210720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8759166575710960654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 8475bf882315d8840968c8a19b31ffdf, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5783198869496049011}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 7ed3d595-5492-4101-bac0-bec109b98af9
+    m_ActionName: Player/Move[/Keyboard/leftArrow,/Keyboard/rightArrow]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5783198869496049011}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 2a9bc1c4-7f9a-4636-b52c-bcc89747d10e
+    m_ActionName: Player/Jump[/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5783198869496049011}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnMeleeAttack
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 5b87336a-73db-41c4-8a15-5b71480088e8
+    m_ActionName: Player/Attack[/Keyboard/z]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5783198869496049011}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnCrouch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: a843cf78-26d3-435f-b278-20653c4dc419
+    m_ActionName: Player/Crouch[/Keyboard/downArrow]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5783198869496049011}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnRoll
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 688e002e-f922-41b0-9f36-aad9afe7c2fa
+    m_ActionName: Player/Roll[/Keyboard/leftShift]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5783198869496049011}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnInteract
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 4701fd65-94fc-4227-861e-8f0593717ac5
+    m_ActionName: Player/Interact[/Keyboard/f]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5783198869496049011}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnThrowWeapon
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 3e3da664-65c0-4f24-9f06-48ba06a74e67
+    m_ActionName: Player/Throw[/Keyboard/x]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5783198869496049011}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnTeleport
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 26e06c1b-05c5-4bf4-8d7e-7d1cc3380442
+    m_ActionName: Player/Teleport
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: PC
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}

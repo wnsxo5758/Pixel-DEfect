@@ -208,8 +208,8 @@ MonoBehaviour:
   throwStunDuration: 3
   knockBackForce: 3
   deathDelay: 2
-  detectionRange: 9
-  loseTargetRange: 12
+  detectionRange: 7
+  loseTargetRange: 10
   target: {fileID: 0}
   targetLayer:
     serializedVersion: 2
@@ -233,6 +233,10 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
+  enableContactDamage: 1
+  contactDamage: 1
+  contactDamageCooldown: 2
+  contactRange: 1
 --- !u!114 &7559644172667179851
 MonoBehaviour:
   m_ObjectHideFlags: 0

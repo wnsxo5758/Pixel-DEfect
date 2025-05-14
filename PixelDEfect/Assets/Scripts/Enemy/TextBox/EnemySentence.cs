@@ -75,4 +75,23 @@ public class EnemySentence : MonoBehaviour
         currentChatBox = Instantiate(chatBoxPrefab, chatTr);
         currentChatBox.GetComponent<ChatSystem>().Ondialogue(deathSentences, chatTr);
     }
+
+    // Å¸ÀÓ¶óÀÎ(ÄÆ¾À)¿ë ÇÔ¼ö
+    public void ShowDialogueFromTimeline(string[] lines)
+    {
+        if (currentChatBox != null)
+        {
+            Destroy(currentChatBox);
+        }
+
+        currentChatBox = Instantiate(chatBoxPrefab, chatTr);
+        currentChatBox.GetComponent<ChatSystem>().Ondialogue(lines, chatTr);
+    }
+    public void ShowTimelineLine(int index)
+    {
+        if (index >= 0 && index < sentences.Length)
+        {
+            ShowDialogueFromTimeline(new string[] { sentences[index] });
+        }
+    }
 }
