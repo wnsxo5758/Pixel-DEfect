@@ -34,7 +34,6 @@ public class BossBT : EnemyBT
     
     // 기절 관련 변수
     protected bool isStunned = false; // 기절 상태 여부
-    protected float stunTimer = 0f; // 기절 타이머
     protected int stunCount = 0; // 패턴 사용 카운터
     
     // 페이즈 관련 변수
@@ -222,7 +221,7 @@ public class BossBT : EnemyBT
         
         // 추적 시퀸스 
         Sequence chaseSequence = new Sequence();
-        ConditionNode isPlayerDetected = new ConditionNode(() => blackboard.GetValue<bool>("IsPlayerDetected"));
+        ConditionNode isPlayerDetected = new ConditionNode(() => blackboard.GetValue<bool>("PlayerDetected"));
         ConditionNode isNotUsingPattern = new ConditionNode(() => !blackboard.GetValue<bool>("IsUsingPattern"));
         ActionNode chaseAction = new ActionNode(ChaseTarget);
         chaseSequence.AddChild(isPlayerDetected);

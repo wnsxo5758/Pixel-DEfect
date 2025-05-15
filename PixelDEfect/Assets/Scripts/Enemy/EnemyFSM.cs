@@ -148,7 +148,7 @@ public abstract class EnemyFSM : MonoBehaviour
     protected virtual IEnumerator Idle() // 정지(휴식)
     {
         movement.MoveTo(0);
-        animator.UpdateAnimation(0);
+        // animator.UpdateAnimation(0);
 
         StartCoroutine(nameof(AutoChangeFromIdleToWander));
         while (true)
@@ -171,12 +171,12 @@ public abstract class EnemyFSM : MonoBehaviour
             if (IsFacingRight)
             {
                 movement.MoveTo(x);
-                animator.UpdateAnimation(x);
+                // animator.UpdateAnimation(x);
             }
             else
             {
                 movement.MoveTo(-x);
-                animator.UpdateAnimation(-x);
+                // animator.UpdateAnimation(-x);
             }
             CheckWall();
             if (currentTime >= maxTime)
@@ -303,7 +303,7 @@ public abstract class EnemyFSM : MonoBehaviour
                 speed = -1;
             }
             movement.MoveTo(speed);
-            animator.UpdateAnimation(speed);
+            // animator.UpdateAnimation(speed);
             CalculateDistanceToTargetAndSelectState();
             yield return null;
         }
@@ -323,8 +323,8 @@ public abstract class EnemyFSM : MonoBehaviour
         {
             col.enabled = false;
         }
-        animator.Death(); // 적 사망 애니메이션 
-        yield return new WaitForSeconds((animator.DeathAnimLength+1f));
+        // animator.Death(); // 적 사망 애니메이션 
+        // yield return new WaitForSeconds((animator.DeathAnimLength+1f));
         
         ThrownWeapon attachedWeapon = GetComponentInChildren<ThrownWeapon>();
         if (attachedWeapon != null)
@@ -333,7 +333,8 @@ public abstract class EnemyFSM : MonoBehaviour
         }
         
         gameObject.SetActive(false);
-        
+
+        yield return null;
     }
     
     protected abstract IEnumerator Attack(); // 하위 객체에서 공격 구현

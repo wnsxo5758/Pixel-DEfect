@@ -4,36 +4,36 @@ using UnityEngine;
 
 public class RangeEnemy : EnemyFSM
 {
-    [Header("¿ø°Å¸® °ø°Ý °ü·Ã")]
+    [Header("ï¿½ï¿½ï¿½Å¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")]
     [SerializeField]
     private int damage;
     [SerializeField]
-    private float coolTime; // °ø°Ý ÄðÅ¸ÀÓ
+    private float coolTime; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½
     [SerializeField]
-    private float currentCoolTime; // ÇöÀç ÄðÅ¸ÀÓ
+    private float currentCoolTime; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½
     [SerializeField]
-    private GameObject bulletPrefab; // ÃÑ¾Ë ÇÁ¸®ÆÕ
+    private GameObject bulletPrefab; // ï¿½Ñ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     [SerializeField]
-    private Transform firePos; // °ø°ÝÀ§Ä¡
+    private Transform firePos; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡
     [SerializeField]
     private float bulletSpeed;
 
     protected override IEnumerator Attack()
     {
-        Debug.Log("ÇÃ·¹ÀÌ¾î¿¡ ´ëÇÑ °ø°Ý!");
+        Debug.Log("ï¿½Ã·ï¿½ï¿½Ì¾î¿¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½!");
         movement.MoveTo(0);
-        animator.isAttack = true;
-        animator.UpdateAnimation(0);
+        // animator.isAttack = true;
+        // animator.UpdateAnimation(0);
         while (true)
         {
-            if(currentCoolTime <= 0)// ÄðÅ¸ÀÓÀÌ 0º¸´Ù ÀÛÀ¸¸é
+            if(currentCoolTime <= 0)// ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             {
-                Shooting(); // ÃÑ¾Ë ¹ß»ç
-                currentCoolTime = coolTime; // ÄðÅ¸ÀÓ ÃÊ±âÈ­
+                Shooting(); // ï¿½Ñ¾ï¿½ ï¿½ß»ï¿½
+                currentCoolTime = coolTime; // ï¿½ï¿½Å¸ï¿½ï¿½ ï¿½Ê±ï¿½È­
             }
             else
             {
-                currentCoolTime -= Time.deltaTime; // ÄðÅ¸ÀÓ 
+                currentCoolTime -= Time.deltaTime; // ï¿½ï¿½Å¸ï¿½ï¿½ 
             }
 
             CalculateDistanceToTargetAndSelectState();
@@ -44,7 +44,7 @@ public class RangeEnemy : EnemyFSM
 
     private void Shooting()
     {
-        //¾Æ¹«°Íµµ ¾øÀ¸¸é return
+        //ï¿½Æ¹ï¿½ï¿½Íµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ return
         if (bulletPrefab == null || firePos == null) return;
 
         //
@@ -53,8 +53,8 @@ public class RangeEnemy : EnemyFSM
         Rigidbody2D rigid = bullet.GetComponent<Rigidbody2D>();
         if (rigid != null)
         {
-            Vector2 direction = (target.position - firePos.position).normalized; // ÇÃ·¹ÀÌ¾î ¹æÇâ °è»ê
-            rigid.velocity = direction * bulletSpeed; // ÃÑ¾Ë ÀÌµ¿
+            Vector2 direction = (target.position - firePos.position).normalized; // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+            rigid.velocity = direction * bulletSpeed; // ï¿½Ñ¾ï¿½ ï¿½Ìµï¿½
         }
     }
 }

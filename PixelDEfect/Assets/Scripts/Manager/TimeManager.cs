@@ -11,7 +11,8 @@ public class TimeManager : MonoBehaviour
     [SerializeField] private float timeFreezeDuration = 5f;
     [SerializeField] private float timeFreezeCooldown = 15f;
     [SerializeField] private LayerMask timeAffectedLayers;
-
+    [SerializeField] private bool hasTimeStopAbility = false;
+    
     [Header("시각 효과")] 
     [SerializeField] private GameObject timeFreezeVFXPrefab;
     [SerializeField] private GameObject screenOverlayPrefab;
@@ -24,8 +25,6 @@ public class TimeManager : MonoBehaviour
     private GameObject currentVFX;
     private GameObject currentOverlay;
     
-    // 스킬 상태
-    private bool hasTimeStopAbility = false;
     
     // 이벤트
     public System.Action OnTimeStopBegin;

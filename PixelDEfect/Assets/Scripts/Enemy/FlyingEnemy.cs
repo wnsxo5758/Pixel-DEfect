@@ -5,7 +5,7 @@ using UnityEngine;
 public class FlyingEnemy : EnemyFSM
 {
     [SerializeField]
-    private Vector2 originalPos; // Ã³À½ À§Ä¡
+    private Vector2 originalPos; // Ã³ï¿½ï¿½ ï¿½ï¿½Ä¡
 
     private void Start()
     {
@@ -14,9 +14,9 @@ public class FlyingEnemy : EnemyFSM
 
     protected override IEnumerator Attack()
     {
-        Debug.Log($"{gameObject.name}ÀÌ ÇÃ·¹ÀÌ¾î¸¦ °ø°Ý!");
+        Debug.Log($"{gameObject.name}ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î¸¦ ï¿½ï¿½ï¿½ï¿½!");
         movement.MoveTo(0);
-        animator.UpdateAnimation(0);
+        // animator.UpdateAnimation(0);
         yield return new WaitForSeconds(1f);
         CalculateDistanceToTargetAndSelectState();
     }
@@ -30,7 +30,7 @@ public class FlyingEnemy : EnemyFSM
             Vector2 dir = (target.position - transform.position).normalized;
             transform.position = Vector2.MoveTowards(transform.position, target.position, movement.RunSpeed * Time.deltaTime);
             LookRotationToTarget();
-            animator.UpdateAnimation(1);
+            // animator.UpdateAnimation(1);
             CalculateDistanceToTargetAndSelectState();
             yield return null;
         }
@@ -38,8 +38,8 @@ public class FlyingEnemy : EnemyFSM
 
     protected override IEnumerator Dead()
     {
-        Debug.Log($"{gameObject.name}ÀÌ »ç¸Á");
-        animator.Death();
+        Debug.Log($"{gameObject.name}ï¿½ï¿½ ï¿½ï¿½ï¿½");
+        // animator.Death();
         movement.MoveTo(0);
         yield return new WaitForSeconds(1f);
         Destroy(gameObject);

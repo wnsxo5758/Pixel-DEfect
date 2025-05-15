@@ -23,8 +23,8 @@ public class MeleeEnemyFSM : EnemyFSM
         while (true)
         {
             movement.MoveTo(0);
-            animator.isAttack = true;
-            animator.UpdateAnimation(0);
+            // animator.isAttack = true;
+            // animator.UpdateAnimation(0);
             StartCoroutine(nameof(MeleeAttack));
             CalculateDistanceToTargetAndSelectState();
             yield return null;
@@ -55,7 +55,7 @@ public class MeleeEnemyFSM : EnemyFSM
         attackCollider.enabled = false;
         while (currentCoolTime > 0)
         {
-            animator.isAttack = false;
+            // animator.isAttack = false;
             currentCoolTime -= Time.deltaTime;
             yield return null;
         }

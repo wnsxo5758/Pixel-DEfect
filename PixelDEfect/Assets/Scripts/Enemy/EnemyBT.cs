@@ -50,7 +50,7 @@ public class EnemyBT : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         movement = GetComponent<MovementRigidbody2D>();
         animator = GetComponentInChildren<EnemyAnimator>();
-        enemyCollider = GetComponent<BoxCollider2D>();
+        enemyCollider = GetComponent<Collider2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         if (spriteRenderer != null)
