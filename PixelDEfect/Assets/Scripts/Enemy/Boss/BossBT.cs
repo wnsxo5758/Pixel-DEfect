@@ -28,19 +28,18 @@ public class BossBT : EnemyBT
     protected List<Node>[] phasePatterns; // 각 페이즈별 패턴 노드 리스트
     protected List<bool>[] patternStunFlags; // 각 패턴이 기절 카운트를 증가시키는지
     protected float lastPatternTime; // 마지막 패턴 실행 시간
-    protected bool isChangingPhase = false; // 페이즈 전환중인지
-    protected bool isUsingPattern = false; // 패턴을 사용 중인지
-    protected bool isBattleStarted = false; // 전투 시작 여부
+    protected bool isChangingPhase; // 페이즈 전환중인지
+    protected bool isUsingPattern; // 패턴을 사용 중인지
+    protected bool isBattleStarted; // 전투 시작 여부
     
     // 기절 관련 변수
-    protected bool isStunned = false; // 기절 상태 여부
-    protected int stunCount = 0; // 패턴 사용 카운터
+    protected bool isStunned; // 기절 상태 여부
+    protected int stunCount; // 패턴 사용 카운터
     
     // 페이즈 관련 변수
     protected bool[] phaseActivated; // 각 페이즈가 활성화되었는지 여부
     
     // 보스 행동 관련 변수
-    protected List<System.Type> immuneStatusList = new List<System.Type>(); // 면역 상태 목록
     protected float patternTimer = 0f; // 패턴 타이머
     protected int lastPatternIndex = -1;
     
@@ -297,7 +296,7 @@ public class BossBT : EnemyBT
     protected virtual void CheckAndTriggerPattern()
     {
         // 전투가 시작되지 않았거나, 패턴 사용 중이면 건너뛰기
-        if (isStunned || !isBattleStarted || isUsingPattern)
+        if (isStunned || !isBattleStarted || isUsingPattern || isChangingPhase)
             return;
         
         // 타겟이 없거나 감지되지 않았으면 건너뛰기
@@ -305,7 +304,7 @@ public class BossBT : EnemyBT
             return;
         
         // 쿨다운 확인
-        if (Time.time - lastPatternTime < patternCooldown)
+        if (patternTimer > 0)
             return;
         
         // 현재 페이즈의 패턴이 없으면 건너뛰기
@@ -395,7 +394,7 @@ public class BossBT : EnemyBT
     // 다음 패턴 인덱스 선택
     protected virtual int GetNextPatternIndex()
     {
-        // 작성 중
+        // 오버라이드 하세요
         return -1;
     }
     
@@ -435,7 +434,7 @@ public class BossBT : EnemyBT
             
             return patternState;
         }
-
+        
         return NodeState.Running;
     }
     
@@ -511,7 +510,7 @@ public class BossBT : EnemyBT
             blackboard.SetValue("CurrentPhase", currentPhase);
 
             phaseActivated[phase] = true;
-            
+            Debug.Log($"Phase {phase} activated");
             // 페이즈별 초기화 작업 수행
             OnPhaseActivated(phase);
         }
@@ -559,30 +558,6 @@ public class BossBT : EnemyBT
         
     }
     
-    // 면역 상태 추가
-    public void AddImmuneStatus(System.Type statusType)
-    {
-        if (!immuneStatusList.Contains(statusType))
-        {
-            immuneStatusList.Add(statusType);
-        }
-    }
-    
-    // 면역 상태 제거
-    public void RemoveImmuneStatus(System.Type statusType)
-    {
-        if (immuneStatusList.Contains(statusType))
-        {
-            immuneStatusList.Remove(statusType);
-        }
-    }
-    
-    // 면역 상태 확인
-    public bool IsImmuneToStatus(System.Type statusType)
-    {
-        return immuneStatusList.Contains(statusType);
-    }
-    
     // 패턴 노드 추가 헬퍼 메서드
     protected void AddPatternToPhase(int phaseIndex, Node patternNode, bool causesStun)
     {
@@ -597,13 +572,6 @@ public class BossBT : EnemyBT
     protected ActionNode CreatePatternNode(System.Func<NodeState> patternAction)
     {
         return new ActionNode(patternAction);
-    }
-    
-    // 공격 범위 표시 (디버깅용)
-    protected override void OnDrawGizmosSelected()
-    {
-        base.OnDrawGizmosSelected();
-        
     }
     
     // 현재 기절 카운트 반환

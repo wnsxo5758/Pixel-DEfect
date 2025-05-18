@@ -13,7 +13,6 @@ public class PlayerHp : MonoBehaviour
     [Header("피격 설정")] 
     [SerializeField] private float hitStunDuration = 0.5f; // 일반 경직 시간
     [SerializeField] private float specialStunDuration = 0.25f; // 특수 상태 경직 시간
-    [SerializeField] private float knockBackForce = 10f; // 넉백
     
     [Header("회복약 관련")]
     [SerializeField]
@@ -32,10 +31,10 @@ public class PlayerHp : MonoBehaviour
     private MovementRigidbody2D movement;
 
     private float currentHitStunDuration; // 현재 적용중인 경직 시간
-    private bool isHit = false; // 피격 중인가
-    private bool isDead = false;
-    private bool isHealing = false; // 회복 중인가
-    private bool isInvincible = false; // 무적인가
+    private bool isHit; // 피격 중인가
+    private bool isDead;
+    private bool isHealing; // 회복 중인가
+    private bool isInvincible; // 무적인가
 
     public event Action OnPlayerDeath;
     public int CurrentHp => currentHp;
@@ -59,6 +58,7 @@ public class PlayerHp : MonoBehaviour
         originColor = spriteRenderer.color;
     }
 
+    // 일반적인 데미지 처리 (경직만 있음)
     public void DecreaseHp(int damage, bool canDodge = false, bool canFreeze = false)
     {
         if (isDead) return;
@@ -71,10 +71,7 @@ public class PlayerHp : MonoBehaviour
         }
 
         // 무적 or 회피 상태 체크
-        if (isInvincible || dodged)
-        {
-            return;
-        }
+        if (isInvincible || dodged) return;
         
         currentHp -= damage;
 
@@ -89,13 +86,46 @@ public class PlayerHp : MonoBehaviour
         {
             Debug.Log("플레이어에게 " + damage + "데미지");
             
-            HandleHit();
+            HandleHit(Vector2.zero);
         }
 
         uiPlayer.SetHpAll(currentHp); // 여기서 전체 갱신
     }
 
-    private void HandleHit()
+    // 넉백이 포함된 데미지 처리
+    public void DecreaseHp(int damage, Vector2 knockBack, bool canDodge = false)
+    {
+        if (isDead) return;
+        
+        bool dodged = false;
+
+        if (canDodge && player != null)
+        {
+            dodged = player.OnAttackReceived(false);
+        }
+        
+        if (isInvincible || dodged) return;
+        
+        currentHp -= damage;
+
+        if (currentHp <= 0)
+        {
+            Debug.Log("플레이어 사망");
+            
+            currentHp = 0;
+            Die();
+        }
+        else
+        {
+            Debug.Log("플레이어에게 " + damage + "데미지");
+            
+            HandleHit(knockBack);
+        }
+
+        uiPlayer.SetHpAll(currentHp);
+    }
+    
+    private void HandleHit(Vector2 knockBack)
     {
         var currentState = player.GetCurrentState();
         bool isSpecialState = currentState is PlayerStates.Climb || currentState is PlayerStates.Hold;
@@ -104,13 +134,12 @@ public class PlayerHp : MonoBehaviour
         currentHitStunDuration = isSpecialState ? specialStunDuration : hitStunDuration;
         isHit = true;
         
-        // 넉백 처리
-        // if (!isSpecialState && attacker != null && rb != null)
-        // {
-        //     Vector2 knockBackDirection = (transform.position - attacker.transform.position).normalized;
-        //     rb.velocity = Vector2.zero;
-        //     rb.AddForce(knockBackDirection * knockBackForce, ForceMode2D.Impulse);
-        // }
+        //넉백 처리
+        if (!isSpecialState && knockBack != Vector2.zero)
+        {
+            rb.velocity = Vector2.zero;
+            rb.AddForce(knockBack, ForceMode2D.Impulse);
+        }
         
         // 피격 효과
         OnInvincibility(1.5f);
@@ -122,7 +151,10 @@ public class PlayerHp : MonoBehaviour
         }
         else
         {
-            movement.MoveTo(0);
+            if (knockBack == Vector2.zero)
+            {
+                player.UpdateMove(0);
+            }
             player.ChangeState(new PlayerStates.Hit());
         }
     }
@@ -152,7 +184,7 @@ public class PlayerHp : MonoBehaviour
     }
 
     
-    public void OnInvincibility(float time) // 무적상태
+    private void OnInvincibility(float time) // 무적상태
     {
         if (isInvincible)
         {

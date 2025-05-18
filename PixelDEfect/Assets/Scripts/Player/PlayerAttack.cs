@@ -593,11 +593,4 @@ public class PlayerAttack : MonoBehaviour
             }
         }
     }
-
-    void OnGUI()
-    {
-        if(currentWeapon != null)
-            GUI.Label(new Rect(1000, 70, 300, 20),
-                currentWeapon.WeaponName);
-    }
 }

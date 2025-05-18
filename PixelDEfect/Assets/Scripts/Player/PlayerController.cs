@@ -347,12 +347,6 @@ public class PlayerController : MonoBehaviour
     
     public bool IsGrounded() => movement.IsGrounded;
     
-    void OnGUI()
-    {
-        GUI.Label(new Rect(1000, 50, 300, 20),
-            "State: " + stateMachine.CurrentState.GetType().Name);
-    }
-
     public void OnDestroy()
     {
         if (playerHp != null)
