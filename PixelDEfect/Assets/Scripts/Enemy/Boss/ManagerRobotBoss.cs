@@ -20,10 +20,24 @@ public class ManagerRobotBoss : BossBT
     [SerializeField] private float headbuttPrepTime = 1f;       // 박치기 준비 시간
     [SerializeField] private float headbuttSpeed = 15f;         // 박치기 속도
     [SerializeField] private float headbuttCooldown = 8f;       // 박치기 쿨다운
-    [SerializeField] private int headbuttDamage = 3;         // 박치기 데미지
+    [SerializeField] private int headbuttDamage = 3;            // 박치기 데미지
     [SerializeField] private float headbuttKnockBackForce = 7f; // 플레이어 넉백
     [SerializeField] private LayerMask headbuttLayer;           // 박치기 벽 레이어
     [SerializeField] private BoxCollider2D headbuttCollider;    // 박치기 충돌 박스
+
+    [Header("로봇 소환 패턴 설정")] 
+    [SerializeField] private float summonCooldown = 20f;    // 로봇 소환 패턴 쿨다운
+    [SerializeField] private float ascentDuration = 2f;     // 천장에 올라가는 시간
+    [SerializeField] private float descentDuration = 2f;    // 내려오는 시간
+    [SerializeField] private float ceilingHeight = 10f;      // 천장 높이
+    [SerializeField] private GameObject[] robotPrefabs;     // 소환할 로봇 프리팹
+    [SerializeField] private int initialRobotCount = 5;     // 초기 소환 로봇 수
+    [SerializeField] private int maxRobotCount = 7;         // 최대 소환 로봇 수
+    [SerializeField] private float minSpawnTime = 5f;       // 소환 최소 간격
+    [SerializeField] private float maxSpawnTime = 10f;      // 소환 최대 간격
+    [SerializeField] private bool useDirectPositioning = true; // 물리 무시하고 직접 위치 설정
+    [SerializeField] private Transform ceilingPoint;        // 천장 위치
+    
     
     // 공격 상태 관리
     private enum AttackState { None, Preparation, Execute, Cooldown }
@@ -39,12 +53,26 @@ public class ManagerRobotBoss : BossBT
     private bool hasHitPlayer;          // 플레이어 충돌 추적
     private bool hasHitWall;            // 벽 충돌 추적
     
+    // 로봇 소환 패턴 상태 관리
+    private enum SummonState { None, Ascending, Summoning, Descending, Ending }
+    private SummonState currentSummonState = SummonState.None;
+    private float nextRobotSpawnTime;
+    private bool canSummon = true;
+    private List<GameObject> summonedRobots = new List<GameObject>();
+    private bool isInvulnerable = false;
+    private Vector3 originalPosition;       // 원래 위치 저장
+    private Quaternion originalRotation;    // 원래 회전 저장
+    private bool wasGravityEnabled = true;  // 중력 활성화 상태 저장
+    private bool initialSpawnComplete = false; // 초기 소환 완료 여부
+    
     // 타이머 및 상태 관리 변수
     private float basicAttackTimer;
     private float headbuttStateTimer;
+    private float summonStateTimer;
     
     // 패턴 액션 노드
     private ActionNode headbuttPatternNode;
+    private ActionNode summonPatternNode;
 
     protected override void Awake()
     {
@@ -58,6 +86,10 @@ public class ManagerRobotBoss : BossBT
         // 박치기 패턴 데이터 추가
         blackboard.SetValue("HeadbuttState", (int)HeadbuttState.None);
         blackboard.SetValue("CanHeadbutt", true);
+        
+        // 소환 관련 블랙보드 설정
+        blackboard.SetValue("SummonState", (int)SummonState.None);
+        blackboard.SetValue("CanSummon", true);
     }
 
     protected override void Start()
@@ -78,7 +110,7 @@ public class ManagerRobotBoss : BossBT
         {
             GameObject headbuttColliderObj = new GameObject("HeadbuttCollider");
             headbuttColliderObj.transform.parent = transform;
-            headbuttColliderObj.transform.localPosition = new Vector2(1.5f, 0.5f);
+            headbuttColliderObj.transform.localPosition = new Vector2(2f, 0.5f);
             
             headbuttCollider = headbuttColliderObj.AddComponent<BoxCollider2D>();
             headbuttCollider.size = new Vector2(0.5f, 7);
@@ -116,6 +148,7 @@ public class ManagerRobotBoss : BossBT
         
         UpdateAttackState();
         UpdateHeadbuttState();
+        UpdateSummonState();
     }
     
     // 공격 상태 업데이트
@@ -199,7 +232,8 @@ public class ManagerRobotBoss : BossBT
                     SetHeadbuttState(HeadbuttState.Cooldown);
                     canHeadbutt = false;
                     blackboard.SetValue("CanHeadbutt", false);
-
+                    
+                    movement.MoveTo(0);
                     return;
                 }
 
@@ -224,14 +258,95 @@ public class ManagerRobotBoss : BossBT
         }
     }
     
+    // 소환 패턴 상태 업데이트
+    private void UpdateSummonState()
+    {
+        if (isStunned || isDead || isChangingPhase)
+            return;
+
+        switch (currentSummonState)
+        {
+            case SummonState.Ascending:
+                // 보스가 천장으로 올라가는 상태
+                summonStateTimer += Time.deltaTime;
+                
+                // 천장으로 이동
+                float ascendProgress = Mathf.Clamp01(summonStateTimer / ascentDuration);
+                MoveTowardsCeiling(ascendProgress);
+                
+                // 올라가기 완료되면 소환 단계로 전환
+                if (summonStateTimer >= ascentDuration)
+                {
+                    SetSummonState(SummonState.Summoning);
+                    nextRobotSpawnTime = Time.time; // 바로 첫 로봇 소환
+                    initialSpawnComplete = false;
+                }
+                break;
+            
+            case SummonState.Summoning:
+                summonStateTimer += Time.deltaTime;
+                
+                // 초기 일괄 소환
+                if (!initialSpawnComplete)
+                {
+                    SpawnInitialRobotBatch();
+                    initialSpawnComplete = true;
+                    
+                    // 다음 추가 소환 시간 설정
+                    nextRobotSpawnTime = Time.time + Random.Range(minSpawnTime, maxSpawnTime);
+                }
+                // 추가 소환
+                else if (Time.time >= nextRobotSpawnTime && summonedRobots.Count < maxRobotCount)
+                {
+                    SpawnRobot();
+                    nextRobotSpawnTime = Time.time + Random.Range(minSpawnTime, maxSpawnTime);
+                }
+                
+                // 패턴 종료 조건 체크
+                if (summonedRobots.Count == 0 && initialSpawnComplete)
+                {
+                    SetSummonState(SummonState.Descending);
+                    summonStateTimer = 0f;
+                }
+                break;
+            
+            case SummonState.Descending:
+                // 보스가 천장에서 내려오는 중
+                summonStateTimer += Time.deltaTime;
+                
+                // 원래 위치로 내려오기
+                float descendProgress = Mathf.Clamp01(summonStateTimer / descentDuration);
+                MoveFromCeiling(descendProgress);
+                
+                // 내려오기 완료되면 패턴 종료
+                if (summonStateTimer >= descentDuration)
+                {
+                    SetSummonState(SummonState.Ending);
+                }
+                break;
+            
+            case SummonState.Ending:
+                // 패턴 종료 처리
+                EndSummonPattern();
+                break;
+        }
+        
+        // 소환된 로봇 리스트 정리
+        CleanupRobotList();
+    }
+    
     // 패턴 초기화
     protected override void InitializePhasePatterns()
     {
         // 박치기 패턴 노드 생성
         headbuttPatternNode = CreatePatternNode(HeadbuttPattern);
         
+        // 소환 패턴 노드 생성
+        summonPatternNode = CreatePatternNode(SummonPattern);
+        
         // 페이즈 1 패턴: 박치기
         AddPatternToPhase(1, headbuttPatternNode, true);
+        AddPatternToPhase(1, summonPatternNode, false);
     }
 
     // 공격 상태 설정
@@ -273,6 +388,26 @@ public class ManagerRobotBoss : BossBT
                 case HeadbuttState.None:
                     break;
             }
+        }
+    }
+
+    // 소환 상태 설정
+    private void SetSummonState(SummonState newState)
+    {
+        currentSummonState = newState;
+        blackboard.SetValue("SummonState", (int)newState);
+        
+        // 상태별 추가 처리 (애니메이션)
+        switch (newState)
+        {
+            case SummonState.Ascending:
+                break;
+            case SummonState.Summoning:
+                break;
+            case SummonState.Descending:
+                break;
+            case SummonState.Ending:
+                break;
         }
     }
     
@@ -324,7 +459,7 @@ public class ManagerRobotBoss : BossBT
         Sequence chaseSequence = new Sequence();
         ConditionNode isPlayerDetected = new ConditionNode(() => blackboard.GetValue<bool>("PlayerDetected"));
         ConditionNode isNotUsingPattern = new ConditionNode(() => !blackboard.GetValue<bool>("IsUsingPattern"));
-        ConditionNode isOutOfAttackRange = new ConditionNode(() => !IsTargetInBasicAttackRange());
+        ConditionNode isOutOfAttackRange = new ConditionNode(() => !IsTargetInAttackRange());
         ActionNode chaseAction = new ActionNode(ChaseTarget);
         chaseSequence.AddChild(isPlayerDetected);
         chaseSequence.AddChild(isNotUsingPattern);
@@ -362,7 +497,7 @@ public class ManagerRobotBoss : BossBT
         // 조건 노드들
         ConditionNode isNotHit = new ConditionNode(() => !blackboard.GetValue<bool>("IsHit"));
         ConditionNode isPlayerDetected = new ConditionNode(() => blackboard.GetValue<bool>("PlayerDetected"));
-        ConditionNode isInAttackRange = new ConditionNode(IsTargetInBasicAttackRange);
+        ConditionNode isInAttackRange = new ConditionNode(IsTargetInAttackRange);
         ConditionNode canAttackNow = new ConditionNode(() => blackboard.GetValue<bool>("CanBasicAttack"));
         ConditionNode isNotUsingPattern = new ConditionNode(() => !blackboard.GetValue<bool>("IsUsingPattern"));
         ConditionNode isNotInAttackState = new ConditionNode(() => currentAttackState == AttackState.None);
@@ -499,13 +634,49 @@ public class ManagerRobotBoss : BossBT
         return NodeState.Running;
     }
     
+    // 소환 패턴 메서드
+    private NodeState SummonPattern()
+    {
+        // 이미 소환 중이면 진행 중 상태 반환
+        if (currentSummonState != SummonState.None)
+        {
+            // 패턴이 종료되었으면 성공 상태 반환
+            if (currentSummonState == SummonState.Ending)
+            {
+                SetSummonState(SummonState.None);
+                return NodeState.Success;
+            }
+            return NodeState.Running;
+        }
+        
+        // 소환 쿨다운 중이면 실패
+        if (!canSummon)
+        {
+            return NodeState.Failure;
+        }
+        
+        // 움직임 정지
+        if (movement != null)
+        {
+            movement.MoveTo(0);
+        }
+        
+        // 플레이어 방향 확인
+        if (target != null)
+        {
+            float direction = Mathf.Sign(target.position.x - transform.position.x);
+            SetDirection(direction);
+        }
+        
+        // 패턴 시작
+        StartSummonPattern();
+
+        return NodeState.Running;
+    }
+    
     // 공격 실행
     private void ExecuteAttack()
     {
-        if (attackPoint != null)
-        {
-            Debug.Log($"[ManagerRobotBoss] Executing attack at position: {attackPoint.position}");
-        }
         // 시각 효과 및 소리 재생
         
         // 공격 방향에 따른 히트박스 위치 조정
@@ -535,7 +706,7 @@ public class ManagerRobotBoss : BossBT
     }
     
     // 플레이어가 기본 공격 범위 내에 있는지 확인
-    private bool IsTargetInBasicAttackRange()
+    protected override bool IsTargetInAttackRange()
     {
         if (target == null)
             return false;
@@ -578,14 +749,14 @@ public class ManagerRobotBoss : BossBT
     private void PerformHeadbuttMovement()
     {
         // 현재 방향으로 일덩 속도 이동
-        transform.position += (Vector3)(headbuttDirection * headbuttSpeed * Time.deltaTime);
+        transform.position += (Vector3)(headbuttDirection * (headbuttSpeed * Time.deltaTime));
     }
     
     // 벽 충돌 감지
     private void CheckWallCollision()
     {
         // 짧은 레이캐스트로 전방 벽 충돌 확인
-        Vector2 rayOrigin = (Vector2)transform.position + new Vector2(Mathf.Sign(headbuttDirection.x) * 2.5f, -2.5f);
+        Vector2 rayOrigin = (Vector2)transform.position + new Vector2(Mathf.Sign(headbuttDirection.x) * 3f, -2.5f);
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, headbuttDirection, wallCheckDistance, headbuttLayer);
         
         // 디버그 레이 표시
@@ -649,6 +820,314 @@ public class ManagerRobotBoss : BossBT
         }
     }
     
+    // 소환 패턴 시작
+    private void StartSummonPattern()
+    {
+        // 시작 시 상태 저장
+        originalPosition = transform.position;
+        originalRotation = transform.rotation;
+        
+        // 리지드바디 상태 저장
+        if (rb != null)
+        {
+            wasGravityEnabled = rb.gravityScale > 0;
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            
+            movement.DisableGravity();
+
+            if (useDirectPositioning)
+            {
+                rb.isKinematic = true;
+            }
+        }
+        
+        // 무적 설정
+        SetInvulnerable(true);
+        
+        // 소환된 로봇 리스트 초기화
+        summonedRobots.Clear();
+        
+        // 타이머 초기화
+        summonStateTimer = 0f;
+        
+        // 소환 상태로 전환
+        SetSummonState(SummonState.Ascending);
+        
+        // 소환 애니메이션 (필요시)
+    }
+    
+    // 소환 패턴 종료
+    private void EndSummonPattern()
+    {
+        // 남은 로봇 모두 제거 
+        foreach (GameObject robot in summonedRobots)
+        {
+            if (robot != null)
+            {
+                Destroy(robot);
+            }
+        }
+        summonedRobots.Clear();
+        
+        // 원래 상태로 복구
+        transform.position = originalPosition;
+        transform.rotation = originalRotation;
+        
+        // 리지드바디 상태 복구
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.gravityScale = wasGravityEnabled ? 1f : 0f;
+        }
+        
+        // 무적 상태 원래대로 복구
+        SetInvulnerable(false);
+        
+        // 쿨다운 설정
+        canSummon = false;
+        StartCoroutine(SummonCooldownRoutine());
+    }
+    
+    // 천장으로 이동
+    private void MoveTowardsCeiling(float progress)
+    {
+        // 천장 위치 계산
+        Vector3 ceilingPosition;
+
+        if (ceilingPoint != null)
+        {
+            // 지정된 천장 지점 사용
+            ceilingPosition = ceilingPoint.position;
+        }
+        else
+        {
+            ceilingPosition = originalPosition + new Vector3(0, ceilingHeight, 0);
+        }
+        
+        // 회전 설정 
+        Quaternion ceilingRotation = Quaternion.Euler(0, 0, 180f);
+        
+        if (useDirectPositioning)
+        {
+            // 직접 위치 설정
+            transform.position = Vector3.Lerp(originalPosition, ceilingPosition, progress);
+            transform.rotation = Quaternion.Slerp(originalRotation, ceilingRotation, progress);
+        }
+        else
+        {
+            // 리지드바디로 이동
+            if (rb != null)
+            {
+                Vector3 targetPosition = Vector3.Lerp(originalPosition, ceilingPosition, progress);
+                rb.MovePosition(targetPosition);
+                
+                rb.MoveRotation(Quaternion.Slerp(originalRotation, ceilingRotation, progress));
+            }
+        }
+    }
+    
+    // 천장에서 내려오기
+    private void MoveFromCeiling(float progress)
+    {
+        // 천장 위치 계산
+        Vector3 ceilingPosition;
+        if (ceilingPoint != null)
+        {
+            ceilingPosition = ceilingPoint.position;
+        }
+        else
+        {
+            ceilingPosition = originalPosition + new Vector3(0, ceilingHeight, 0);
+        }
+        
+        // 회전 설정
+        Quaternion ceilingRotation = Quaternion.Euler(0, 0, 180f);
+
+        if (useDirectPositioning)
+        {
+            // 반대 방향으로 보간
+            transform.position = Vector3.Lerp(ceilingPosition, originalPosition, progress);
+            transform.rotation = Quaternion.Slerp(ceilingRotation, originalRotation, progress);
+        }
+        else
+        {
+            if (rb != null)
+            {
+                Vector3 targetPosition = Vector3.Lerp(ceilingPosition, originalPosition, progress);
+                rb.MovePosition(targetPosition);
+                
+                rb.MoveRotation(Quaternion.Slerp(ceilingRotation, originalRotation, progress));
+            }
+        }
+    }
+    
+    // 초기 로봇 일괄 소환 메서드
+    private void SpawnInitialRobotBatch()
+    {
+        // 로봇 프리팹 체크
+        if (robotPrefabs == null || robotPrefabs.Length == 0)
+        {
+            return;
+        }
+        
+        // 초기에 5개 로봇 소환
+        for (int i = 0; i < initialRobotCount; i++)
+        {
+            // 소환 위치 계산 
+            Vector2 spawnPos = CalculateSpawnPosition(i, initialRobotCount);
+            
+            // 랜덤 로봇 선택
+            int randomIndex = Random.Range(0, robotPrefabs.Length);
+            GameObject robotPrefab = robotPrefabs[randomIndex];
+
+            if (robotPrefab == null) continue;
+            
+            // 로봇 생성
+            GameObject robot = Instantiate(robotPrefab, spawnPos, Quaternion.identity);
+            
+            // 리스트에 추가
+            summonedRobots.Add(robot);
+        }
+    }
+    
+    // 로봇 소환
+    private void SpawnRobot()
+    {
+        if (robotPrefabs == null || robotPrefabs.Length == 0)
+        {
+            return;
+        }
+        
+        // 랜덤 로봇 선택
+        int randomIndex = Random.Range(0, robotPrefabs.Length);
+        GameObject robotPrefab = robotPrefabs[randomIndex];
+
+        if (robotPrefab == null) return;
+        
+        // 소환 위치 계산 (보스 주변)
+        Vector2 spawnPos = CalculateSpawnPosition();
+        
+        // 로봇 생성
+        GameObject robot = Instantiate(robotPrefab, spawnPos, Quaternion.identity);
+        
+        // 리스트에 추가
+        summonedRobots.Add(robot);
+        
+    }
+
+    private Vector2 CalculateSpawnPosition(int index, int totalCount)
+    {
+        // 기본 위치
+        Vector2 basePosition = new Vector2(transform.position.x, originalPosition.y);
+        
+        // 소환 범위
+        float spawnWidth = 10f;
+        
+        // 플레이어 위치 고려
+        float playerOffset = 0f;
+        if (target != null)
+        {
+            playerOffset = target.position.x - transform.position.x;
+            // 범위 제한
+            playerOffset = Mathf.Clamp(playerOffset, -5f, 5f);
+        }
+        
+        // 분포 계산
+        float fraction = (float)index / (totalCount - 1);
+        float positionX;
+
+        if (totalCount <= 1)
+        {
+            positionX = basePosition.x + playerOffset;
+        }
+        else
+        {
+            positionX = basePosition.x - spawnWidth / 2 + spawnWidth * fraction + playerOffset * 0.5f;
+        }
+        
+        // 최종 위치 계산
+        Vector2 spawnPos = new Vector2(positionX, basePosition.y);
+        
+        // 바닥 레이캐스트로 확인
+        RaycastHit2D floorHit = Physics2D.Raycast(spawnPos + Vector2.up * 5f, Vector2.down, 10f, groundLayer);
+        if (floorHit.collider != null)
+        {
+            spawnPos.y = floorHit.point.y + 1f;
+        }
+        
+        return spawnPos;
+    }
+    
+    // 소환 위치 계산
+    private Vector2 CalculateSpawnPosition()
+    {
+        // 기본 위치
+        Vector2 basePosition = new Vector2(transform.position.x, originalPosition.y);
+        
+        // 소환 방향 랜덤화
+        float spawnDir = (target != null && Random.value < 0.7f) 
+            ? Mathf.Sign(target.position.x - transform.position.x)
+            : (Random.value < 0.5f ? 1f : -1f);
+        
+        // 소환 거리 랜덤화
+        float spawnDistance = Random.Range(3f, 7f);
+        
+        // 최종 위치 계산
+        Vector2 spawnPos = basePosition + new Vector2(spawnDir * spawnDistance, 0);
+        
+        // 바닥 레이캐스트 확인
+        RaycastHit2D floorHit = Physics2D.Raycast(spawnPos + Vector2.up * 5f, Vector2.down, 10f, groundLayer);
+        if (floorHit.collider != null)
+        {
+            spawnPos.y = floorHit.point.y + 1f;
+        }
+        
+        return spawnPos;
+    }
+    
+    // 소환된 로봇 리스트 정리
+    private void CleanupRobotList()
+    {
+        for (int i = summonedRobots.Count - 1; i >= 0; i--)
+        {
+            GameObject robot = summonedRobots[i];
+
+            if (robot == null || !robot.activeInHierarchy || robot.Equals(null))
+            {
+                summonedRobots.RemoveAt(i);
+                Debug.Log($"Removed {robot.name}");
+            }
+        }
+    }
+    
+    // 무적 설정
+    private void SetInvulnerable(bool invulnerable)
+    {
+        // 무적 플래그 설정
+        isInvulnerable = invulnerable;
+        
+        // 무적 상태일 때
+    }
+    
+    // 소환 쿨다운 코루틴
+    private IEnumerator SummonCooldownRoutine()
+    {
+        yield return new WaitForSeconds(summonCooldown);
+        canSummon = true;
+        blackboard.SetValue("CanSummon", true);
+    }
+    
+    // 데미지 처리 오버라이드
+    public override void DecreaseHp(int damage, bool isThrownWeapon = false)
+    {
+        // 무적 상태면 데미지 무시
+        if (isInvulnerable)
+            return;
+        
+        base.DecreaseHp(damage, isThrownWeapon);
+    }
+    
     // 애니메이션 이벤트 (애니메이션에서 호출 가능)
     public void OnAttackHitFrame()
     {
@@ -670,46 +1149,38 @@ public class ManagerRobotBoss : BossBT
         if (currentPhase == 1)
         {
             int headbuttIndex = -1;
+            int summonIndex = -1;
 
+            // 패턴 인덱스 찾기
             for (int i = 0; i < phasePatterns[currentPhase].Count; i++)
             {
                 if (phasePatterns[currentPhase][i] == headbuttPatternNode)
                 {
                     headbuttIndex = i;
-                    break;
+                }
+                else if (phasePatterns[currentPhase][i] == summonPatternNode)
+                {
+                    summonIndex = i;
                 }
             }
             
             // 패턴 가용성 확인
             bool canUseHeadbuttNow = canHeadbutt && currentHeadbuttState == HeadbuttState.None;
+            bool canUseSummonNow = canSummon && currentSummonState == SummonState.None;
             
-            // 패턴 2개가 모두 사용 가능하면 박치기 우선
-            if (canUseHeadbuttNow && phasePatterns[currentPhase].Count > 1)
+            // 패턴 선택 로직
+            if (canUseHeadbuttNow && canUseSummonNow)
             {
                 return headbuttIndex;
             }
-            // 박치기만 사용 가능하면
             else if (canUseHeadbuttNow)
             {
                 return headbuttIndex;
             }
-            // 다른 패턴만 사용 가능하면 해당 패턴 사용
-            else if (phasePatterns[currentPhase].Count > 1)
+            else if (canUseSummonNow)
             {
-                // 박치기가 아닌 첫 번째 패턴 찾기
-                for (int i = 0; i < phasePatterns[currentPhase].Count; i++)
-                {
-                    if (i != headbuttIndex)
-                    {
-                        return i;
-                    }
-                }
+                return summonIndex;
             }
-        }
-        // 페이즈가 0이거나 다른 페이즈의 경우 첫 번째 패턴 사용
-        else if (phasePatterns[currentPhase].Count > 0)
-        {
-            return 0;
         }
 
         return -1;

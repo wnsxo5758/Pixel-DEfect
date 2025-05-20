@@ -343,6 +343,8 @@ public class BossBT : EnemyBT
         // UI 업데이트
         UpdateBossUI();
         
+        Debug.Log($"스턴 카운트: {stunCount}");
+        
         // 기절 임계값에 도달하면 기절 적용
         if (stunCount >= stunThreshold)
         {
@@ -373,7 +375,7 @@ public class BossBT : EnemyBT
         blackboard.SetValue("StunTimer", stunTimer);
         
         // 기절 시각 효과 표시
-        
+        Debug.Log("보스가 스턴에 걸림");
         // 기절 애니메이션
         
         // UI 업데이트
