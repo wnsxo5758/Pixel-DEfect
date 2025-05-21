@@ -235,6 +235,16 @@ public class PlayerHp : MonoBehaviour
     {
         return currentHitStunDuration;
     }
+
+    public int GetCurrentHp()
+    {
+        return currentHp;
+    }
+
+    public void SetHp(int newHp)
+    {
+        currentHp = newHp;
+    }
     
     public void IncreaseHp()  // 체력 회복
     {

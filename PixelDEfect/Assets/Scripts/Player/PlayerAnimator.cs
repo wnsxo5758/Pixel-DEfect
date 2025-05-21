@@ -25,6 +25,7 @@ public class PlayerAnimator : MonoBehaviour
     private MovementRigidbody2D movement; // 움직임
     private PlayerAttack playerAttack; // 플레이어 공격
     private PlayerInteraction playerInteraction; // 상호작용
+    private PlayerHp playerHp; // HP
 
     private float pnpDirection;
     
@@ -175,7 +176,7 @@ public class PlayerAnimator : MonoBehaviour
         GameManager gameManager = FindObjectOfType<GameManager>();
         if (gameManager != null)
         {
-            gameManager.RestartGame();
+            gameManager.PlayerDied();
         }
     }
 }
