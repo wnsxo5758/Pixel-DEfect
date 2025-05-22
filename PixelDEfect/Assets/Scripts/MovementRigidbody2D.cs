@@ -144,6 +144,18 @@ public class MovementRigidbody2D : MonoBehaviour
         rigid.velocity = Vector2.zero;
     }
 
+    public void EnableRigidbody()
+    {
+        if (rigid != null)
+        {
+            rigid.isKinematic = false;
+            rigid.simulated = true;
+            rigid.velocity = Vector2.zero;
+            rigid.angularVelocity = 0f;
+            rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+    }
+
     public void SetVelocity(Vector2 velocity)
     {
         rigid.velocity = velocity;

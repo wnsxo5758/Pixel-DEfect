@@ -98,9 +98,20 @@ public class CheckpointManager : MonoBehaviour
 
             if (playerHp != null)
             {
-                playerHp.SetHp(savedPlayerHealth);
+                playerHp.SetHp(playerHp.GetMaxHp());
             }
         }
+    }
+
+    public void TeleportToCheckpoint(GameObject player)
+    {
+        if (currentCheckpointID == -1 || player == null)
+        {
+            GameManager.Instance.RestartGame();
+            return;
+        }
+        
+        player.transform.position = respawnPosition;
     }
     
     // 체크포인트 상태 확인

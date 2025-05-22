@@ -477,7 +477,7 @@ public class PlayerAttack : MonoBehaviour
         }
         else
         {
-            adjustedStartPosition = weaponPosition;
+            adjustedStartPosition = weaponPosition + Vector2.up;
         }
         
         RaycastHit2D[] pathHits = Physics2D.LinecastAll(adjustedStartPosition, position, weapon.StickLayers);
@@ -508,6 +508,41 @@ public class PlayerAttack : MonoBehaviour
     {
         yield return new WaitForSeconds(teleportCooldown);
         canTeleport = true;
+    }
+    
+    // 낙사한 무기를 플레이어에게 즉시 픽업
+    public void RecallWeaponFromFall(ThrownWeapon weapon)
+    {
+        if (weapon == null) return;
+
+        if (hasWeapon)
+        {
+            Destroy(weapon.gameObject);
+            return;
+        }
+        
+        // 즉시 무기 픽업
+        RecallWeaponInstant(weapon);
+    }
+    
+    // 즉시 무기 픽업
+    public void RecallWeaponInstant(ThrownWeapon weapon)
+    {
+        if (weapon == null) return;
+
+        WeaponBase weaponData = weapon.GetWeaponData();
+        if (weaponData != null)
+        {
+            EquipWeapon(weaponData);
+        }
+
+        if (lastThrownWeapon == weapon)
+        {
+            lastThrownWeapon = null;
+            canTeleport = false;
+        }
+        
+        Destroy(weapon.gameObject);
     }
     
     // 플레이어가 공격 가능한 상태인지 확인

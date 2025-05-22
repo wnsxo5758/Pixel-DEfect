@@ -29,6 +29,36 @@ public class GameManager : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
     }
 
+    public void ProcessPlayerFall(GameObject player, int fallDamage)
+    {
+        if (player == null) return;
+        
+        StartCoroutine(FallRespawnProcess(player, fallDamage));
+    }
+
+    private IEnumerator FallRespawnProcess(GameObject player, int fallDamage)
+    {
+        PlayerHp playerHp = player.GetComponent<PlayerHp>();
+        if (playerHp != null)
+        {
+            playerHp.TakeFallDamage(fallDamage);
+
+            if (playerHp.GetCurrentHp() <= 0)
+            {
+                PlayerDied();
+                yield break;
+            }
+            
+            playerHp.OnInvincibility(2f);
+        }
+
+        // 즉시 체크포인트로 이동
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.TeleportToCheckpoint(player);
+        }
+    }
+    
     public void PlayerDied()
     {
         DisableTimeEvents();
@@ -47,47 +77,24 @@ public class GameManager : MonoBehaviour
     
     private IEnumerator RespawnProcess()
     {
-        if (player != null)
-        {
-            PlayerController controller = player.GetComponent<PlayerController>();
-            if (controller != null)
-            {
-                controller.enabled = false;
-            }
-        }
-        
         // 딜레이 
         yield return new WaitForSeconds(respawnDelay);
         
         // 체크포인트 매니저가 있는지 확인
-        if (CheckpointManager.Instance != null)
+        if (CheckpointManager.Instance != null && player != null)
         {
-            // 플레이어 위치 및 상태 복원
-            RespawnPlayer();
-            
-            // 플레이어 활성화 및 컨트롤러 복원
-            if (player != null)
+            PlayerController controller = player.GetComponent<PlayerController>();
+            if (controller != null)
             {
-                PlayerController controller = player.GetComponent<PlayerController>();
-                if (controller != null)
-                {
-                    controller.enabled = true;
-                }
-                
-                // 체크포인트에서 부활
-                CheckpointManager.Instance.RespawnCheckpoint(player);
+                controller.ResetOnRespawn();
             }
+            
+            CheckpointManager.Instance.RespawnCheckpoint(player);
         }
         else
         {
             RestartGame();
         }
-    }
-
-    // 플레이어 부활 및 상태 복원
-    private void RespawnPlayer()
-    {
-        if (player == null) return;
     }
     
     public void RestartGame()

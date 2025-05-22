@@ -309,6 +309,22 @@ public class PlayerController : MonoBehaviour
     {
         DisablePlayerControl();
     }
+
+    public void ResetOnRespawn()
+    {
+        if (playerHp != null)
+        {
+            playerHp.ResetDeathState();
+        }
+        
+        EnablePlayerControl();
+        
+        ChangeState(new PlayerStates.Idle());
+
+        ResetAllPlayerStates();
+
+        ResetAnimationsToCurrentState();
+    }
     
     private void DisablePlayerControl()
     {
@@ -330,6 +346,55 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void EnablePlayerControl()
+    {
+        // 물리 속성 다시 활성화
+        if (movement != null)
+        {
+            movement.EnableRigidbody();
+        }
+
+        if (playerAttack != null)
+        {
+            playerAttack.enabled = true;
+        }
+
+        if (playerInteraction != null)
+        {
+            playerInteraction.enabled = true;
+        }
+    }
+
+    private void ResetAllPlayerStates()
+    {
+        // 입력 변수 초기화
+        moveInput = Vector2.zero;
+        
+        // 상호작용 관련 초기화
+        canInteract = false;
+        currentInteractionType = PlayerInteraction.InteractionType.None;
+        
+        // 액션 관련 초기화
+        canRoll = true;
+        
+        // 특수 상태 초기화
+        IsOnLadder = false;
+        WantToStand = false;
+    }
+
+    private void ResetAnimationsToCurrentState()
+    {
+        if (animator != null)
+        {
+            
+            animator.SetCrouchAnim(false);
+            animator.SetClimbAnim(false);
+            animator.SetHasWeapon(playerAttack != null && playerAttack.HasWeapon());
+
+            animator.ResetAllAnimationStates();
+        }
+    }
+    
     public void ChangeState(State<PlayerController> newState)
     {
         stateMachine.ChangeState(newState);

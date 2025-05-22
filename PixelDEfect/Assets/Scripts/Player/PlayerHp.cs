@@ -177,14 +177,14 @@ public class PlayerHp : MonoBehaviour
         {
             rigid.velocity = Vector2.zero; // 속도 0으로
             rigid.angularVelocity = 0f;    // 회전속도도 정지
-            rigid.constraints = RigidbodyConstraints2D.FreezePositionX; // x위치 고정
+            rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation; // x위치 고정
         }
         playerAnimator.TriggerDeathAnim();
         OnPlayerDeath?.Invoke();
     }
 
     
-    private void OnInvincibility(float time) // 무적상태
+    public void OnInvincibility(float time) // 무적상태
     {
         if (isInvincible)
         {
@@ -231,11 +231,39 @@ public class PlayerHp : MonoBehaviour
         isHit = false;
     }
 
+    public void ResetDeathState()
+    {
+        isDead = false;
+        isHit = false;
+        
+        // 체력을 최대 체력으로 설정
+        SetHp(GetMaxHp());
+        
+        // 무적 상태 설정
+        OnInvincibility(2f);
+    }
+
+    public void TakeFallDamage(int damage)
+    {
+        currentHp -= damage;
+        currentHp = Mathf.Max(0, currentHp);
+
+        if (uiPlayer != null)
+        {
+            uiPlayer.SetHpAll(currentHp);
+        }
+    }
+    
     public float GetCurrentHitStunDuration()
     {
         return currentHitStunDuration;
     }
 
+    public int GetMaxHp()
+    {
+        return maxHp;
+    }
+    
     public int GetCurrentHp()
     {
         return currentHp;

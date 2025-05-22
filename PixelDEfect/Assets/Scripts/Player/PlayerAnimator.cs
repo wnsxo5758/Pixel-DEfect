@@ -20,6 +20,7 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int throwWeapon = Animator.StringToHash("Throw");
     private readonly int hit = Animator.StringToHash("Hit");
     private readonly int death = Animator.StringToHash("Death");
+    private readonly int revive = Animator.StringToHash("Revive");
     
     private Animator animator; // 애니메이션 
     private MovementRigidbody2D movement; // 움직임
@@ -169,6 +170,25 @@ public class PlayerAnimator : MonoBehaviour
     private void FinishedThrowWeaponEvent()
     {
         playerAttack.FinishedThrowAnim();
+    }
+
+    public void ResetAllAnimationStates()
+    {
+        animator.SetBool(isGrounded, true);
+        animator.SetBool(isCrouching, false);
+        animator.SetBool(isClimbing, false);
+        animator.SetBool(isConnected, false);
+        animator.SetBool(hasWeapon, playerAttack.HasWeapon());
+        
+        animator.ResetTrigger(jump);
+        animator.ResetTrigger(roll);
+        animator.ResetTrigger(stopRoll);
+        animator.ResetTrigger(attack);
+        animator.ResetTrigger(throwWeapon);
+        animator.ResetTrigger(hit);
+        animator.ResetTrigger(death);
+        
+        animator.SetTrigger(revive);
     }
     
     private void RestartGameEvent()
