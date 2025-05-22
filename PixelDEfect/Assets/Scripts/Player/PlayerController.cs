@@ -7,6 +7,10 @@ public class PlayerController : MonoBehaviour
     [Header("스테이지")]
     [SerializeField] private StageData stageData;
 
+    [Header("디버그 설정")] 
+    [SerializeField] private bool enableDeveloperDebug = false;
+    
+
     [Header("웅크리기")] 
     [SerializeField] private float crouchCheckDistance = 0.5f;
     [SerializeField] private LayerMask aboveLayer;
@@ -411,7 +415,15 @@ public class PlayerController : MonoBehaviour
     }
     
     public bool IsGrounded() => movement.IsGrounded;
-    
+
+    public void DebugDeath(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Performed && enableDeveloperDebug)
+        {
+            playerHp.TriggerDebugDeath();
+        }
+    }
+        
     public void OnDestroy()
     {
         if (playerHp != null)

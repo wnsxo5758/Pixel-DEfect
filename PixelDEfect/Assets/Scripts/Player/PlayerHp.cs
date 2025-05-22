@@ -305,4 +305,11 @@ public class PlayerHp : MonoBehaviour
         uiPlayer.SetHpAll(currentHp); // 전체 갱신
         isHealing = false;
     }
+
+    public void TriggerDebugDeath()
+    {
+        if (isDead) return;
+
+        Die();
+    }
 }

@@ -98,6 +98,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DebugDeath"",
+                    ""type"": ""Button"",
+                    ""id"": ""d638bf1a-1e10-4321-9595-26fe0679d470"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -232,6 +241,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Teleport"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""642e661a-4598-4af4-b1c8-495528706500"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugDeath"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -265,6 +285,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_MeleeAttack = m_Player.FindAction("MeleeAttack", throwIfNotFound: true);
         m_Player_Throw = m_Player.FindAction("Throw", throwIfNotFound: true);
         m_Player_Teleport = m_Player.FindAction("Teleport", throwIfNotFound: true);
+        m_Player_DebugDeath = m_Player.FindAction("DebugDeath", throwIfNotFound: true);
     }
 
     ~@PlayerInput()
@@ -339,6 +360,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MeleeAttack;
     private readonly InputAction m_Player_Throw;
     private readonly InputAction m_Player_Teleport;
+    private readonly InputAction m_Player_DebugDeath;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -351,6 +373,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @MeleeAttack => m_Wrapper.m_Player_MeleeAttack;
         public InputAction @Throw => m_Wrapper.m_Player_Throw;
         public InputAction @Teleport => m_Wrapper.m_Player_Teleport;
+        public InputAction @DebugDeath => m_Wrapper.m_Player_DebugDeath;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -384,6 +407,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Teleport.started += instance.OnTeleport;
             @Teleport.performed += instance.OnTeleport;
             @Teleport.canceled += instance.OnTeleport;
+            @DebugDeath.started += instance.OnDebugDeath;
+            @DebugDeath.performed += instance.OnDebugDeath;
+            @DebugDeath.canceled += instance.OnDebugDeath;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -412,6 +438,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Teleport.started -= instance.OnTeleport;
             @Teleport.performed -= instance.OnTeleport;
             @Teleport.canceled -= instance.OnTeleport;
+            @DebugDeath.started -= instance.OnDebugDeath;
+            @DebugDeath.performed -= instance.OnDebugDeath;
+            @DebugDeath.canceled -= instance.OnDebugDeath;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -448,5 +477,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnMeleeAttack(InputAction.CallbackContext context);
         void OnThrow(InputAction.CallbackContext context);
         void OnTeleport(InputAction.CallbackContext context);
+        void OnDebugDeath(InputAction.CallbackContext context);
     }
 }

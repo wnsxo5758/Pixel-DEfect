@@ -45,7 +45,7 @@ public class CheckpointManager : MonoBehaviour
     public void SetActiveCheckpoint(int id, Vector3 position)
     {
         currentCheckpointID = id;
-        respawnPosition = position;
+        respawnPosition = position + Vector3.down * 3;
         
         // 체크포인트 상태 저장
         CheckpointData data = new CheckpointData
