@@ -17,8 +17,10 @@ public class ElevatorController : MonoBehaviour
     public bool IsAtUpperFloor => isAtUpperFloor;
     public bool IsMoving => isMoving;
 
+    private Animator animator;
     private void Awake()
     {
+        animator = GetComponentInChildren<Animator>();
         downFloorPosition = transform.position;
     }
 
@@ -33,7 +35,7 @@ public class ElevatorController : MonoBehaviour
     private IEnumerator MoveElevator(Vector3 destination)
     {
         isMoving = true;
-
+        animator.SetBool("isMove", true);
         // 내부 버튼 비활성화
         if (internalButton != null)
             internalButton.SetInteractable(false);
@@ -50,6 +52,7 @@ public class ElevatorController : MonoBehaviour
 
         // 도착 후 내부 버튼 다시 활성화
         if (internalButton != null)
-            internalButton.SetInteractable(true);
+            animator.SetBool("isMove", false);
+        internalButton.SetInteractable(true);
     }
 }
