@@ -27,8 +27,14 @@ public class ElevatorController : MonoBehaviour
     public void RequestMove()
     {
         Debug.Log("이동 명령받음");
+
         if (isMoving) return;
         Vector3 destination = isAtUpperFloor ? downFloorPosition : upFloorTransform.position;
+        if(animator != null)
+        {
+            bool isGoingUp = destination.y > transform.position.y;
+            animator.SetBool("isUp", isGoingUp);
+        }
         StartCoroutine(MoveElevator(destination));
     }
 
