@@ -459,6 +459,8 @@ namespace PlayerStates
             animator = player.GetComponentInChildren<PlayerAnimator>();
             
             movement.MoveTo(0f);
+
+            animator.SetValveAnim(true);
         }
 
         public override void Execute(PlayerController player)
@@ -471,6 +473,7 @@ namespace PlayerStates
 
         public override void Exit(PlayerController player)
         {
+            animator.SetValveAnim(false);
         }
     }
 

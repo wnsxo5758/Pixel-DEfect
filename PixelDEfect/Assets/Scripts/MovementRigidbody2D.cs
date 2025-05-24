@@ -152,6 +152,7 @@ public class MovementRigidbody2D : MonoBehaviour
             rigid.simulated = true;
             rigid.velocity = Vector2.zero;
             rigid.angularVelocity = 0f;
+            rigid.gravityScale = highGravityScale;
             rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
     }

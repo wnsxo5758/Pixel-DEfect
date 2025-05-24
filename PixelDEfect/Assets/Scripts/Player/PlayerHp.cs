@@ -36,10 +36,15 @@ public class PlayerHp : MonoBehaviour
     private bool isHealing; // 회복 중인가
     private bool isInvincible; // 무적인가
 
+    private DeathCause lastDeathCause = DeathCause.None;
+    private DeathData currentDeathData;
+    
     public event Action OnPlayerDeath;
+    public event Action<DeathCause> OnPlayerDeathWithCause;
     public int CurrentHp => currentHp;
     public bool IsHit { get => isHit; set => isHit = value; }
     public bool IsDead => isDead;
+    public DeathCause LastDeathCause => lastDeathCause;
     public int CurrentMedicKit
     {
         set => Mathf.Clamp(value, 0, maxHp);
@@ -59,7 +64,7 @@ public class PlayerHp : MonoBehaviour
     }
 
     // 일반적인 데미지 처리 (경직만 있음)
-    public void DecreaseHp(int damage, bool canDodge = false, bool canFreeze = false)
+    public void DecreaseHp(int damage, DeathData deathData, bool canDodge = false, bool canFreeze = false)
     {
         if (isDead) return;
         
@@ -78,8 +83,9 @@ public class PlayerHp : MonoBehaviour
         if (currentHp <= 0)
         {
             Debug.Log("플레이어 사망");
-            
             currentHp = 0;
+            currentDeathData = deathData;
+            lastDeathCause = deathData.cause;
             Die();
         }
         else
@@ -93,7 +99,7 @@ public class PlayerHp : MonoBehaviour
     }
 
     // 넉백이 포함된 데미지 처리
-    public void DecreaseHp(int damage, Vector2 knockBack, bool canDodge = false)
+    public void DecreaseHp(int damage, Vector2 knockBack, DeathData deathData, bool canDodge = false)
     {
         if (isDead) return;
         
@@ -113,6 +119,8 @@ public class PlayerHp : MonoBehaviour
             Debug.Log("플레이어 사망");
             
             currentHp = 0;
+            currentDeathData = deathData;
+            lastDeathCause = deathData.cause;
             Die();
         }
         else
@@ -128,7 +136,8 @@ public class PlayerHp : MonoBehaviour
     private void HandleHit(Vector2 knockBack)
     {
         var currentState = player.GetCurrentState();
-        bool isSpecialState = currentState is PlayerStates.Climb || currentState is PlayerStates.Hold;
+        bool isSpecialState = currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || 
+                              currentState is PlayerStates.Valve || currentState is PlayerStates.Attack;
         
         // 경직 시간 설정
         currentHitStunDuration = isSpecialState ? specialStunDuration : hitStunDuration;
@@ -172,17 +181,11 @@ public class PlayerHp : MonoBehaviour
         isDead = true;
         currentHp = 0;
 
-        Rigidbody2D rigid = GetComponent<Rigidbody2D>();
-        if(rigid != null)
-        {
-            rigid.velocity = Vector2.zero; // 속도 0으로
-            rigid.angularVelocity = 0f;    // 회전속도도 정지
-            rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation; // x위치 고정
-        }
-        playerAnimator.TriggerDeathAnim();
+        ApplyDeathPhysics();
+        playerAnimator.TriggerDeathAnim(currentDeathData);
         OnPlayerDeath?.Invoke();
+        OnPlayerDeathWithCause?.Invoke(lastDeathCause);
     }
-
     
     public void OnInvincibility(float time) // 무적상태
     {
@@ -231,10 +234,40 @@ public class PlayerHp : MonoBehaviour
         isHit = false;
     }
 
+    private void ApplyDeathPhysics()
+    {
+        switch (currentDeathData.cause)
+        {
+            case DeathCause.MeleeAttack:
+            case DeathCause.RangedAttack:
+            case DeathCause.Laser:
+                rb.velocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+                break;
+            
+            case DeathCause.Press:
+                rb.velocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.isKinematic = true;
+                break;
+            
+            case DeathCause.Drowning:
+                rb.gravityScale = 0.2f;
+                break;
+            
+            default:
+                rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+                break;
+        }
+    }
+    
     public void ResetDeathState()
     {
         isDead = false;
         isHit = false;
+        lastDeathCause = DeathCause.None;
+        currentDeathData = new DeathData();
         
         // 체력을 최대 체력으로 설정
         SetHp(GetMaxHp());
@@ -247,7 +280,7 @@ public class PlayerHp : MonoBehaviour
     {
         currentHp -= damage;
         currentHp = Mathf.Max(0, currentHp);
-
+        
         if (uiPlayer != null)
         {
             uiPlayer.SetHpAll(currentHp);
@@ -310,6 +343,9 @@ public class PlayerHp : MonoBehaviour
     {
         if (isDead) return;
 
+        DeathData deathData = new DeathData(DeathCause.Environmental);
+        currentDeathData = deathData;
+        lastDeathCause = deathData.cause;
         Die();
     }
 }

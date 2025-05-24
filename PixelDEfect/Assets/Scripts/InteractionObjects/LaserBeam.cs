@@ -110,7 +110,8 @@ public class LaserBeam : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            collision.GetComponent<PlayerHp>()?.DecreaseHp(damage);
+            DeathData deathData = new DeathData(DeathCause.Laser);
+            collision.GetComponent<PlayerHp>()?.DecreaseHp(damage, deathData);
         }
         else if (collision.CompareTag("Enemy"))
         {

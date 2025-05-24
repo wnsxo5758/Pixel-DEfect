@@ -15,14 +15,23 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int stopRoll = Animator.StringToHash("StopRoll");
     private readonly int isClimbing = Animator.StringToHash("IsClimbing");
     private readonly int isConnected = Animator.StringToHash("IsConnected");
+    private readonly int turnValve = Animator.StringToHash("TurnValve");
     private readonly int hasWeapon = Animator.StringToHash("HasWeapon");
     private readonly int attack = Animator.StringToHash("Attack");
     private readonly int throwWeapon = Animator.StringToHash("Throw");
     private readonly int hit = Animator.StringToHash("Hit");
-    private readonly int death = Animator.StringToHash("Death");
     private readonly int revive = Animator.StringToHash("Revive");
     
+    // 사망 원인
+    private readonly int death = Animator.StringToHash("Death");
+    private readonly int deathMelee = Animator.StringToHash("DeathMelee");
+    private readonly int deathRanged = Animator.StringToHash("DeathRanged");
+    private readonly int deathPress = Animator.StringToHash("DeathPress");
+    private readonly int deathLaser = Animator.StringToHash("DeathLaser");
+    private readonly int deathDrown = Animator.StringToHash("DeathDrown");
+
     private Animator animator; // 애니메이션 
+    private PlayerController controller;
     private MovementRigidbody2D movement; // 움직임
     private PlayerAttack playerAttack; // 플레이어 공격
     private PlayerInteraction playerInteraction; // 상호작용
@@ -32,10 +41,13 @@ public class PlayerAnimator : MonoBehaviour
     
     // 상태 추적
     private bool isPlayingClimbingAnimation = false;
+
+    private DeathData currentDeathData;
     
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        controller = GetComponentInParent<PlayerController>();
         movement = GetComponentInParent<MovementRigidbody2D>();
         playerAttack = GetComponentInParent<PlayerAttack>();
         playerInteraction = GetComponentInParent<PlayerInteraction>();
@@ -131,6 +143,11 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetFloat(velocityX, pnpDirection * x);
     }
 
+    public void SetValveAnim(bool valveState)
+    {
+        animator.SetBool(turnValve, valveState);
+    }
+
     public void SetHasWeapon(bool weapon)
     {
         animator.SetBool(hasWeapon, weapon);
@@ -146,11 +163,48 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetTrigger(hit);
     }
     
-    public void TriggerDeathAnim()
+    public void TriggerDeathAnim(DeathData deathData)
     {
-        animator.SetTrigger(death);
+        currentDeathData = deathData;
+        
+        TriggerSpecificDeathAnim();
     }
 
+    private void TriggerSpecificDeathAnim()
+    {
+        ResetAllDeathTrigger();
+
+        switch (currentDeathData.cause)
+        {
+            case DeathCause.MeleeAttack:
+                controller.SpriteFlipX(-currentDeathData.direction);
+                animator.SetTrigger(deathMelee);
+                break;
+            
+            case DeathCause.RangedAttack:
+                animator.SetTrigger(deathRanged);
+                break;
+            
+            case DeathCause.Press:
+                animator.SetTrigger(deathPress);
+                break;
+            
+            case DeathCause.Laser:
+                animator.SetTrigger(deathLaser);
+                break;
+            
+            case DeathCause.Drowning:
+                animator.SetTrigger(deathDrown);
+                break;
+            
+            case DeathCause.Fall:
+            case DeathCause.Environmental:
+            default:
+                animator.SetTrigger(death);
+                break;
+        }
+    }
+    
     public void TriggerThrowAnim()
     {
         animator.SetTrigger(throwWeapon);
@@ -189,6 +243,16 @@ public class PlayerAnimator : MonoBehaviour
         animator.ResetTrigger(death);
         
         animator.SetTrigger(revive);
+    }
+
+    private void ResetAllDeathTrigger()
+    {
+        animator.ResetTrigger(death);
+        animator.ResetTrigger(deathMelee);
+        animator.ResetTrigger(deathRanged);
+        animator.ResetTrigger(deathPress);
+        animator.ResetTrigger(deathLaser);
+        animator.ResetTrigger(deathDrown);
     }
     
     private void RestartGameEvent()

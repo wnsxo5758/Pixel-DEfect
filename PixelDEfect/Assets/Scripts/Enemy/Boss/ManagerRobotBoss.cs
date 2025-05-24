@@ -694,7 +694,8 @@ public class ManagerRobotBoss : BossBT
             if (playerHp != null)
             {
                 Vector2 knockBackDirection = new Vector2(direction * knockBackForce, 4 * knockBackForce);
-                playerHp.DecreaseHp(basicAttackDamage, knockBackDirection, true);
+                DeathData deathData = new DeathData(DeathCause.MeleeAttack, GetDirection());
+                playerHp.DecreaseHp(basicAttackDamage, knockBackDirection, deathData,true);
                 
                 // 카메라 효과
                 if (CameraController.Instance != null)
@@ -808,9 +809,10 @@ public class ManagerRobotBoss : BossBT
         {
             // 넉백
             Vector2 knockBackDirection = new Vector2(headbuttDirection.x * knockBackForce, 4 * knockBackForce);
-            
+
+            DeathData deathData = new DeathData(DeathCause.MeleeAttack, GetDirection());
             // 데미지 적용
-            playerHp.DecreaseHp(headbuttDamage, knockBackDirection, true);
+            playerHp.DecreaseHp(headbuttDamage, knockBackDirection, deathData,true);
         }
         
         // 카메라 효과

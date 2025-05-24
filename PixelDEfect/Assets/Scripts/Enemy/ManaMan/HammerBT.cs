@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HammerBT : ManaBT
 {
-    [Header("ÇØ¸Ó Àû °ø°Ý ¼³Á¤")]
+    [Header("ï¿½Ø¸ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")]
     [SerializeField] private float attackRange = 2f;
     [SerializeField] private float attackCooldown = 2f;
     [SerializeField] private int attackDamage = 2;
@@ -126,7 +126,8 @@ public class HammerBT : ManaBT
             PlayerHp hp = hitPlayer.GetComponent<PlayerHp>();
             if (hp != null)
             {
-                hp.DecreaseHp(attackDamage, true, true);
+                DeathData deathData = new DeathData(DeathCause.MeleeAttack, dir);
+                hp.DecreaseHp(attackDamage, deathData,true, true);
             }
         }
     }

@@ -21,7 +21,8 @@ public class ObstacleBase : MonoBehaviour
         if (isInstantDeath)
         {
             // collision.GetComponent<PlayerInteraction>().MoveToSpawnPoint();
-            collision.GetComponent<PlayerHp>().DecreaseHp(damage);
+            DeathData deathData = new DeathData(DeathCause.Environmental);
+            collision.GetComponent<PlayerHp>().DecreaseHp(damage, deathData);
         }
         else if (continuousDamage)
         {
@@ -29,7 +30,8 @@ public class ObstacleBase : MonoBehaviour
         }
         else // ��� ��ֹ��� �ƴ϶�� ü�� ����
         {
-            collision.GetComponent<PlayerHp>().DecreaseHp(damage);
+            DeathData deathData = new DeathData(DeathCause.Environmental);
+            collision.GetComponent<PlayerHp>().DecreaseHp(damage, deathData);
             if(canDestory)
             {
                 StartCoroutine(nameof(ObstacleDestory));
@@ -68,7 +70,8 @@ public class ObstacleBase : MonoBehaviour
     {
         while(true)
         {
-            hp.DecreaseHp(damage);
+            DeathData deathData = new DeathData(DeathCause.Environmental);
+            hp.DecreaseHp(damage, deathData);
             yield return new WaitForSeconds(1f);
         }
     }

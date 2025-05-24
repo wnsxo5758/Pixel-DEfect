@@ -233,7 +233,8 @@ public class MeleeEnemy : EnemyBT
             PlayerHp playerHp = hitPlayer.GetComponent<PlayerHp>();
             if (playerHp != null)
             {
-                playerHp.DecreaseHp(attackDamage, true, true);
+                DeathData deathData = new DeathData(DeathCause.MeleeAttack, direction);
+                playerHp.DecreaseHp(attackDamage, deathData, true, true);
 
                 // 히트 효과
             }
@@ -256,7 +257,8 @@ public class MeleeEnemy : EnemyBT
             PlayerHp playerHp = playerCollider.GetComponent<PlayerHp>();
             if (playerHp != null)
             {
-                playerHp.DecreaseHp(contactDamage, true);
+                DeathData deathData = new DeathData(DeathCause.Environmental);
+                playerHp.DecreaseHp(contactDamage, deathData,true);
 
                 // 쿨다운 적용
                 canDealContactDamage = false;

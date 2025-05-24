@@ -68,7 +68,6 @@ public class MeleeEnemyFSM : EnemyFSM
             PlayerHp playerHp = collision.GetComponent<PlayerHp>();
             if(playerHp != null)
             {
-                playerHp.DecreaseHp(damage);
                 Debug.Log($"{gameObject.name}의 공격이 플레이어에게 {damage}의 데미지 부여");
             }
         }

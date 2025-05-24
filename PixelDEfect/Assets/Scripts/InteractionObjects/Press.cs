@@ -36,7 +36,8 @@ public class Press : MonoBehaviour
                 PlayerHp playerHp = other.GetComponent<PlayerHp>();
                 if (playerHp != null)
                 {
-                    playerHp.Die();
+                    DeathData deathData = new DeathData(DeathCause.Press);
+                    playerHp.DecreaseHp(9999, deathData);
                 }
             }
 

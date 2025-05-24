@@ -64,7 +64,8 @@ public class BulletBase : MonoBehaviour
             PlayerHp playerHp = collision.GetComponent<PlayerHp>();
             if (playerHp != null)
             {
-                playerHp.DecreaseHp(damage, true, true);
+                DeathData deathData = new DeathData(DeathCause.RangedAttack);
+                playerHp.DecreaseHp(damage, deathData,true, true);
             }
         }
 
