@@ -142,14 +142,19 @@ public class HammerBT : ManaBT
         isAttacking = false;
         blackboard.SetValue("IsAttacking", false);
 
-        if (IsInAttackRange())
+        if (IsTargetInAttackRange())
         {
-            Transform target = blackboard.GetValue<Transform>("Target");
-            if (target != null)
+            // 공격 범위 내에 있으면 플레이어 방향만 바라보도록 설정
+            Transform currentTarget = blackboard.GetValue<Transform>("Target");
+            if (currentTarget != null)
             {
-                float dir = Mathf.Sign(target.position.x - transform.position.x);
-                SetDirection(dir);
-                movement?.MoveTo(0);
+                float directionToTarget = Mathf.Sign(currentTarget.position.x - transform.position.x);
+                SetDirection(directionToTarget);
+
+                if (movement != null)
+                {
+                    movement.MoveTo(0);
+                }
             }
         }
     }
