@@ -52,7 +52,7 @@ public class FallZone : MonoBehaviour
             PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
             if (playerAttack != null)
             {
-                playerAttack.RecallWeaponInstant(weapon);
+                playerAttack.RecallWeaponFromFall(weapon);
             }
         }
 

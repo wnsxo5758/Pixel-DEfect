@@ -15,6 +15,7 @@ public class MovementRigidbody2D : MonoBehaviour
     [SerializeField] private float jumpForce; // 점프력
     [SerializeField] private float lowGravityScale; // 약한 중력 (높은 점프시)
     [SerializeField] private float highGravityScale; // 강한 중력 (일반 점프시)
+    [SerializeField] private bool movementLocked = false; // 움직임 잠금
 
     private float moveSpeed; // 현재 움직이는 속도
     private float initialSpeed; // 초기 속도

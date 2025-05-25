@@ -411,41 +411,156 @@ namespace PlayerStates
         }
     }
 
-    public class Teleport : State<PlayerController>
+    public class PullWeapon : State<PlayerController>
     {
         private PlayerAnimator animator;
-        private float teleportDuration = 0.5f;
-        private float teleportTimer;
-        
+        private MovementRigidbody2D movement;
+        private WeaponPullContext pullContext;
+        private bool animationFinished = false;
+
         public override void Enter(PlayerController player)
         {
             animator = player.GetComponentInChildren<PlayerAnimator>();
-            
-            teleportTimer = teleportDuration;
+            movement = player.GetComponent<MovementRigidbody2D>();
 
-            // 이동 중지
-            player.UpdateMove(0f);
+            if (movement != null)
+            {
+                if (!player.IsGrounded())
+                {
+                    movement.DisableGravity();
+                }
+                movement.MoveTo(0);
+            }
             
-            // 임시 애니메이션
-            animator.MovementAnim(0f);
+            animationFinished = false;
         }
 
         public override void Execute(PlayerController player)
         {
-            teleportTimer -= Time.deltaTime;
-            
-            // 텔레포트 완료
-            if (teleportTimer <= 0)
+            if (movement != null)
+            {
+                movement.MoveTo(0);
+            }
+
+            if (animationFinished)
             {
                 player.ChangeState(new Idle());
+                animationFinished = false;
             }
         }
 
         public override void Exit(PlayerController player)
         {
+            if (movement != null)
+            {
+                movement.EnableGravity();
+            }
+        }
+
+        public void OnAnimationFinished()
+        {
+            animationFinished = true;
         }
     }
 
+    public class TeleportStart : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private MovementRigidbody2D movement;
+        private bool animationFinished = false;
+
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            movement = player.GetComponent<MovementRigidbody2D>();
+
+            if (movement != null)
+            {
+                movement.MoveTo(0);
+            }
+            
+            // 텔레포트 시작 애니메이션
+            if (animator != null)
+            {
+                animator.StartTeleportAnim();
+            }
+
+            animationFinished = false;
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            // 애니메이션 완료 대기
+            if (animationFinished)
+            {
+                PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
+                if (playerAttack != null)
+                {
+                    playerAttack.ExecuteTeleportMovement();
+                }
+                animationFinished = false;
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            
+        }
+
+        // 텔레포트 시작 애니메이션 완료 시 호출
+        public void OnTeleportStartAnimationFinished()
+        {
+            animationFinished = true;
+        }
+    }
+
+    public class TeleportEnd : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private MovementRigidbody2D movement;
+        private bool animationFinished = false;
+        
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            movement = player.GetComponent<MovementRigidbody2D>();
+
+            if (movement != null)
+            {
+                movement.MoveTo(0);
+            }
+
+            if (animator != null)
+            {
+                animator.EndTeleportAnim(false);
+            }
+
+            animationFinished = false;
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            
+            // 애니메이션 완료 시 상태 전환
+            if (animationFinished)
+            {
+                player.ChangeState(new Idle());
+                animationFinished = false;
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            
+        }
+
+        // 텔레포트 종료 애니메이션 완료 시 호출
+        public void OnTeleportEndAnimationFinished()
+        {
+            animationFinished = true;
+        }
+    }
+    
     public class Valve : State<PlayerController>
     {
         private PlayerInteraction interaction;

@@ -431,4 +431,58 @@ public class PlayerController : MonoBehaviour
             playerHp.OnPlayerDeath -= OnPlayerDeath;
         }
     }
+
+    private void OnGUI()
+    {
+        // 개발자 디버그가 활성화되어 있을 때만 표시
+        if (!enableDeveloperDebug) return;
+    
+        // GUI 스타일 설정
+        GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+        labelStyle.fontSize = 16;
+        labelStyle.normal.textColor = Color.white;
+        labelStyle.fontStyle = FontStyle.Bold;
+    
+        // 배경 박스 스타일
+        GUIStyle boxStyle = new GUIStyle(GUI.skin.box);
+        boxStyle.normal.background = MakeTexture(2, 2, new Color(0, 0, 0, 0.7f));
+        
+        // 현재 상태 정보 수집
+        string currentStateName = GetCurrentStateName();
+    
+        // 화면 왼쪽 상단에 상태 정보 표시
+        GUILayout.BeginArea(new Rect(10, 10, 300, 200));
+    
+        GUILayout.BeginVertical(boxStyle);
+    
+        GUILayout.Label("=== Player Debug Info ===", labelStyle);
+        GUILayout.Space(5);
+    
+        GUILayout.Label($"Current State: {currentStateName}", labelStyle);
+        GUILayout.EndVertical();
+        GUILayout.EndArea();
+    }
+    
+    // 현재 상태 이름을 문자열로 반환
+    private string GetCurrentStateName()
+    {
+        var currentState = GetCurrentState();
+        if (currentState == null) return "None";
+    
+        // 상태 타입 이름에서 네임스페이스 제거
+        string fullName = currentState.GetType().Name;
+        return fullName;
+    }
+    
+    private Texture2D MakeTexture(int width, int height, Color color)
+    {
+        Color[] pix = new Color[width * height];
+        for (int i = 0; i < pix.Length; i++)
+            pix[i] = color;
+    
+        Texture2D result = new Texture2D(width, height);
+        result.SetPixels(pix);
+        result.Apply();
+        return result;
+    }
 }

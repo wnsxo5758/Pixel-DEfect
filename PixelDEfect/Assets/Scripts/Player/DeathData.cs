@@ -1,6 +1,5 @@
 
-using UnityEngine;
-
+[System.Serializable]
 public struct DeathData
 {
     public DeathCause cause;        // 사망 원인

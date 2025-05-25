@@ -23,12 +23,15 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private GameObject thrownWeaponPrefab;
     [SerializeField] private float throwCooldown = 1f;
 
+    [Header("무기 뽑기 설정")] 
+    [SerializeField] private Vector2 airPullKnockBack = new Vector2(8f, 3f); // 공중 뽑기 넉백 힘
+    
     [Header("텔레포트 설정")] 
     [SerializeField] private float teleportDelayTime = 0.5f;
     [SerializeField] private float teleportCooldown = 3f;
     
     private WeaponBase currentWeapon;
-    private PlayerController playerController;
+    private PlayerController controller;
     private PlayerAnimator playerAnimator;
     private MovementRigidbody2D movement;
     private ThrownWeapon lastThrownWeapon;
@@ -39,10 +42,16 @@ public class PlayerAttack : MonoBehaviour
     private bool canThrow = true;
     private bool canTeleport = true;
     private bool isTeleporting = false;
+    private bool isPullingWeapon = false;
+    
+    // 텔레포트 상태 관리
+    private bool isTeleportInProgress = false;
+    private ThrownWeapon pendingTeleportWeapon;
+    private WeaponPullContext pendingPullContext;
     
     private void Awake()
     {
-        playerController = GetComponent<PlayerController>();
+        controller = GetComponent<PlayerController>();
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         movement = GetComponent<MovementRigidbody2D>();
 
@@ -87,7 +96,7 @@ public class PlayerAttack : MonoBehaviour
             MeleeAttackAnimation();
             StartCoroutine(AttackCooldownTimer());
             
-            playerController.ChangeState(new PlayerStates.Attack());
+            controller.ChangeState(new PlayerStates.Attack());
         }
     }
     
@@ -103,13 +112,15 @@ public class PlayerAttack : MonoBehaviour
     // PlayerController에서 호출되는 텔레포트
     public void PerformTeleport()
     {
+        Debug.Log($"CanTeleport: {canTeleport}, isTeleporting: {isTeleporting}");
+        
         if (lastThrownWeapon != null && canTeleport && !isTeleporting &&
-            playerController.GetCurrentState() is not PlayerStates.Climb and not PlayerStates.Hold and not PlayerStates.Valve)
+            controller.GetCurrentState() is PlayerStates.Idle or PlayerStates.Run or PlayerStates.Jump)
         {
             // 텔레포트 전 검증
             if (IsTeleportPossible(lastThrownWeapon))
             {
-                StartCoroutine(TeleportCoroutine(lastThrownWeapon));
+                StartTeleportSequence(lastThrownWeapon);
             }
             else
             {
@@ -117,25 +128,16 @@ public class PlayerAttack : MonoBehaviour
                 Debug.Log("텔레포트 불가");
             }
         }
-    } 
-    
+    }
+
     // 무기 픽업 메소드
     public void ProcessWeaponPickup(WeaponPickup weaponPickup, ThrownWeapon thrownWeapon)
     {
         // 던져진 무기 픽업
         if (thrownWeapon != null && canThrow)
         {
-            WeaponBase weaponData = thrownWeapon.GetWeaponData();
-            
-            // 적에게 박힌 무기라면 추가 데미지 적용
-            thrownWeapon.PullOutFromEnemy();
-
-            if (weaponData != null)
-            {
-                EquipWeapon(weaponData);
-                Destroy(thrownWeapon.gameObject);
-                return;
-            }
+            ProcessThrownWeaponPickup(thrownWeapon);
+            return;
         }
         
         // 일반 무기 픽업
@@ -152,6 +154,54 @@ public class PlayerAttack : MonoBehaviour
                 Destroy(weaponPickup.gameObject);
             }
         }
+    }
+
+    private void ProcessThrownWeaponPickup(ThrownWeapon thrownWeapon)
+    {
+        bool playerGrounded = movement.IsGrounded;
+        bool enemyGrounded = true;
+        
+        // 적에게 박힌 무기인지 확인
+        if (thrownWeapon.transform.parent != null)
+        {
+            EnemyBT enemy = thrownWeapon.transform.parent.GetComponent<EnemyBT>();
+            if (enemy != null)
+            {
+                MovementRigidbody2D enemyMovement = enemy.GetComponent<MovementRigidbody2D>();
+                if (enemyMovement != null)
+                {
+                    enemyGrounded = enemyMovement.IsGrounded;
+                }
+            }
+        }
+        
+        // 무기 뽑기 컨텍스트 생성
+        WeaponPullContext pullContext = new WeaponPullContext(
+            thrownWeapon,
+            transform.position,
+            playerGrounded,
+            enemyGrounded);
+        
+        // 적에게 박힌 무기라면 추가 데미지 적용
+        thrownWeapon.PullOutFromEnemy();
+        
+        // 무기 뽑기 상태로 전환 및 애니메이션 시작
+        StartWeaponPull(pullContext);
+    }
+    
+    // 무기 뽑기 시작
+    private void StartWeaponPull(WeaponPullContext context)
+    {
+        // 무기 뽑기 상태로 전환
+        controller.ChangeState(new PlayerStates.PullWeapon());
+        
+        // 애니메이션 시작
+        if (playerAnimator != null)
+        {
+            playerAnimator.StartPullAnim(context);
+        }
+        
+        pendingPullContext = context;
     }
     
     private void EquipWeapon(WeaponBase weaponData)
@@ -217,7 +267,7 @@ public class PlayerAttack : MonoBehaviour
     {
         if (currentWeapon == null || !hasWeapon) return;
         
-        playerController.ChangeState(new PlayerStates.Attack());
+        controller.ChangeState(new PlayerStates.Attack());
         
         // 던지기 애니메이션 재생
         if (playerAnimator != null)
@@ -245,7 +295,7 @@ public class PlayerAttack : MonoBehaviour
         if (currentWeapon != null && isAttacking)
         {
             movement.MoveTo(0);
-            playerController.ChangeState(new PlayerStates.Idle());
+            controller.ChangeState(new PlayerStates.Idle());
         }
     }
 
@@ -253,7 +303,7 @@ public class PlayerAttack : MonoBehaviour
     public void FinishedThrowAnim()
     {
         movement.MoveTo(0);
-        playerController.ChangeState(new PlayerStates.Idle());
+        controller.ChangeState(new PlayerStates.Idle());
     }
 
     // 무기 던지기 수행
@@ -322,36 +372,60 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
-    private IEnumerator TeleportCoroutine(ThrownWeapon targetWeapon)
+    private void StartTeleportSequence(ThrownWeapon targetWeapon)
     {
-        canTeleport = false;
+        isTeleportInProgress = true;
         isTeleporting = true;
-        
-        // 텔레포트 시작 이펙트 (구현 예정)
-        
-        playerController.ChangeState(new PlayerStates.Teleport());
+        canTeleport = false;
 
-        yield return new WaitForSeconds(teleportDelayTime);
+        pendingTeleportWeapon = targetWeapon;
         
-        // 무기가 이미 파괴되었는지 확인
-        if (targetWeapon == null)
+        // 텔레포트 시작 상태로 전환
+        controller.ChangeState(new PlayerStates.TeleportStart());
+    }
+
+    // 텔레포트 이동 수행
+    public void ExecuteTeleportMovement()
+    {
+        if (pendingTeleportWeapon == null)
         {
-            isTeleporting = false;
-            playerController.ChangeState(new PlayerStates.Idle());
-            StartCoroutine(TeleportCooldownTimer());
-            yield break;
+            CompleteTeleportSequence(false);
+            return;
         }
 
-        Vector3 teleportPosition;
+        StartCoroutine(TeleportMovementCoroutine());
+    }
 
+    // 텔레포트 이동 코루틴
+    private IEnumerator TeleportMovementCoroutine()
+    {
+        ThrownWeapon targetWeapon = pendingTeleportWeapon;
+        
+        // 적에게 박힌 무기인지 확인
+        bool wasAttachedToEnemy = targetWeapon != null && 
+                                 targetWeapon.transform.parent != null && 
+                                 targetWeapon.transform.parent.CompareTag("Enemy");
+        
+        // 짧은 대기 시간 (텔레포트 이펙트용)
+        yield return new WaitForSeconds(0.1f);
+        
+        // 무기가 파괴되었는지 확인
+        if (targetWeapon == null)
+        {
+            CompleteTeleportSequence(false);
+            yield break;
+        }
+        
         // 텔레포트 위치 계산
+        Vector3 teleportPosition;
+        
         if (targetWeapon.IsStuck())
         {
             Vector2 contactNormal = targetWeapon.GetContactNormal();
             Vector2 teleportDirection;
 
             Vector2 playerSize = GetComponent<Collider2D>().bounds.size;
-            float teleportDistance = playerSize.x * 3f;
+            float teleportDistance = playerSize.x * 2f;
         
             float absNormalX = Mathf.Abs(contactNormal.x);
             float absNormalY = Mathf.Abs(contactNormal.y);
@@ -360,7 +434,7 @@ public class PlayerAttack : MonoBehaviour
             {
                 float diagonalX = Mathf.Sign(contactNormal.x);
                 teleportDirection = new Vector2(diagonalX, 1f).normalized;
-                teleportDistance = playerSize.x * 3f;
+                teleportDistance = playerSize.x * 2f;
             }
             else
             {
@@ -375,36 +449,140 @@ public class PlayerAttack : MonoBehaviour
             teleportPosition = targetWeapon.transform.position;
         }
         
-        // 무기가 날아가는 중이면 리지드바디 멈추기
-        if (!targetWeapon.IsStuck())
-        {
-            targetWeapon.StopMovement();
-        }
-        // 적에게 무기가 박혀있는 경우 
-        else
-        {
-            targetWeapon.PullOutFromEnemy();
-        }
-        
-        // 무기 장착
-        WeaponBase weaponData = targetWeapon.GetWeaponData();
-        if (weaponData != null)
-        {
-            EquipWeapon(weaponData);
-        }
+        // 무기 처리
+        HandleWeaponDuringTeleport(targetWeapon);
         
         // 플레이어 위치 이동
         transform.position = teleportPosition;
         
-        // 도착 이펙트 (구현 예정)
+        // 텔레포트 완료 처리
+        CompleteTeleportSequence(wasAttachedToEnemy);
+    }
+    
+    // 텔레포트 중 무기 처리
+    private void HandleWeaponDuringTeleport(ThrownWeapon weapon)
+    {
+        // 적에게 박힌 무기라면 추가 데미지
+        weapon.PullOutFromEnemy();
         
-        // 던져진 무기 제거
-        Destroy(targetWeapon.gameObject);
+        // 무기 데이터 백업
+        WeaponBase weaponData = weapon.GetWeaponData();
+        if (weaponData != null)
+        {
+            // 무기 장착 준비
+            thrownWeaponPrefab = FindWeaponPrefab(weaponData);
+        }
+        
+        // 적에게 붙어있지 않은 경우에만 즉시 무기 제거
+        bool isAttachedToEnemy = weapon.transform.parent != null && 
+                                 weapon.transform.parent.CompareTag("Enemy");
+        
+        if (!isAttachedToEnemy)
+        {
+            Debug.Log("[Teleport] 일반 무기 - 즉시 제거");
+            Destroy(weapon.gameObject);
+        }
+        else
+        {
+            Debug.Log("[Teleport] 적 부착 무기 - 뽑기 애니메이션 후 제거 예정");
+            // 적에게 붙어있던 무기는 나중에 뽑기 애니메이션 완료 시 제거
+        }
+    }
+    
+    // 텔레포트 시퀸스 완료
+    private void CompleteTeleportSequence(bool wasAttachedToEnemy)
+    {
+        isTeleportInProgress = false;
 
-        //텔레포트 쿨다운
+        if (wasAttachedToEnemy && pendingTeleportWeapon != null)
+        {
+            Debug.Log("[Teleport] 적 부착 무기 → 바로 무기 뽑기 상태로 전환");
+            WeaponPullContext pullContext = WeaponPullContext.CreateTeleportPull(
+                pendingTeleportWeapon,
+                transform.position,
+                controller.IsGrounded());
+            
+            controller.ChangeState(new PlayerStates.PullWeapon());
+
+            if (playerAnimator != null)
+            {
+                playerAnimator.StartPullAnim(pullContext);
+            }
+            
+            isTeleporting = false;
+            
+            pendingPullContext = pullContext;
+        }
+        else
+        {
+            if (pendingTeleportWeapon != null)
+            {
+                WeaponBase weaponData = pendingTeleportWeapon.GetWeaponData();
+                if (weaponData != null)
+                {
+                    EquipWeapon(weaponData);
+                }
+            }
+            
+            // 텔레포트 종료 상태로 전환
+            controller.ChangeState(new PlayerStates.TeleportEnd());
+        }
+        
+        // 쿨다운 시작
         StartCoroutine(TeleportCooldownTimer());
         
+        // 정리
+        pendingTeleportWeapon = null;
+        lastThrownWeapon = null;
+    }
+    
+    // 텔레포트 시작 애니메이션 완료 콜백
+    public void OnTeleportStartAnim()
+    {
+        if (controller.GetCurrentState() is PlayerStates.TeleportStart teleportStartState)
+        {
+            teleportStartState.OnTeleportStartAnimationFinished();
+        }
+    }
+    
+    // 텔레포트 종료 애니메이션 완료 콜백
+    public void OnTeleportEndAnim()
+    {
         isTeleporting = false;
+        
+        if (controller.GetCurrentState() is PlayerStates.TeleportEnd teleportEndState)
+        {
+            teleportEndState.OnTeleportEndAnimationFinished();
+        }
+    }
+    
+    // 무기 뽑기 애니메이션 완료 콜백
+    public void FinishedPullAnim(WeaponPullContext context)
+    {
+        if (context != null && context.targetWeapon != null)
+        {
+            // 무기 장착
+            WeaponBase weaponData = context.targetWeapon.GetWeaponData();
+            if (weaponData != null)
+            {
+                EquipWeapon(weaponData);
+            }
+            
+            Destroy(context.targetWeapon.gameObject);
+        }
+        
+        // 상태 변경은 PullWeapon 상태에서 처리
+        if (controller.GetCurrentState() is PlayerStates.PullWeapon pullState)
+        {
+            pullState.OnAnimationFinished();
+        }
+        
+        pendingPullContext = null;
+    }
+
+    private GameObject FindWeaponPrefab(WeaponBase weaponData)
+    {
+        return thrownWeaponPrefab;
     }
 
     private bool IsTeleportPossible(ThrownWeapon weapon)
@@ -439,7 +617,7 @@ public class PlayerAttack : MonoBehaviour
             teleportDirection = new Vector2(diagonalX, 1f).normalized;
             
             // 수평 벽의 경우 더 큰 거리 설정
-            teleportDistance = playerSize.x * 3f;
+            teleportDistance = playerSize.x * 2f;
         }
         // 법선 벡터가 수직 방향인 경우
         else
@@ -526,7 +704,7 @@ public class PlayerAttack : MonoBehaviour
     }
     
     // 즉시 무기 픽업
-    public void RecallWeaponInstant(ThrownWeapon weapon)
+    private void RecallWeaponInstant(ThrownWeapon weapon)
     {
         if (weapon == null) return;
 
@@ -548,7 +726,7 @@ public class PlayerAttack : MonoBehaviour
     // 플레이어가 공격 가능한 상태인지 확인
     private bool CanPlayerAttack()
     {
-        var currentState = playerController.GetCurrentState();
+        var currentState = controller.GetCurrentState();
 
         // 낙하 중에는 공격 불가
         if (currentState is PlayerStates.Idle || currentState is PlayerStates.Run)
@@ -562,7 +740,8 @@ public class PlayerAttack : MonoBehaviour
         // 공격 가능한 상태 확인
         if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || 
             currentState is PlayerStates.Crawl || currentState is PlayerStates.Roll || 
-            currentState is PlayerStates.Teleport || currentState is PlayerStates.Valve)
+            currentState is PlayerStates.TeleportStart || currentState is PlayerStates.TeleportEnd ||
+            currentState is PlayerStates.PullWeapon || currentState is PlayerStates.Valve)
         {
             return false;
         }
@@ -611,7 +790,7 @@ public class PlayerAttack : MonoBehaviour
                 {
                     float diagonalX = Mathf.Sign(normal.x);
                     teleportDirection = new Vector2(diagonalX, 1f).normalized;
-                    teleportDistance = playerSize.x * 3f;
+                    teleportDistance = playerSize.x * 2f;
                     Gizmos.color = Color.magenta;
                 }
                 else
