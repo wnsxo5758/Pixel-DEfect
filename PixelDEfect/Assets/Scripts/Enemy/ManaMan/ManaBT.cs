@@ -11,12 +11,42 @@ public class ManaBT : EnemyBT
     [SerializeField] protected float gapcheckDistance = 3f;
     [SerializeField] protected LayerMask obstacleLayer;
 
+    [Header("스킬 관련")]
+    [SerializeField] protected float skillRange = 4f; // 스킬 사용 거리
+    [SerializeField] protected float skillCooldown = 5f; // 
+
+    protected bool canUseSkill = true;
+    protected float skillTimer = 0f;
+
+
+
     ManaAnimator manaAnimator;
 
     protected override void Awake()
     {
         base.Awake();
         manaAnimator = GetComponentInChildren<ManaAnimator>();
+    }
+    protected override void Update()
+    {
+        base.Update();
+
+        if(!canUseSkill)
+        {
+            skillTimer += Time.deltaTime;
+            if(skillTimer >= skillCooldown)
+            {
+                skillTimer = 0f;
+                canUseSkill = true;
+            }
+        }
+    }
+
+    protected virtual bool IsTargetInSkillRange()
+    {
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target == null) return false;
+        return Vector2.Distance(transform.position, target.position) <= skillRange;
     }
 
     protected override NodeState Patrol()
