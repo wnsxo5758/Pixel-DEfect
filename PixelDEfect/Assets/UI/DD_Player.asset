@@ -13,7 +13,37 @@ MonoBehaviour:
   m_Name: DD_Player
   m_EditorClassIdentifier: 
   lines:
-  - "\uC5B4\uC5B4"
-  - "\uC800... \uC800\uAE30\uC694?"
-  - "\uC73C\uC544\uC544\uC545"
-  - "\uD5C9\uD5C9"
+  - line: '?'
+    waitAfterLine: 1
+  - line: "\uD5D0..."
+    waitAfterLine: 2
+  - line: "\uBB50\uC9C0?"
+    waitAfterLine: 1
+  - line: "\uC548\uB155\uD558\uC138\uC694?"
+    waitAfterLine: 1.5
+  - line: "\uB124?? \uB124???"
+    waitAfterLine: 0.8
+  - line: "\uC73C\uC544\uC544\uC544!!!!"
+    waitAfterLine: 2
+  - line: "\uD5C9\uD5C9..."
+    waitAfterLine: 1.5
+  - line: "\uB3C4\uB300\uCCB4 \uBB50\uC57C..."
+    waitAfterLine: 2
+  - line: "\uBB50\uC57C? \uC5B4\uB514\uC57C?"
+    waitAfterLine: 2
+  - line: "\uB204\uAD6C\uC138\uC694?"
+    waitAfterLine: 1
+  - line: ?????
+    waitAfterLine: 1
+  - line: "\uAC10\uC0AC\uD569\uB2C8\uB2E4"
+    waitAfterLine: 1
+  - line: "\uADFC\uB370 \uB204\uAD6C\uC2E0\uC9C0...."
+    waitAfterLine: 1
+  - line: ????????
+    waitAfterLine: 1
+  - line: "\uB0B4\uAC00 \uAFC8\uC744 \uAFB8\uB294\uAC74\uAC00...."
+    waitAfterLine: 1
+  - line: "\uADF8\uB798\uB3C4 \uB355\uBD84\uC5D0"
+    waitAfterLine: 1
+  - line: "\uD574\uBCF4\uC790!"
+    waitAfterLine: 1

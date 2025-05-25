@@ -75,4 +75,35 @@ public class DialogueSystem : MonoBehaviour
             transform.localScale = new Vector3(scaleX, 1f, 1f);
         }
     }
+
+    public void ShowSingleLine(string sentence, Transform target, float duration)
+    {
+        followTarget = target;
+        StartCoroutine(TypeAndAutoDestroy(sentence, duration));
+    }
+
+    void SetBoxSize(string sentence)
+    {
+        sizeCalculatorText.text = sentence;
+        sizeCalculatorText.ForceMeshUpdate(); // 텍스트 길이 정확히 반영
+        float width = Mathf.Min(sizeCalculatorText.preferredWidth + 0.3f, 3f);
+        float height = sizeCalculatorText.preferredHeight + 0.3f;
+
+        TextBox.transform.localScale = new Vector2(width, height);
+    }
+
+    IEnumerator TypeAndAutoDestroy(string sentence, float duration)
+    {
+        SetBoxSize(sentence);
+
+        text.text = "";
+        foreach (char c in sentence)
+        {
+            text.text += c;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        yield return new WaitForSeconds(duration);
+        Destroy(gameObject);
+    }
 }

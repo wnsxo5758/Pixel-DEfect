@@ -129,7 +129,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.31
+  m_Radius: 0.2
 --- !u!114 &8180118777850371946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,8 +154,8 @@ MonoBehaviour:
   pressTimeRequired: 3
   currentPressTime: 0
   isPressing: 0
-  rotateClip: {fileID: 8300000, guid: f844a034654644548a582424df3ad217, type: 3}
-  rewindClip: {fileID: 8300000, guid: 36a627d0e7bda2c49bda6b604b9e731b, type: 3}
+  rotateClip: {fileID: 8300000, guid: 1d85b54285f2b3b48953fa0fb8bb58ea, type: 3}
+  rewindClip: {fileID: 8300000, guid: 3796b23127a0c984c9020025b9de9e0a, type: 3}
 --- !u!82 &6143259144677869343
 AudioSource:
   m_ObjectHideFlags: 0
@@ -166,7 +166,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 37b8904b4512dbf42ac1301390a5a568, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 053be432bdc60c047862da81d7062cac, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

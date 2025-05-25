@@ -10,13 +10,22 @@ public class DialogueTrigger : MonoBehaviour
 
     private GameObject currentChatBox;
 
-    public void TriggerDialogueFromTimeline()
+    /// Timeline에서 이 함수만 호출하면 됨!
+    public void ShowTimelineLine(int lineIndex)
     {
         if (currentChatBox != null)
             Destroy(currentChatBox);
 
+        if (lineIndex < 0 || lineIndex >= dialogueData.lines.Count)
+        {
+            Debug.LogWarning("잘못된 대사 인덱스");
+            return;
+        }
+
+        var lineData = dialogueData.lines[lineIndex];
+
         currentChatBox = Instantiate(chatBoxPrefab, chatTarget);
-        var DialogueSystem = currentChatBox.GetComponent<DialogueSystem>();
-        DialogueSystem.StartDialogue(dialogueData.lines.ToArray(), chatTarget);
+        var dialogueSystem = currentChatBox.GetComponent<DialogueSystem>();
+        dialogueSystem.ShowSingleLine(lineData.line, chatTarget, lineData.waitAfterLine);
     }
 }
