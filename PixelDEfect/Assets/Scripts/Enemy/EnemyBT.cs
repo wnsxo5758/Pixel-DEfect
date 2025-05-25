@@ -127,7 +127,7 @@ public class EnemyBT : MonoBehaviour
     }
     
     // 기본 행동 트리 설정
-    private void SetupBaseBehaviorTree()
+    protected virtual void SetupBaseBehaviorTree()
     {
         // 루트 노드 (셀렉터)
         Selector rootSelector = new Selector();

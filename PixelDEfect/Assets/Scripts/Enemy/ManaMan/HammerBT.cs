@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HammerBT : ManaBT
 {
-    [Header("�ظ� �� ���� ����")]
+    [Header("공격 관련")]
     [SerializeField] private float attackRange = 2f;
     [SerializeField] private float attackCooldown = 2f;
     [SerializeField] private int attackDamage = 2;
@@ -12,6 +12,11 @@ public class HammerBT : ManaBT
     [SerializeField] private Vector2 attackBoxSize = new Vector2(1.5f, 1f);
     [SerializeField] private Vector2 attackBoxOffset = new Vector2(0.8f, 0);
     [SerializeField] private LayerMask playerLayer;
+
+
+    [Header("스킬 관련")]
+    [SerializeField] private GameObject lightningPrefab;
+    [SerializeField] private float skillSpawnDelay = 0.5f;
 
     private float attackTimer = 0f;
     private bool canAttack = true;
@@ -27,6 +32,7 @@ public class HammerBT : ManaBT
 
     protected override void Update()
     {
+        base.Update();
         if (!canAttack)
         {
             attackTimer += Time.deltaTime;
@@ -38,9 +44,45 @@ public class HammerBT : ManaBT
             }
         }
 
-        base.Update();
+
     }
 
+
+    protected override Node CreateSkillSequence()
+    {
+        Sequence skillSequence = new Sequence();
+
+        skillSequence.AddChild(new ConditionNode(() => !isDead && !isHit));
+        skillSequence.AddChild(new ConditionNode(() => IsTargetInSkillRange()));
+        skillSequence.AddChild(new ConditionNode(() => canUseSkill));
+        skillSequence.AddChild(new ActionNode(UseSkill));
+
+        return skillSequence;
+    }
+
+    protected override NodeState UseSkill()
+    {
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target == null) return NodeState.Failure;
+
+        Vector2 spawnPosition = target.position; // 스킬 대상 위치 고정
+        StartCoroutine(SpawnLightningAfterDelay(spawnPosition));
+
+        canUseSkill = false;
+        skillTimer = 0f;
+
+        return NodeState.Running;
+    }
+
+    private IEnumerator SpawnLightningAfterDelay(Vector2 position)
+    {
+        yield return new WaitForSeconds(skillSpawnDelay);
+
+        if (lightningPrefab != null)
+        {
+            Instantiate(lightningPrefab, position, Quaternion.identity);
+        }
+    }
     protected override Node CreateAttackSequence()
     {
         Sequence attackSequence = new Sequence();
