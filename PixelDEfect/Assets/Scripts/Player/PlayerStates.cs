@@ -482,6 +482,7 @@ namespace PlayerStates
             // 텔레포트 시작 애니메이션
             if (animator != null)
             {
+                Debug.Log("텔레포트 시작 애니메이션");
                 animator.StartTeleportAnim();
             }
 
@@ -496,6 +497,7 @@ namespace PlayerStates
                 PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
                 if (playerAttack != null)
                 {
+                    Debug.Log("텔레포트 시작 애니메이션 완료");
                     playerAttack.ExecuteTeleportMovement();
                 }
                 animationFinished = false;

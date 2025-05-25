@@ -218,6 +218,7 @@ public class PlayerAnimator : MonoBehaviour
         playerAttack?.FinishedPullAnim(currentPullContext);
         
         isPlayingPullAnimation = false;
+        isPlayingTeleportAnimation = false;
         currentPullContext = null;
     }
 
@@ -236,6 +237,7 @@ public class PlayerAnimator : MonoBehaviour
 
     public void StartTeleportAnim()
     {
+        Debug.Log(isPlayingTeleportAnimation);
         if (isPlayingTeleportAnimation) return;
         
         isPlayingTeleportAnimation = true;

@@ -112,8 +112,6 @@ public class PlayerAttack : MonoBehaviour
     // PlayerController에서 호출되는 텔레포트
     public void PerformTeleport()
     {
-        Debug.Log($"CanTeleport: {canTeleport}, isTeleporting: {isTeleporting}");
-        
         if (lastThrownWeapon != null && canTeleport && !isTeleporting &&
             controller.GetCurrentState() is PlayerStates.Idle or PlayerStates.Run or PlayerStates.Jump)
         {
@@ -215,6 +213,8 @@ public class PlayerAttack : MonoBehaviour
         hasWeapon = true;
 
         lastThrownWeapon = null;
+        pendingTeleportWeapon = null;
+        isTeleportInProgress = false;
         
         if (attackColliderObject != null)
         {
@@ -510,7 +510,6 @@ public class PlayerAttack : MonoBehaviour
             }
             
             isTeleporting = false;
-            
             pendingPullContext = pullContext;
         }
         else
@@ -526,14 +525,15 @@ public class PlayerAttack : MonoBehaviour
             
             // 텔레포트 종료 상태로 전환
             controller.ChangeState(new PlayerStates.TeleportEnd());
+            isTeleporting = false;
+            
+            // 정리
+            pendingTeleportWeapon = null;
+            lastThrownWeapon = null;
         }
         
         // 쿨다운 시작
         StartCoroutine(TeleportCooldownTimer());
-        
-        // 정리
-        pendingTeleportWeapon = null;
-        lastThrownWeapon = null;
     }
     
     // 텔레포트 시작 애니메이션 완료 콜백
@@ -569,6 +569,14 @@ public class PlayerAttack : MonoBehaviour
             }
             
             Destroy(context.targetWeapon.gameObject);
+
+            if (context.isTeleportPull)
+            {
+                lastThrownWeapon = null;
+                pendingTeleportWeapon = null;
+                isTeleportInProgress = false;
+                isTeleporting = false;
+            }
         }
         
         // 상태 변경은 PullWeapon 상태에서 처리
