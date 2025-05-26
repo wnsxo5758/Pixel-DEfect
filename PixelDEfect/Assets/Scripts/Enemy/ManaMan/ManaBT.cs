@@ -12,7 +12,7 @@ public class ManaBT : EnemyBT
     protected bool canUseSkill = true;
     protected float skillTimer = 0f;
 
-    ManaAnimator manaAnimator;
+    protected ManaAnimator manaAnimator;
 
     protected override void Awake()
     {
@@ -116,7 +116,7 @@ public class ManaBT : EnemyBT
     {
         if (isHit || isDead) return NodeState.Failure;
 
-        manaAnimator?.SetChasing(false);
+        animator?.SetChasingState(false);
 
         float direction = blackboard.GetValue<float>("PatrolDirection");
 
@@ -137,7 +137,7 @@ public class ManaBT : EnemyBT
         }
 
         movement.MoveTo(direction);
-        manaAnimator?.SetMovement(Mathf.Abs(direction));
+        animator?.SetMovementAnim(Mathf.Abs(direction));
         return NodeState.Running;
     }
 

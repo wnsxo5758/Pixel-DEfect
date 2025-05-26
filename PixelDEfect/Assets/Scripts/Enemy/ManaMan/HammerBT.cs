@@ -62,27 +62,40 @@ public class HammerBT : ManaBT
 
     protected override NodeState UseSkill()
     {
-        Transform target = blackboard.GetValue<Transform>("Target");
-        if (target == null) return NodeState.Failure;
+        // 피격 또는 사망 중이면 스킬 취소
+        if (isHit || isDead) return NodeState.Failure;
 
-        Vector2 spawnPosition = target.position; // 스킬 대상 위치 고정
-        StartCoroutine(SpawnLightningAfterDelay(spawnPosition));
+        Transform currentTarget = blackboard.GetValue<Transform>("Target");
+        if (currentTarget == null) return NodeState.Failure;
 
+        // 스킬 타겟 위치 저장
+        Vector2 skillTargetPos = currentTarget.position;
+        blackboard.SetValue("SkillTargetPosition", skillTargetPos);
+
+        // 방향 설정
+        float directionToTarget = Mathf.Sign(currentTarget.position.x - transform.position.x);
+        SetDirection(directionToTarget);
+
+        // 이동 중지
+        movement?.MoveTo(0);
+
+        // 애니메이션 실행
+        if (animator != null)
+        {
+            animator.SetMovementAnim(0);
+            animator.SetChasingState(true);
+            manaAnimator.TriggerSkillAnim(); // 트리거 이름은 "Skill"
+        }
+
+        // 스킬 상태 설정
         canUseSkill = false;
         skillTimer = 0f;
+        isAttacking = true;
+        blackboard.SetValue("IsAttacking", true);
 
         return NodeState.Running;
     }
 
-    private IEnumerator SpawnLightningAfterDelay(Vector2 position)
-    {
-        yield return new WaitForSeconds(skillSpawnDelay);
-
-        if (lightningPrefab != null)
-        {
-            Instantiate(lightningPrefab, position, Quaternion.identity);
-        }
-    }
     protected override Node CreateAttackSequence()
     {
         Sequence attackSequence = new Sequence();
@@ -131,13 +144,43 @@ public class HammerBT : ManaBT
         return NodeState.Running;
     }
 
-    public override void OnAttackAnimationEvent()
+    public override void OnAttackAnimationEvent() //공격 트리거
     {
         if (isHit) return;
         DealDamage();
     }
 
-    public override void OnAttackAnimationFinished()
+    public override void OnAttackAnimationFinished() //공격 끝났을 경우
+    {
+        isAttacking = false;
+        blackboard.SetValue("IsAttacking", false);
+
+        if (IsTargetInAttackRange())
+        {
+            // 공격 범위 내에 있으면 플레이어 방향만 바라보도록 설정
+            Transform currentTarget = blackboard.GetValue<Transform>("Target");
+            if (currentTarget != null)
+            {
+                float directionToTarget = Mathf.Sign(currentTarget.position.x - transform.position.x);
+                SetDirection(directionToTarget);
+
+                if (movement != null)
+                {
+                    movement.MoveTo(0);
+                }
+            }
+        }
+    }
+    public void OnSkillEffectTrigger() // 스킬 트리거
+    {
+        Vector2 pos = blackboard.GetValue<Vector2>("SkillTargetPosition");
+
+        if (lightningPrefab != null)
+        {
+            Instantiate(lightningPrefab, pos, Quaternion.identity);
+        }
+    }
+    public void OnSkillAnimationFinished() // 스킬이 끝났을 경우
     {
         isAttacking = false;
         blackboard.SetValue("IsAttacking", false);

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class ManaAnimator : MonoBehaviour
@@ -8,7 +9,7 @@ public class ManaAnimator : MonoBehaviour
     private EnemyAnimator baseAnimator;
 
     // Hash된 파라미터 이름들
-    private readonly int castSkill = Animator.StringToHash("CastSkill");
+    private readonly int castSkill = Animator.StringToHash("Skill");
     private readonly int manaDeath = Animator.StringToHash("ManaDeath");
     private readonly int jump = Animator.StringToHash("Jump");
 
@@ -23,41 +24,20 @@ public class ManaAnimator : MonoBehaviour
         if (baseAnimator == null)
             Debug.LogWarning("EnemyAnimator 컴포넌트가 없습니다!");
     }
-
-    // 🎮 기본 기능 위임 (필요한 것만)
-    public void SetMovement(float speed)
-    {
-        baseAnimator?.SetMovementAnim(speed);
-    }
-
-    public void SetChasing(bool isChasing)
-    {
-        baseAnimator?.SetChasingState(isChasing);
-    }
-
-    public void TriggerAttack()
-    {
-        baseAnimator?.TriggerAttackAnim();
-    }
-
-    public void TriggerHit()
-    {
-        baseAnimator?.TriggerHitAnim();
-    }
-
-    public void TriggerDeath()
-    {
-        baseAnimator?.TriggerDeathAnim(); // 일반 사망
-    }
-
-    public void TriggerSkillCast()
+    public void TriggerSkillAnim()
     {
         animator?.SetTrigger(castSkill);
     }
-
-    public void TriggerManaDeath()
+    public void OnSkillEvent()
     {
-        animator?.SetTrigger(manaDeath);
+        HammerBT hammer = transform.GetComponentInParent<HammerBT>();
+        hammer.OnSkillEffectTrigger();
+    }
+
+    public void OnSkillFinished()
+    {
+        HammerBT hammer = transform.GetComponentInParent<HammerBT>();
+        hammer.OnSkillAnimationFinished();
     }
 
     public void TriggerJump()
