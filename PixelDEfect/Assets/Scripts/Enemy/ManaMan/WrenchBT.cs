@@ -28,7 +28,7 @@ public class WrenchBT : ManaBT
     [SerializeField]
     private int skillBulletCount = 5; // 스킬로 생성되는 렌치수
     [SerializeField]
-    private float skillAngle = 60f; 
+    private float skillAngle = 60f; //부채꼴 범위
 
     //총알 메모리풀
     private MemoryPool bulletPool;
@@ -50,7 +50,7 @@ public class WrenchBT : ManaBT
     protected override void Update()
     {
         base.Update();
-        if(!canAttack)
+        if (!canAttack)
         {
             attackTimer += Time.deltaTime;
             if (attackTimer >= attackCooldown)
@@ -61,6 +61,45 @@ public class WrenchBT : ManaBT
             }
         }
     }
+
+    protected override NodeState UseSkill()
+    {
+        // 피격 또는 사망 중이면 스킬 취소
+        if (isHit || isDead) return NodeState.Failure;
+
+        Transform currentTarget = blackboard.GetValue<Transform>("Target");
+        if (currentTarget == null) return NodeState.Failure;
+
+        // 스킬 타겟 위치 저장
+        Vector2 skillTargetPos = currentTarget.position;
+        blackboard.SetValue("SkillTargetPosition", skillTargetPos);
+
+        // 방향 설정
+        float directionToTarget = Mathf.Sign(currentTarget.position.x - transform.position.x);
+        SetDirection(directionToTarget);
+
+        // 이동 중지
+        movement?.MoveTo(0);
+
+        // 애니메이션 실행
+        if (animator != null)
+        {
+            animator.SetMovementAnim(0);
+            animator.SetChasingState(true);
+            manaAnimator.TriggerSkillAnim(); // 트리거 이름은 "Skill"
+        }
+
+        // 스킬 상태 설정
+        canUseSkill = false;
+        skillTimer = 0f;
+        isAttacking = true;
+        blackboard.SetValue("IsAttacking", true);
+
+        return NodeState.Running;
+    }
+
+
+
     protected override Node CreateAttackSequence()
     {
         Sequence attackSequence = new Sequence();
@@ -110,21 +149,44 @@ public class WrenchBT : ManaBT
 
     public void OnSkillEffectTrigger() // 스킬 트리거
     {
-        float baseAngle = GetDirection() > 0 ? 0f : 180f; // 방향 따라 기준
-        float startAngle = baseAngle - skillAngle / 2f;
-        float angleStep = skillAngle / (skillBulletCount - 1);
+        Debug.Log("렌치봇 스킬 사용");
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target == null) return;
 
-        for (int i = 0; i < skillBulletCount; i++)
+        Vector2 targetPos = (Vector2)target.position + new Vector2(0f, 0.8f);
+        Vector2 centerDir = (targetPos - (Vector2)firePos.position).normalized;
+
+        float baseAngle = Mathf.Atan2(centerDir.y, centerDir.x) * Mathf.Rad2Deg;
+
+        int totalBullets = skillBulletCount;
+        if (totalBullets <= 1) totalBullets = 1; // 최소 1발
+
+        float angleStep = skillAngle / (totalBullets - 1);
+
+        for (int i = 0; i < totalBullets; i++)
         {
-            float angle = startAngle + angleStep * i;
-            Vector2 dir = Quaternion.Euler(0, 0, angle) * Vector2.right;
+            float offsetAngle = -skillAngle / 2f + angleStep * i;
+            float finalAngle = baseAngle + offsetAngle;
 
-            GameObject bullet = Instantiate(wrenchPrefab, firePos.position, Quaternion.identity);
-            bullet.GetComponent<Rigidbody2D>().velocity = dir.normalized * bulletSpeed;
+            Vector2 dir = Quaternion.Euler(0, 0, finalAngle) * Vector2.right;
+
+            GameObject bullet = bulletPool.ActivePoolItem();
+            if (bullet != null)
+            {
+                bullet.transform.position = firePos.position;
+                bullet.transform.rotation = Quaternion.identity;
+
+                BulletBase bulletScript = bullet.GetComponent<BulletBase>();
+                if (bulletScript != null)
+                {
+                    bulletScript.SetUp(dir, bulletPool);
+                }
+            }
         }
     }
     public void OnSkillAnimationFinished() // 스킬이 끝났을 경우
     {
+        Debug.Log("렌치봇 스킬 끝!");
         isAttacking = false;
         blackboard.SetValue("IsAttacking", false);
 
@@ -186,5 +248,41 @@ public class WrenchBT : ManaBT
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
+
+        if (firePos != null)
+        {
+            Gizmos.color = Color.cyan;
+
+            Transform target = Application.isPlaying
+                ? blackboard.GetValue<Transform>("Target")
+                : null;
+
+            Vector2 centerDir = Vector2.right * GetDirection();
+            if (Application.isPlaying && target != null)
+            {
+                Vector2 targetPos = (Vector2)target.position + new Vector2(0f, 0.5f);
+                centerDir = (targetPos - (Vector2)firePos.position).normalized;
+            }
+
+            float baseAngle = Mathf.Atan2(centerDir.y, centerDir.x) * Mathf.Rad2Deg;
+
+            int totalBullets = skillBulletCount;
+            if (totalBullets <= 1) totalBullets = 1;
+
+            float angleStep = skillAngle / (totalBullets - 1);
+
+            for (int i = 0; i < totalBullets; i++)
+            {
+                float offsetAngle = -skillAngle / 2f + angleStep * i;
+                float finalAngle = baseAngle + offsetAngle;
+                Vector2 dir = Quaternion.Euler(0, 0, finalAngle) * Vector2.right;
+
+                Gizmos.DrawRay(firePos.position, dir.normalized * 3f);
+            }
+        }
     }
+
+
+
 }

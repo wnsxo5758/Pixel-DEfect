@@ -223,7 +223,7 @@ Transform:
   m_GameObject: {fileID: 8700790810545068082}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 11.8448515, y: -2.1173186, z: 0}
+  m_LocalPosition: {x: 12.373831, y: -1.5595412, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -265,7 +265,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 4680
-  skillRange: 4
+  skillRange: 6
   skillCooldown: 5
   attackCooldown: 2
   wrenchPrefab: {fileID: 2788398159146907001, guid: 848ceb4f3196eba4594eddf1a194b002, type: 3}
@@ -276,7 +276,7 @@ MonoBehaviour:
     m_Bits: 128
   attackRange: 6
   skillBulletCount: 5
-  skillAngle: 60
+  skillAngle: 90
 --- !u!70 &1259034146605184180
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

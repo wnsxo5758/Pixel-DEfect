@@ -30,14 +30,40 @@ public class ManaAnimator : MonoBehaviour
     }
     public void OnSkillEvent()
     {
-        HammerBT hammer = transform.GetComponentInParent<HammerBT>();
-        hammer.OnSkillEffectTrigger();
+        HammerBT hammer = GetComponentInParent<HammerBT>();
+        if (hammer != null)
+        {
+            hammer.OnSkillEffectTrigger();
+            return;
+        }
+
+        WrenchBT wrench = GetComponentInParent<WrenchBT>();
+        if (wrench != null)
+        {
+            wrench.OnSkillEffectTrigger();
+            return;
+        }
+
+        Debug.LogWarning("상위 객체에 HammerBT 또는 WrenchBT 컴포넌트가 없습니다.");
     }
 
     public void OnSkillFinished()
     {
-        HammerBT hammer = transform.GetComponentInParent<HammerBT>();
-        hammer.OnSkillAnimationFinished();
+        HammerBT hammer = GetComponentInParent<HammerBT>();
+        if (hammer != null)
+        {
+            hammer.OnSkillAnimationFinished();
+            return;
+        }
+
+        WrenchBT wrench = GetComponentInParent<WrenchBT>();
+        if (wrench != null)
+        {
+            wrench.OnSkillAnimationFinished();
+            return;
+        }
+
+        Debug.LogWarning("상위 객체에 HammerBT 또는 WrenchBT 컴포넌트가 없습니다.");
     }
 
     public void TriggerJump()
