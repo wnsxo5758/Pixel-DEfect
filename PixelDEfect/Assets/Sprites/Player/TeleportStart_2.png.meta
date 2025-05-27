@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 528b9195af5da4d46aa485a346549eef
+guid: 042ca348f4b58b6469f165217f33ca76
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 24
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -97,253 +97,127 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: WrenchBot_3_0
+      name: TeleportStart_2_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 96
         height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 869b95dc9f9e33247bf637225a2dca1a
-      internalID: -1567155737
+      spriteID: ac33ce096ad306e4ea15f69b28b0eb7b
+      internalID: 175035248
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_3_1
+      name: TeleportStart_2_1
       rect:
         serializedVersion: 2
         x: 96
         y: 0
         width: 96
         height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 83eaf059eb0c1e447be8ed444aa4fb6c
-      internalID: -551502879
+      spriteID: d85f4884dc126be44961dec600fbe749
+      internalID: 1578371712
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_3_2
+      name: TeleportStart_2_2
       rect:
         serializedVersion: 2
         x: 192
         y: 0
         width: 96
         height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6ee4adda6b2419947b4cc56827e622b2
-      internalID: 795495601
+      spriteID: c8ad00846bb090e42b232cf73ae556a2
+      internalID: 1997387635
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_3_3
+      name: TeleportStart_2_3
       rect:
         serializedVersion: 2
         x: 288
         y: 0
         width: 96
         height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 148f47b14361e2d4ca7a04e12995f4f6
-      internalID: -1987419417
+      spriteID: e4e4c4db50e27d24ba227395f63a0a91
+      internalID: -1107021533
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_3_4
+      name: TeleportStart_2_4
       rect:
         serializedVersion: 2
         x: 384
         y: 0
         width: 96
         height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d57fcd9c0ac1a9041969a5a5a2a826a6
-      internalID: 1594361070
+      spriteID: 0aafd5915c008dd4193135210b336408
+      internalID: -1743905472
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_3_5
+      name: TeleportStart_2_5
       rect:
         serializedVersion: 2
         x: 480
         y: 0
         width: 96
         height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 76b95d6874ae19a458c22d77e94e796b
-      internalID: 2020359083
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: WrenchBot_3_6
-      rect:
-        serializedVersion: 2
-        x: 576
-        y: 0
-        width: 96
-        height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b8c5eeffc80d6ae45a3ad0dd88f10ec4
-      internalID: 1067918482
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: WrenchBot_3_7
-      rect:
-        serializedVersion: 2
-        x: 672
-        y: 0
-        width: 96
-        height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a0d71099e884e5d4b9b807620e7ffac9
-      internalID: -1411835845
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: WrenchBot_3_8
-      rect:
-        serializedVersion: 2
-        x: 768
-        y: 0
-        width: 96
-        height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8d20f354dcb5d2f47bdbb23d10ad63d7
-      internalID: -2097329713
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: WrenchBot_3_9
-      rect:
-        serializedVersion: 2
-        x: 864
-        y: 0
-        width: 96
-        height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 30394025ea78c2c4189683aa09ec8628
-      internalID: 474934644
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: WrenchBot_3_10
-      rect:
-        serializedVersion: 2
-        x: 960
-        y: 0
-        width: 96
-        height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8f2c23eaad2bf0144828667106ee913f
-      internalID: 1791293990
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: WrenchBot_3_11
-      rect:
-        serializedVersion: 2
-        x: 1056
-        y: 0
-        width: 96
-        height: 84
-      alignment: 9
-      pivot: {x: 0.5, y: 0.3}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 753af931ef41bf945b65e6865b0a0d28
-      internalID: -611504543
+      spriteID: 863af93e8fb7bad4dbaead68c063b72c
+      internalID: -1866484123
       vertices: []
       indices: 
       edges: []
@@ -359,18 +233,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      WrenchBot_3_0: -1567155737
-      WrenchBot_3_1: -551502879
-      WrenchBot_3_10: 1791293990
-      WrenchBot_3_11: -611504543
-      WrenchBot_3_2: 795495601
-      WrenchBot_3_3: -1987419417
-      WrenchBot_3_4: 1594361070
-      WrenchBot_3_5: 2020359083
-      WrenchBot_3_6: 1067918482
-      WrenchBot_3_7: -1411835845
-      WrenchBot_3_8: -2097329713
-      WrenchBot_3_9: 474934644
+      TeleportStart_2_0: 175035248
+      TeleportStart_2_1: 1578371712
+      TeleportStart_2_2: 1997387635
+      TeleportStart_2_3: -1107021533
+      TeleportStart_2_4: -1743905472
+      TeleportStart_2_5: -1866484123
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

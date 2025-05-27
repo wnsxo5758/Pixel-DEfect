@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2984ed59e5fd8754bb60d42127caa79d
+guid: 9858e9006412b7d42ae039d29d820c1b
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,7 +97,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: WrenchBot_1_0
+      name: WrenchBotAttack_0
       rect:
         serializedVersion: 2
         x: 0
@@ -111,14 +111,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 49394abbea79e6645b78aacd596109a1
-      internalID: 1571587006
+      spriteID: 16921df64a0faa543a483371ef21b2e0
+      internalID: 2127584992
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_1
+      name: WrenchBotAttack_1
       rect:
         serializedVersion: 2
         x: 96
@@ -132,17 +132,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cbad52d4ac9aa304ebe086c17db65534
-      internalID: -1198472281
+      spriteID: 59d33d62bfdfa444a8dfbf28c37e56f5
+      internalID: -1353801612
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_2
+      name: WrenchBotAttack_2
       rect:
         serializedVersion: 2
-        x: 192
+        x: 193
         y: 0
         width: 96
         height: 84
@@ -153,17 +153,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6371a35e6c5be914e8b9e7e4b6dac9e3
-      internalID: 1284112373
+      spriteID: 481a416ed5e9d8344ad939b37efab913
+      internalID: -1044810406
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_3
+      name: WrenchBotAttack_3
       rect:
         serializedVersion: 2
-        x: 288
+        x: 287
         y: 0
         width: 96
         height: 84
@@ -174,14 +174,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 686a14df794f7644293572cf15364d8d
-      internalID: 1832322426
+      spriteID: 35be5b6e5d65e7244b8218e382fb7b77
+      internalID: 21627870
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_4
+      name: WrenchBotAttack_4
       rect:
         serializedVersion: 2
         x: 384
@@ -195,14 +195,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fdbdc4f40e1d7934097ad8d97d6b68b3
-      internalID: -1229648244
+      spriteID: 095f2c10a94653349aae3f5102587865
+      internalID: 1964945999
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_5
+      name: WrenchBotAttack_5
       rect:
         serializedVersion: 2
         x: 480
@@ -216,14 +216,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c78baa88f2524dd46a05887626ba9b91
-      internalID: -641825201
+      spriteID: c0afe7aad8139c74f8675a0d26951e8b
+      internalID: -1219934264
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_6
+      name: WrenchBotAttack_6
       rect:
         serializedVersion: 2
         x: 576
@@ -237,14 +237,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f25470a8d46e6954795c32989a64b73d
-      internalID: 356209508
+      spriteID: df05abc411a598a4d959dc128941d4dc
+      internalID: 2025745065
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_7
+      name: WrenchBotAttack_7
       rect:
         serializedVersion: 2
         x: 672
@@ -258,14 +258,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 19b7d226e50ee614c9a7330f14fb9170
-      internalID: 2036902590
+      spriteID: 17825f0a4e74c9548b27b04460b2615a
+      internalID: -1589345377
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_8
+      name: WrenchBotAttack_8
       rect:
         serializedVersion: 2
         x: 768
@@ -279,14 +279,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 47729154b4d9a7e4593f8d3cc463877f
-      internalID: 1467709490
+      spriteID: b24e90dbd4d50cd4f8fbc0dd2380d180
+      internalID: -1599099453
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_9
+      name: WrenchBotAttack_9
       rect:
         serializedVersion: 2
         x: 864
@@ -300,14 +300,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 36666d9915f5bab44a1f08b98a49a76d
-      internalID: 1493865370
+      spriteID: c086184f21b4bd049b22297ee69815c6
+      internalID: 1625372077
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_10
+      name: WrenchBotAttack_10
       rect:
         serializedVersion: 2
         x: 960
@@ -321,14 +321,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 05935ac3b2d08ab4d99241a4dc84c075
-      internalID: 136023223
+      spriteID: 9dc8d20804af96c408302ee2253cb518
+      internalID: -1549099297
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_11
+      name: WrenchBotAttack_11
       rect:
         serializedVersion: 2
         x: 1056
@@ -342,14 +342,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: eadfc7b1cbf98214eb287bafc05ad052
-      internalID: -419692256
+      spriteID: 1c526b5e54278284daaa05adc1ccf31b
+      internalID: 1593927069
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WrenchBot_1_12
+      name: WrenchBotAttack_12
       rect:
         serializedVersion: 2
         x: 1152
@@ -363,8 +363,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b1c5bcc6e1072cf4da7d65f4ea9ddf1e
-      internalID: 265495502
+      spriteID: f41f2c1206e710844a333f258030407e
+      internalID: 1707764175
       vertices: []
       indices: 
       edges: []
@@ -380,19 +380,19 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      WrenchBot_1_0: 1571587006
-      WrenchBot_1_1: -1198472281
-      WrenchBot_1_10: 136023223
-      WrenchBot_1_11: -419692256
-      WrenchBot_1_12: 265495502
-      WrenchBot_1_2: 1284112373
-      WrenchBot_1_3: 1832322426
-      WrenchBot_1_4: -1229648244
-      WrenchBot_1_5: -641825201
-      WrenchBot_1_6: 356209508
-      WrenchBot_1_7: 2036902590
-      WrenchBot_1_8: 1467709490
-      WrenchBot_1_9: 1493865370
+      WrenchBotAttack_0: 2127584992
+      WrenchBotAttack_1: -1353801612
+      WrenchBotAttack_10: -1549099297
+      WrenchBotAttack_11: 1593927069
+      WrenchBotAttack_12: 1707764175
+      WrenchBotAttack_2: -1044810406
+      WrenchBotAttack_3: 21627870
+      WrenchBotAttack_4: 1964945999
+      WrenchBotAttack_5: -1219934264
+      WrenchBotAttack_6: 2025745065
+      WrenchBotAttack_7: -1589345377
+      WrenchBotAttack_8: -1599099453
+      WrenchBotAttack_9: 1625372077
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
