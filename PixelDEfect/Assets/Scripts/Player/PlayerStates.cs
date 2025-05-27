@@ -82,17 +82,27 @@ namespace PlayerStates
     public class Jump : State<PlayerController>
     {
         private MovementRigidbody2D movement;
+        private PlayerAttack attack;
         
         public override void Enter(PlayerController player)
         {
             movement = player.GetComponent<MovementRigidbody2D>();
+            attack = player.GetComponent<PlayerAttack>();
         }
 
         public override void Execute(PlayerController player)
         {
             float input = player.HorizontalInput();
-            
-            player.UpdateMove(input);
+
+            if (attack.AfterPulling && player.IsGrounded())
+            {
+                attack.AfterPulling = false;
+            }
+
+            if (!attack.AfterPulling)
+            {
+                player.UpdateMove(input);
+            }
             
             // 방향 설정
             if (input != 0)
@@ -411,7 +421,45 @@ namespace PlayerStates
         }
     }
 
-    public class PullWeapon : State<PlayerController>
+    public class PullWeaponGround : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private MovementRigidbody2D movement;
+        private WeaponPullContext pullContext;
+        private bool animationFinished = false;
+
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            movement = player.GetComponent<MovementRigidbody2D>();
+
+            // 지면에서는 이동 완전 정지
+            player.UpdateMove(0);
+            
+            animationFinished = false;
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            if (animationFinished)
+            {
+                player.ChangeState(new Idle());
+                animationFinished = false;
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            
+        }
+
+        public void OnAnimationFinished()
+        {
+            animationFinished = true;
+        }
+    }
+
+    public class PullWeaponAir : State<PlayerController>
     {
         private PlayerAnimator animator;
         private MovementRigidbody2D movement;
@@ -425,11 +473,8 @@ namespace PlayerStates
 
             if (movement != null)
             {
-                if (!player.IsGrounded())
-                {
-                    movement.DisableGravity();
-                }
-                movement.MoveTo(0);
+                movement.DisableGravity();
+                movement.DisableRigidbody();
             }
             
             animationFinished = false;
@@ -437,24 +482,16 @@ namespace PlayerStates
 
         public override void Execute(PlayerController player)
         {
-            if (movement != null)
-            {
-                movement.MoveTo(0);
-            }
-
             if (animationFinished)
             {
-                player.ChangeState(new Idle());
+                player.ChangeState(new AfterPull());
                 animationFinished = false;
             }
         }
 
         public override void Exit(PlayerController player)
         {
-            if (movement != null)
-            {
-                movement.EnableGravity();
-            }
+            
         }
 
         public void OnAnimationFinished()
@@ -463,6 +500,82 @@ namespace PlayerStates
         }
     }
 
+    public class AfterPull : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private MovementRigidbody2D movement;
+        private Rigidbody2D rb;
+        private WeaponPullContext pullContext;
+        
+        private bool knockBackApplied = false;
+        private bool hasLanded = false;
+        private float minimumAirTime = 0.1f; // 최소 공중 시간
+        private float airTimer = 0f;
+
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            movement = player.GetComponent<MovementRigidbody2D>();
+            rb = player.GetComponent<Rigidbody2D>();
+
+            if (movement != null)
+            {
+                movement.EnableGravity();
+            }
+            
+            // 넉백 힘 적용
+            ApplyKnockBack(player);
+
+            if (animator != null)
+            {
+                animator.StartAfterPullAnim();
+            }
+
+            knockBackApplied = true;
+            hasLanded = false;
+            airTimer = 0f;
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            // 공중 시간 누적
+            airTimer += Time.deltaTime;
+            
+            // 착지 체크 (최소 공중 시간 경과 후)
+            if (airTimer >= minimumAirTime && player.IsGrounded() && !hasLanded && rb.velocity.y <= 0.1f)
+            {
+                hasLanded = true;
+                
+                // 착지 즉시 Idle 상태로 전환
+                player.ChangeState(new Idle());
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            if (animator != null)
+            {
+                animator.StopAfterPullAnim(); // 루프 애니메이션 정지
+            }
+        }
+        
+        private void ApplyKnockBack(PlayerController player)
+        {
+            // 플레이어가 바라보는 방향의 반대로 넉백
+            float currentDirection = player.transform.localScale.x;
+            Vector2 knockBackDirection = new Vector2(-currentDirection, 0.5f).normalized;
+            
+            // 넉백 힘 적용 (WeaponPullContext에서 설정된 값 사용)
+            Vector2 knockBackForce = new Vector2(8f, 3f); // 기본값, 필요시 context에서 가져오기
+            
+            if (rb != null)
+            {
+                rb.velocity = Vector2.zero; // 기존 속도 초기화
+                rb.AddForce(new Vector2(knockBackDirection.x * knockBackForce.x, knockBackForce.y), ForceMode2D.Impulse);
+            }
+        }
+    }
+    
     public class TeleportStart : State<PlayerController>
     {
         private PlayerAnimator animator;
@@ -482,10 +595,9 @@ namespace PlayerStates
             // 텔레포트 시작 애니메이션
             if (animator != null)
             {
-                Debug.Log("텔레포트 시작 애니메이션");
                 animator.StartTeleportAnim();
             }
-
+            
             animationFinished = false;
         }
 
@@ -521,6 +633,8 @@ namespace PlayerStates
         private PlayerAnimator animator;
         private MovementRigidbody2D movement;
         private bool animationFinished = false;
+        private bool shouldPullWeapon = false;
+        private WeaponPullContext pendingPullContext;
         
         public override void Enter(PlayerController player)
         {
@@ -531,19 +645,47 @@ namespace PlayerStates
             {
                 movement.MoveTo(0);
             }
-
-            if (animator != null)
+            
+            // 텔레포트 후 무기 뽑기가 필요한지 확인
+            PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
+            if (playerAttack != null)
             {
-                animator.EndTeleportAnim(false);
+                shouldPullWeapon = playerAttack.HasPendingWeaponPull();
+                if (shouldPullWeapon)
+                {
+                    pendingPullContext = playerAttack.GetPendingPullContext();
+                }
             }
 
-            animationFinished = false;
+            if (shouldPullWeapon && pendingPullContext != null)
+            {
+                if (animator != null)
+                {
+                    animator.FinishTeleportAnim(); // ← 텔레포트 애니메이션 상태 정리
+                }
+                // 무기 뽑기가 필요하면 텔레포트 종료 애니메이션 건너뛰고 바로 무기 뽑기 상태로 전환
+                DetermineAndStartPullState(player, pendingPullContext);
+            }
+            else
+            {
+                // 일반적인 텔레포트 완료 - 텔레포트 종료 애니메이션 재생
+                if (animator != null)
+                {
+                    animator.EndTeleportAnim();
+                }
+                animationFinished = false;
+            }
         }
 
         public override void Execute(PlayerController player)
         {
+            // 무기 뽑기가 필요한 경우에는 이미 Enter에서 상태 전환했으므로 여기서는 처리하지 않음
+            if (shouldPullWeapon)
+            {
+                return;
+            }
             
-            // 애니메이션 완료 시 상태 전환
+            // 일반적인 텔레포트 완료 처리
             if (animationFinished)
             {
                 player.ChangeState(new Idle());
@@ -556,6 +698,35 @@ namespace PlayerStates
             
         }
 
+        private void DetermineAndStartPullState(PlayerController player, WeaponPullContext context)
+        {
+            // 현재 플레이어가 공중에 있는지 확인
+            bool isPlayerInAir = !player.IsGrounded();
+            
+            context.isGrounded = !isPlayerInAir;
+            
+            if (isPlayerInAir)
+            {
+                // 공중 뽑기 상태로 전환
+                player.ChangeState(new PullWeaponAir());
+                
+                if (animator != null)
+                {
+                    animator.StartPullAirAnim(context);
+                }
+            }
+            else
+            {
+                // 지면 뽑기 상태로 전환
+                player.ChangeState(new PullWeaponGround());
+                
+                if (animator != null)
+                {
+                    animator.StartPullGroundAnim(context);
+                }
+            }
+        }
+        
         // 텔레포트 종료 애니메이션 완료 시 호출
         public void OnTeleportEndAnimationFinished()
         {

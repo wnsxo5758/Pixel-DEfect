@@ -174,90 +174,114 @@ public class PlayerAnimator : MonoBehaviour
     {
         animator.SetTrigger(throwWeapon);
     }
-
-    public void StartPullAnim(WeaponPullContext context)
+    
+    // 지면에서 무기 뽑기 애니메이션 시작
+    public void StartPullGroundAnim(WeaponPullContext context)
     {
-        if (isPlayingPullAnimation) return;
-        
         currentPullContext = context;
-        isPlayingPullAnimation = true;
         
-        ResetPullAnimationTriggers();
-
-        if (context.isTeleportPull)
-        {
-            if (context.isPlayerAirborne)
-            {
-                animator.SetTrigger(pullAir);
-            }
-            else
-            {
-                animator.SetTrigger(pullGround);
-            }
-        }
-        else if (context.isGrounded)
+        if (animator != null)
         {
             animator.SetTrigger(pullGround);
         }
-        else
+    }
+    
+    // 공중에서 무기 뽑기 애니메이션 시작
+    public void StartPullAirAnim(WeaponPullContext context)
+    {
+        currentPullContext = context;
+        
+        if (animator != null)
         {
             animator.SetTrigger(pullAir);
         }
     }
 
-    private void FinishedPullAnim()
+    public void StartAfterPullAnim()
     {
-        if (currentPullContext == null) return;
-        
-        if (currentPullContext.isPlayerAirborne)
+        if (animator != null)
         {
-            ApplyAirPullKnockBack();
-            animator.SetTrigger(afterPull);
+            // 루프 애니메이션이므로 Bool 파라미터 사용
+            animator.SetBool(afterPull, true);
+        }
+    }
+    
+    public void StopAfterPullAnim()
+    {
+        if (animator != null)
+        {
+            // 루프 애니메이션 정지
+            animator.SetBool(afterPull, false);
         }
         
-        playerAttack?.FinishedPullAnim(currentPullContext);
-        
-        isPlayingPullAnimation = false;
-        isPlayingTeleportAnimation = false;
-        currentPullContext = null;
+        ResetPullAnimationTriggers();
     }
 
-    private void ApplyAirPullKnockBack()
+    // 뽑기 데미지 이벤트
+    private void OnPullDamage()
     {
-        if (movement == null || currentPullContext == null) return;
+        if (playerAttack != null)
+        {
+            playerAttack.OnWeaponPullDamage();
+        }
+    }
+    
+    // 애니메이션 이벤트에서 호출되는 메서드들
+    public void OnPullGroundAnimationFinished()
+    {
+        if (playerAttack != null)
+        {
+            playerAttack.FinishedPullGroundAnim(currentPullContext);
+        }
         
-        // 뒤로 날아가는 힘 계산
-        float knockBackDirection = -Mathf.Sign(controller.transform.localScale.x);
-        Vector2 knockBackForce = new Vector2(knockBackDirection* currentPullContext.knockBackForce.x,
-            currentPullContext.knockBackForce.y);
+        currentPullContext = null;
         
-        // 물리 효과 적용
-        movement.SetVelocity(knockBackForce);
+        ResetPullAnimationTriggers();
+        ResetTeleportAnimationTriggers();
+    }
+    
+    public void OnPullAirAnimationFinished()
+    {
+        if (playerAttack != null)
+        {
+            playerAttack.FinishedPullAirAnim(currentPullContext);
+        }
+        
+        currentPullContext = null;
+        
+        ResetPullAnimationTriggers();
+        ResetTeleportAnimationTriggers();
     }
 
     public void StartTeleportAnim()
     {
-        Debug.Log(isPlayingTeleportAnimation);
         if (isPlayingTeleportAnimation) return;
         
         isPlayingTeleportAnimation = true;
         ResetTeleportAnimationTriggers();
+        ResetPullAnimationTriggers();
         
         animator.SetTrigger(teleportPre);
     }
 
-    public void EndTeleportAnim(bool willPullWeapon)
+    public void FinishTeleportAnim()
+    {
+        if (isPlayingTeleportAnimation)
+        {
+            // 텔레포트 애니메이션 상태 정리
+            isPlayingTeleportAnimation = false;
+        
+            // 텔레포트 관련 트리거 초기화
+            ResetTeleportAnimationTriggers();
+            ResetPullAnimationTriggers();
+        }
+    }
+
+    public void EndTeleportAnim()
     {
         if (!isPlayingTeleportAnimation) return;
         
-        if (willPullWeapon)
-        {
-            isPlayingTeleportAnimation = false;
-        }
-        else
-        {
-            animator.SetTrigger(teleportPost);
-        }
+        animator.SetTrigger(teleportPost);
     }
 
     // 텔레포트 시작 애니메이션 완료
@@ -354,6 +378,7 @@ public class PlayerAnimator : MonoBehaviour
         
         ResetPullAnimationTriggers();
         ResetTeleportAnimationTriggers();
+        ResetAllDeathTrigger();
         
         animator.SetTrigger(revive);
     }
@@ -372,13 +397,14 @@ public class PlayerAnimator : MonoBehaviour
     {
         animator.ResetTrigger(pullGround);
         animator.ResetTrigger(pullAir);
-        animator.ResetTrigger(afterPull);
+        animator.ResetTrigger(jump);
     }
 
     private void ResetTeleportAnimationTriggers()
     {
         animator.ResetTrigger(teleportPre);
         animator.ResetTrigger(teleportPost);
+        animator.ResetTrigger(jump);
     }
     
     private void RestartGameEvent()

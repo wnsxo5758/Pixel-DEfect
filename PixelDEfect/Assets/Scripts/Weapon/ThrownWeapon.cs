@@ -16,7 +16,8 @@ public class ThrownWeapon : MonoBehaviour
     private Rigidbody2D rb;
     private CircleCollider2D circleCollider;
     private SpriteRenderer spriteRenderer;
-    
+
+    private bool isPullDamageApplied = false; // 뽑기 데미지 적용 여부
     private bool isStuck = false;
     private bool canDealDamage = true;
     private Transform stuckTarget;
@@ -226,8 +227,49 @@ public class ThrownWeapon : MonoBehaviour
         return weaponData;
     }
 
+    public void StartPullFromEnemy()
+    {
+        if (isStuck && stuckTarget != null)
+        {
+            // 무기 숨김 (애니메이션에서 무기가 표현되므로)
+            SetVisible(false);
+        
+            // 데미지는 아직 적용하지 않음
+            isPullDamageApplied = false;
+        }
+    }
+
+    public void ApplyPullDamage()
+    {
+        if (isPullDamageApplied) return;
+
+        if (isStuck && stuckTarget != null && stuckTarget.CompareTag("Enemy"))
+        {
+            EnemyBT enemy = stuckTarget.GetComponent<EnemyBT>();
+            ITimeAffected timeAffected = stuckTarget.GetComponent<ITimeAffected>();
+
+            if (enemy != null)
+            {
+                int extraDamage = weaponData.Damage * extraDamageMultiplier;
+
+                if (TimeManager.Instance.IsTimeFrozen() && timeAffected != null)
+                {
+                    TimeManager.Instance.ApplyDamageInFrozenTime(timeAffected, extraDamage, Vector2.zero);
+                }
+                else
+                {
+                    enemy.DecreaseHp(extraDamage);
+                }
+            
+                isPullDamageApplied = true;
+            }
+        }
+    }
+    
     public void PullOutFromEnemy()
     {
+        if (isPullDamageApplied) return;
+        
         if (isStuck && stuckTarget != null && stuckTarget.CompareTag("Enemy"))
         {
             EnemyBT enemy = stuckTarget.GetComponent<EnemyBT>();
@@ -246,6 +288,23 @@ public class ThrownWeapon : MonoBehaviour
                     enemy.DecreaseHp(extraDamage);
                 }
             }
+        }
+    }
+    
+    // 뽑기 완료 처리
+    public void CompletePull()
+    {
+        // 무기 다시 보이게 하기 (잠시만)
+        SetVisible(true);
+        
+        // 적에서 분리
+        if (isStuck && stuckTarget != null)
+        {
+            transform.SetParent(null);
+        
+            isStuck = false;
+            stuckTarget = null;
+            isPullDamageApplied = false;
         }
     }
 
@@ -278,6 +337,14 @@ public class ThrownWeapon : MonoBehaviour
             rb.velocity = Vector2.zero;
             rb.angularVelocity = 0f;
             rb.isKinematic = true;
+        }
+    }
+
+    public void SetVisible(bool visible)
+    {
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.enabled = visible;
         }
     }
     

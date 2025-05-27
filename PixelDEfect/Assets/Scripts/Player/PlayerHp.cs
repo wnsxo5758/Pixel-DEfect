@@ -136,8 +136,9 @@ public class PlayerHp : MonoBehaviour
     private void HandleHit(Vector2 knockBack)
     {
         var currentState = player.GetCurrentState();
-        bool isSpecialState = currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || 
-                              currentState is PlayerStates.Valve || currentState is PlayerStates.Attack;
+        bool isSpecialState = currentState is PlayerStates.Climb or PlayerStates.Hold or
+            PlayerStates.Valve or PlayerStates.Attack or PlayerStates.PullWeaponGround or
+            PlayerStates.PullWeaponAir or PlayerStates.TeleportStart or PlayerStates.TeleportEnd;
         
         // 경직 시간 설정
         currentHitStunDuration = isSpecialState ? specialStunDuration : hitStunDuration;

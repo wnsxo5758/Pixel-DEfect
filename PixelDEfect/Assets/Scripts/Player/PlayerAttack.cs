@@ -22,9 +22,6 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float throwUpwardForce = 5f;
     [SerializeField] private GameObject thrownWeaponPrefab;
     [SerializeField] private float throwCooldown = 1f;
-
-    [Header("무기 뽑기 설정")] 
-    [SerializeField] private Vector2 airPullKnockBack = new Vector2(8f, 3f); // 공중 뽑기 넉백 힘
     
     [Header("텔레포트 설정")] 
     [SerializeField] private float teleportDelayTime = 0.5f;
@@ -42,12 +39,16 @@ public class PlayerAttack : MonoBehaviour
     private bool canThrow = true;
     private bool canTeleport = true;
     private bool isTeleporting = false;
-    private bool isPullingWeapon = false;
+    
+    public bool AfterPulling { get; set; }
+    
+    // 무기 뽑기 상태 관리
+    private WeaponPullContext pendingPullContext;
+    private bool hasPendingWeaponPull = false;
     
     // 텔레포트 상태 관리
     private bool isTeleportInProgress = false;
     private ThrownWeapon pendingTeleportWeapon;
-    private WeaponPullContext pendingPullContext;
     
     private void Awake()
     {
@@ -157,31 +158,15 @@ public class PlayerAttack : MonoBehaviour
     private void ProcessThrownWeaponPickup(ThrownWeapon thrownWeapon)
     {
         bool playerGrounded = movement.IsGrounded;
-        bool enemyGrounded = true;
-        
-        // 적에게 박힌 무기인지 확인
-        if (thrownWeapon.transform.parent != null)
-        {
-            EnemyBT enemy = thrownWeapon.transform.parent.GetComponent<EnemyBT>();
-            if (enemy != null)
-            {
-                MovementRigidbody2D enemyMovement = enemy.GetComponent<MovementRigidbody2D>();
-                if (enemyMovement != null)
-                {
-                    enemyGrounded = enemyMovement.IsGrounded;
-                }
-            }
-        }
         
         // 무기 뽑기 컨텍스트 생성
         WeaponPullContext pullContext = new WeaponPullContext(
-            thrownWeapon,
-            transform.position,
-            playerGrounded,
-            enemyGrounded);
+            thrownWeapon, 
+            transform.position, 
+            playerGrounded);
         
-        // 적에게 박힌 무기라면 추가 데미지 적용
-        thrownWeapon.PullOutFromEnemy();
+        // 뽑기 시작
+        thrownWeapon.StartPullFromEnemy();
         
         // 무기 뽑기 상태로 전환 및 애니메이션 시작
         StartWeaponPull(pullContext);
@@ -190,16 +175,29 @@ public class PlayerAttack : MonoBehaviour
     // 무기 뽑기 시작
     private void StartWeaponPull(WeaponPullContext context)
     {
-        // 무기 뽑기 상태로 전환
-        controller.ChangeState(new PlayerStates.PullWeapon());
-        
-        // 애니메이션 시작
-        if (playerAnimator != null)
-        {
-            playerAnimator.StartPullAnim(context);
-        }
-        
         pendingPullContext = context;
+        hasPendingWeaponPull = true;
+
+        if (!movement.IsGrounded)
+        {
+            // 공중 뽑기 상태로 전환
+            controller.ChangeState(new PlayerStates.PullWeaponAir());
+
+            if (playerAnimator != null)
+            {
+                playerAnimator.StartPullAirAnim(context);
+            }
+        }
+        else
+        {
+            // 지면 뽑기 상태로 전환
+            controller.ChangeState(new PlayerStates.PullWeaponGround());
+
+            if (playerAnimator != null)
+            {
+                playerAnimator.StartPullGroundAnim(context);
+            }
+        }
     }
     
     private void EquipWeapon(WeaponBase weaponData)
@@ -417,37 +415,7 @@ public class PlayerAttack : MonoBehaviour
         }
         
         // 텔레포트 위치 계산
-        Vector3 teleportPosition;
-        
-        if (targetWeapon.IsStuck())
-        {
-            Vector2 contactNormal = targetWeapon.GetContactNormal();
-            Vector2 teleportDirection;
-
-            Vector2 playerSize = GetComponent<Collider2D>().bounds.size;
-            float teleportDistance = playerSize.x * 2f;
-        
-            float absNormalX = Mathf.Abs(contactNormal.x);
-            float absNormalY = Mathf.Abs(contactNormal.y);
-        
-            if (absNormalX > absNormalY)
-            {
-                float diagonalX = Mathf.Sign(contactNormal.x);
-                teleportDirection = new Vector2(diagonalX, 1f).normalized;
-                teleportDistance = playerSize.x * 2f;
-            }
-            else
-            {
-                teleportDirection = contactNormal.y < 0 ? Vector2.down : Vector2.up;
-                teleportDistance = playerSize.y;
-            }
-        
-            teleportPosition = (Vector2)targetWeapon.transform.position + teleportDirection * teleportDistance;
-        }
-        else
-        {
-            teleportPosition = targetWeapon.transform.position;
-        }
+        Vector3 teleportPosition = CalculateTeleportPosition(targetWeapon);
         
         // 무기 처리
         HandleWeaponDuringTeleport(targetWeapon);
@@ -459,17 +427,45 @@ public class PlayerAttack : MonoBehaviour
         CompleteTeleportSequence(wasAttachedToEnemy);
     }
     
+    private Vector3 CalculateTeleportPosition(ThrownWeapon weapon)
+    {
+        if (!weapon.IsStuck())
+        {
+            return weapon.transform.position;
+        }
+
+        Vector2 contactNormal = weapon.GetContactNormal();
+        Vector2 weaponPos = weapon.transform.position;
+        
+        Vector2 playerSize = GetComponent<Collider2D>().bounds.size;
+        float teleportDistance;
+        Vector2 teleportDirection;
+        
+        float absNormalX = Mathf.Abs(contactNormal.x);
+        float absNormalY = Mathf.Abs(contactNormal.y);
+        
+        if (absNormalX > absNormalY)
+        {
+            float diagonalX = Mathf.Sign(contactNormal.x);
+            teleportDirection = new Vector2(diagonalX, 1f).normalized;
+            teleportDistance = playerSize.x * 2f;
+        }
+        else
+        {
+            teleportDirection = contactNormal.y < 0 ? Vector2.down : Vector2.up;
+            teleportDistance = playerSize.y;
+        }
+        
+        return weaponPos + teleportDirection * teleportDistance;
+    }
+    
     // 텔레포트 중 무기 처리
     private void HandleWeaponDuringTeleport(ThrownWeapon weapon)
     {
-        // 적에게 박힌 무기라면 추가 데미지
-        weapon.PullOutFromEnemy();
-        
         // 무기 데이터 백업
         WeaponBase weaponData = weapon.GetWeaponData();
         if (weaponData != null)
         {
-            // 무기 장착 준비
             thrownWeaponPrefab = FindWeaponPrefab(weaponData);
         }
         
@@ -496,21 +492,16 @@ public class PlayerAttack : MonoBehaviour
 
         if (wasAttachedToEnemy && pendingTeleportWeapon != null)
         {
-            Debug.Log("[Teleport] 적 부착 무기 → 바로 무기 뽑기 상태로 전환");
             WeaponPullContext pullContext = WeaponPullContext.CreateTeleportPull(
                 pendingTeleportWeapon,
                 transform.position,
                 controller.IsGrounded());
             
-            controller.ChangeState(new PlayerStates.PullWeapon());
-
-            if (playerAnimator != null)
-            {
-                playerAnimator.StartPullAnim(pullContext);
-            }
-            
-            isTeleporting = false;
             pendingPullContext = pullContext;
+            hasPendingWeaponPull = true;
+            
+            controller.ChangeState(new PlayerStates.TeleportEnd());
+            isTeleporting = false;
         }
         else
         {
@@ -536,6 +527,15 @@ public class PlayerAttack : MonoBehaviour
         StartCoroutine(TeleportCooldownTimer());
     }
     
+    // 뽑기 데미지 적용 애니메이션 이벤트
+    public void OnWeaponPullDamage()
+    {
+        if (pendingPullContext?.targetWeapon != null)
+        {
+            pendingPullContext.targetWeapon.ApplyPullDamage();
+        }
+    }
+    
     // 텔레포트 시작 애니메이션 완료 콜백
     public void OnTeleportStartAnim()
     {
@@ -556,8 +556,30 @@ public class PlayerAttack : MonoBehaviour
         }
     }
     
-    // 무기 뽑기 애니메이션 완료 콜백
-    public void FinishedPullAnim(WeaponPullContext context)
+    // 무기 뽑기 애니메이션 완료 콜백들
+    public void FinishedPullGroundAnim(WeaponPullContext context)
+    {
+        CompleteWeaponPull(context);
+        
+        // 지면 뽑기 완료 시 Idle로 전환
+        if (controller.GetCurrentState() is PlayerStates.PullWeaponGround pullState)
+        {
+            pullState.OnAnimationFinished();
+        }
+    }
+    
+    public void FinishedPullAirAnim(WeaponPullContext context)
+    {
+        CompleteWeaponPull(context);
+        
+        // 공중 뽑기 완료 시 AfterPull 상태로 전환
+        if (controller.GetCurrentState() is PlayerStates.PullWeaponAir pullState)
+        {
+            pullState.OnAnimationFinished();
+        }
+    }
+
+    private void CompleteWeaponPull(WeaponPullContext context)
     {
         if (context != null && context.targetWeapon != null)
         {
@@ -579,15 +601,22 @@ public class PlayerAttack : MonoBehaviour
             }
         }
         
-        // 상태 변경은 PullWeapon 상태에서 처리
-        if (controller.GetCurrentState() is PlayerStates.PullWeapon pullState)
-        {
-            pullState.OnAnimationFinished();
-        }
-        
+        // pending 상태 초기화
         pendingPullContext = null;
+        hasPendingWeaponPull = false;
     }
-
+    
+    // 외부에서 접근 가능한 메서드들
+    public bool HasPendingWeaponPull()
+    {
+        return hasPendingWeaponPull;
+    }
+    
+    public WeaponPullContext GetPendingPullContext()
+    {
+        return pendingPullContext;
+    }
+    
     private GameObject FindWeaponPrefab(WeaponBase weaponData)
     {
         return thrownWeaponPrefab;
@@ -746,10 +775,9 @@ public class PlayerAttack : MonoBehaviour
         }
         
         // 공격 가능한 상태 확인
-        if (currentState is PlayerStates.Climb || currentState is PlayerStates.Hold || 
-            currentState is PlayerStates.Crawl || currentState is PlayerStates.Roll || 
-            currentState is PlayerStates.TeleportStart || currentState is PlayerStates.TeleportEnd ||
-            currentState is PlayerStates.PullWeapon || currentState is PlayerStates.Valve)
+        if (currentState is PlayerStates.Climb or PlayerStates.Hold or PlayerStates.Crawl or PlayerStates.Roll 
+            or PlayerStates.TeleportStart or PlayerStates.TeleportEnd or PlayerStates.PullWeaponGround 
+            or PlayerStates.PullWeaponAir or PlayerStates.AfterPull or PlayerStates.Valve)
         {
             return false;
         }

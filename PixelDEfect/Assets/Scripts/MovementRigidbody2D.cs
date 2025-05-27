@@ -162,6 +162,11 @@ public class MovementRigidbody2D : MonoBehaviour
     {
         rigid.velocity = velocity;
     }
+
+    public void AddForce(Vector2 force)
+    {
+        rigid.AddForce(force, ForceMode2D.Impulse);
+    }
     
     void OnDrawGizmos()
     {
