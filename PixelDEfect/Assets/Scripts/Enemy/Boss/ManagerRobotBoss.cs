@@ -364,6 +364,7 @@ public class ManagerRobotBoss : BossBT
                 case AttackState.Preparation:
                     break;
                 case AttackState.Execute:
+                    animator.TriggerAttackAnim();
                     break;
             }
         }
@@ -382,10 +383,13 @@ public class ManagerRobotBoss : BossBT
             switch (newState)
             {
                 case HeadbuttState.Preparation:
+                    animator.TriggerHeadbuttPrep();
                     break;
                 case HeadbuttState.Charging:
+                    animator.SetHeadbuttCharge(true);
                     break;
-                case HeadbuttState.None:
+                case HeadbuttState.Cooldown:
+                    animator.SetHeadbuttCharge(false);
                     break;
             }
         }
@@ -401,12 +405,17 @@ public class ManagerRobotBoss : BossBT
         switch (newState)
         {
             case SummonState.Ascending:
+                animator.TriggerBossUp();
                 break;
             case SummonState.Summoning:
+                animator.SetBossUpIdle(true);
                 break;
             case SummonState.Descending:
+                animator.SetBossUpIdle(false);
+                animator.SetBossDown(true);
                 break;
             case SummonState.Ending:
+                animator.SetBossDown(false);
                 break;
         }
     }
@@ -855,8 +864,6 @@ public class ManagerRobotBoss : BossBT
         
         // 소환 상태로 전환
         SetSummonState(SummonState.Ascending);
-        
-        // 소환 애니메이션 (필요시)
     }
     
     // 소환 패턴 종료
@@ -907,14 +914,10 @@ public class ManagerRobotBoss : BossBT
             ceilingPosition = originalPosition + new Vector3(0, ceilingHeight, 0);
         }
         
-        // 회전 설정 
-        Quaternion ceilingRotation = Quaternion.Euler(0, 0, 180f);
-        
         if (useDirectPositioning)
         {
             // 직접 위치 설정
             transform.position = Vector3.Lerp(originalPosition, ceilingPosition, progress);
-            transform.rotation = Quaternion.Slerp(originalRotation, ceilingRotation, progress);
         }
         else
         {
@@ -923,8 +926,6 @@ public class ManagerRobotBoss : BossBT
             {
                 Vector3 targetPosition = Vector3.Lerp(originalPosition, ceilingPosition, progress);
                 rb.MovePosition(targetPosition);
-                
-                rb.MoveRotation(Quaternion.Slerp(originalRotation, ceilingRotation, progress));
             }
         }
     }
@@ -943,14 +944,10 @@ public class ManagerRobotBoss : BossBT
             ceilingPosition = originalPosition + new Vector3(0, ceilingHeight, 0);
         }
         
-        // 회전 설정
-        Quaternion ceilingRotation = Quaternion.Euler(0, 0, 180f);
-
         if (useDirectPositioning)
         {
             // 반대 방향으로 보간
             transform.position = Vector3.Lerp(ceilingPosition, originalPosition, progress);
-            transform.rotation = Quaternion.Slerp(ceilingRotation, originalRotation, progress);
         }
         else
         {
@@ -958,8 +955,6 @@ public class ManagerRobotBoss : BossBT
             {
                 Vector3 targetPosition = Vector3.Lerp(ceilingPosition, originalPosition, progress);
                 rb.MovePosition(targetPosition);
-                
-                rb.MoveRotation(Quaternion.Slerp(ceilingRotation, originalRotation, progress));
             }
         }
     }

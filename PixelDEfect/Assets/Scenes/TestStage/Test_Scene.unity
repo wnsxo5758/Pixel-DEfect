@@ -53792,16 +53792,28 @@ PrefabInstance:
       value: 2.3
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: deathDelay
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: ceilingPoint
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: ceilingHeight
-      value: 10
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: stunThreshold
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: ascentDuration
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: attackPrepTime
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: summonCooldown
@@ -53813,15 +53825,39 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: patternCooldown
-      value: 8
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: basicAttackRange
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: headbuttCooldown
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: initialRobotCount
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: attackHitBoxSize.x
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: attackHitBoxSize.y
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: basicAttackCooldown
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: attackHitBoxOffset.x
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: attackHitBoxOffset.y
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: robotPrefabs.Array.size
@@ -53839,6 +53875,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4512894842384245631, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 1371527030, guid: fcd48619784fd064bb4b7c0fcfe39c10, type: 3}
     - target: {fileID: 7370528742305282222, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: m_Name
       value: ManagerRobotBoss

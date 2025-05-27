@@ -376,7 +376,13 @@ public class BossBT : EnemyBT
         
         // 기절 시각 효과 표시
         Debug.Log("보스가 스턴에 걸림");
+        
         // 기절 애니메이션
+        if (animator != null)
+        {
+            Debug.Log("SetStunned true");
+            animator.TriggerStunned(true);
+        }
         
         // UI 업데이트
         UpdateBossUI();
@@ -391,6 +397,11 @@ public class BossBT : EnemyBT
         // 기절 시각 효과 제거
         
         // 기절 회복 애니메이션
+        if (animator != null)
+        {
+            Debug.Log("SetStunned false");
+            animator.SetStunned(false);
+        }
     }
     
     // 다음 패턴 인덱스 선택

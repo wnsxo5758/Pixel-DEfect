@@ -775,14 +775,12 @@ public class PlayerAttack : MonoBehaviour
         }
         
         // 공격 가능한 상태 확인
-        if (currentState is PlayerStates.Climb or PlayerStates.Hold or PlayerStates.Crawl or PlayerStates.Roll 
-            or PlayerStates.TeleportStart or PlayerStates.TeleportEnd or PlayerStates.PullWeaponGround 
-            or PlayerStates.PullWeaponAir or PlayerStates.AfterPull or PlayerStates.Valve)
+        if (currentState is PlayerStates.Idle or PlayerStates.Run or PlayerStates.Jump)
         {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     // 무기 소지 여부 (외부 접근용)

@@ -12,10 +12,13 @@ public class EnemyAnimator : MonoBehaviour
     private readonly int isChasing = Animator.StringToHash("IsChasing");
     
     // 보스 애니메이션 파라미터
-    private readonly int attackPreparation = Animator.StringToHash("AttackPreparation");
-    private readonly int attackExecute = Animator.StringToHash("AttackExecute");
-    private readonly int stunState = Animator.StringToHash("Stunned");
-    private readonly int phaseChange = Animator.StringToHash("PhaseChange");
+    private readonly int headbuttPrep = Animator.StringToHash("HeadbuttPrep");
+    private readonly int headbuttCharge = Animator.StringToHash("HeadbuttCharge");
+    private readonly int bossUpTrigger = Animator.StringToHash("BossUp");
+    private readonly int bossUpIdle = Animator.StringToHash("BossUpIdle");
+    private readonly int bossDown = Animator.StringToHash("BossDown");
+    private readonly int stunTrigger = Animator.StringToHash("Stun");
+    private readonly int isStunned = Animator.StringToHash("IsStunned");
     
     private Animator animator;
     private MovementRigidbody2D movement; // 움직임
@@ -81,35 +84,60 @@ public class EnemyAnimator : MonoBehaviour
     }
     
     // 보스 전용 애니메이션 메서드
-    public void TriggerPreparationAnim()
+    public void TriggerHeadbuttPrep()
     {
         if (animator != null)
         {
-            animator.SetTrigger(attackPreparation);
+            animator.SetTrigger(headbuttPrep);
+        }
+    }
+    
+    public void SetHeadbuttCharge(bool isCharge)
+    {
+        if (animator != null)
+        {
+            animator.SetBool(headbuttCharge, isCharge);
+        }
+    }
+    
+    public void TriggerBossUp()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(bossUpTrigger);
+        }
+    }
+    
+    public void SetBossUpIdle(bool isUpIdle)
+    {
+        if (animator != null)
+        {
+            animator.SetBool(bossUpIdle, isUpIdle);
         }
     }
 
-    public void TriggerAttackExecuteAnim()
+    public void SetBossDown(bool isDown)
     {
         if (animator != null)
         {
-            animator.SetTrigger(attackExecute);
+            animator.SetBool(bossDown, isDown);
         }
     }
 
-    public void SetStunnedState(bool isStunned)
+    public void TriggerStunned(bool _isStunned)
     {
         if (animator != null)
         {
-            animator.SetBool(stunState, isStunned);
+            animator.SetTrigger(stunTrigger);
+            SetStunned(_isStunned);
         }
     }
-
-    public void TriggerPhaseChangeAnim()
+    
+    public void SetStunned(bool _isStunned)
     {
         if (animator != null)
         {
-            animator.SetTrigger(phaseChange);
+            animator.SetBool(isStunned, _isStunned);
         }
     }
 }

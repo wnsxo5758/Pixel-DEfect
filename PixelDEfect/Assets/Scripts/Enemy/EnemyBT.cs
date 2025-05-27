@@ -42,6 +42,7 @@ public class EnemyBT : MonoBehaviour
     protected int currentHp;
     protected bool isHit = false;
     protected bool isDead = false;
+    protected bool isDeathProcessed = false;
     protected float stunTimer = 0f;
     protected bool isTimeFrozen = false; // 시간 정지 관련 변수
     
@@ -87,6 +88,9 @@ public class EnemyBT : MonoBehaviour
     {
         // 시간 정지 상태라면 아무 행동도 하지 않음
         if (isTimeFrozen)
+            return;
+
+        if (isDeathProcessed) 
             return;
         
         // 피격 상태 처리
@@ -436,8 +440,12 @@ public class EnemyBT : MonoBehaviour
     //사망 처리 메서드
     protected virtual NodeState HandleDeath()
     {
-        // 이미 사망 처리 완료됐으면 Success 반환
-        if (!gameObject.activeSelf) return NodeState.Success;
+        if (isDeathProcessed)
+        {
+            return NodeState.Success;
+        }
+        
+        isDeathProcessed = true;
         
         // 움직임 멈춤
         if (movement != null)
@@ -456,6 +464,7 @@ public class EnemyBT : MonoBehaviour
 
         enemyCollider.enabled = false;
         
+        Debug.Log("적 사망 애니메이션 시작");
         // 사망 애니메이션 재생
         if (animator != null)
         {
