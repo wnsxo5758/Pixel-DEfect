@@ -223,7 +223,7 @@ Transform:
   m_GameObject: {fileID: 8700790810545068082}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.75, y: -1.1975116, z: 0}
+  m_LocalPosition: {x: 11.8448515, y: -2.1173186, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -267,7 +267,8 @@ MonoBehaviour:
     m_Bits: 4680
   skillRange: 4
   skillCooldown: 5
-  wrenchBulletPrefab: {fileID: 2788398159146907001, guid: 848ceb4f3196eba4594eddf1a194b002, type: 3}
+  attackCooldown: 2
+  wrenchPrefab: {fileID: 2788398159146907001, guid: 848ceb4f3196eba4594eddf1a194b002, type: 3}
   firePos: {fileID: 5448218630321133868}
   bulletSpeed: 5
   playerLayer:

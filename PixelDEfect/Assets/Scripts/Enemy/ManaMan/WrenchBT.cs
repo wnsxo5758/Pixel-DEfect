@@ -7,7 +7,9 @@ public class WrenchBT : ManaBT
 
     [Header("공격 관련")]
     [SerializeField]
-    private GameObject wrenchBulletPrefab;
+    private float attackCooldown = 2f;
+    [SerializeField]
+    private GameObject wrenchPrefab;
     [SerializeField]
     private Transform firePos;
     [SerializeField]
@@ -17,19 +19,32 @@ public class WrenchBT : ManaBT
     [SerializeField]
     private float attackRange = 6f; //공격가능 범위
 
+
+    private float attackTimer = 0f;
+    private bool canAttack = true;
+    private bool isAttacking = false;
+
     [Header("스킬 관련")]
     [SerializeField]
     private int skillBulletCount = 5; // 스킬로 생성되는 렌치수
     [SerializeField]
     private float skillAngle = 60f; 
 
-    private float attackTimer = 0f;
-    private bool canAttack = true;
-    private bool isAttacking = false;
-    private float attackCooldown;
+    //총알 메모리풀
+    private MemoryPool bulletPool;
+
     protected override void Awake()
     {
         base.Awake();
+        blackboard.SetValue("AttackRange", attackRange);
+        blackboard.SetValue("CanAttack", true);
+        blackboard.SetValue("IsAttacking", false);
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        bulletPool = new MemoryPool(wrenchPrefab);
     }
 
     protected override void Update()
@@ -104,7 +119,7 @@ public class WrenchBT : ManaBT
             float angle = startAngle + angleStep * i;
             Vector2 dir = Quaternion.Euler(0, 0, angle) * Vector2.right;
 
-            GameObject bullet = Instantiate(wrenchBulletPrefab, firePos.position, Quaternion.identity);
+            GameObject bullet = Instantiate(wrenchPrefab, firePos.position, Quaternion.identity);
             bullet.GetComponent<Rigidbody2D>().velocity = dir.normalized * bulletSpeed;
         }
     }
@@ -133,9 +148,30 @@ public class WrenchBT : ManaBT
     {
         if (isHit) return;
 
-        Vector2 dir = new Vector2(GetDirection(), 0f);
-        GameObject bullet = Instantiate(wrenchBulletPrefab, firePos.position, Quaternion.identity);
-        bullet.GetComponent<Rigidbody2D>().velocity = dir.normalized * bulletSpeed;
+        Transform target = blackboard.GetValue<Transform>("Target");
+        if (target == null) return;
+
+        Vector2 targetPos = (Vector2)target.position + new Vector2(0f, 0.8f);
+        Vector2 dir = (targetPos - (Vector2)firePos.position).normalized;
+
+        if (wrenchPrefab != null && firePos != null)
+        {
+            GameObject bullet = bulletPool.ActivePoolItem();
+            if (bullet != null)
+            {
+                bullet.transform.position = firePos.position;
+                bullet.transform.rotation = Quaternion.identity;
+
+                BulletBase bulletScript = bullet.GetComponent<BulletBase>();
+                if (bulletScript != null)
+                {
+                    bulletScript.SetUp(dir, bulletPool);
+                }
+
+            }
+        }
+
+
     }
 
     public override void OnAttackAnimationFinished()

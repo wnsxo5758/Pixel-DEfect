@@ -276,7 +276,8 @@ public class FlyRangeEnemy : EnemyBT
         }
 
         // 🔁 방향 계산: firePoint에서 target을 바라보도록
-        Vector2 direction = ((Vector2)target.position - (Vector2)firePoint.position).normalized;
+        Vector2 targetPos = (Vector2)target.position + new Vector2(0f, 0.8f);
+        Vector2 direction = (targetPos - (Vector2)firePoint.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
         if (transform.localScale.x < 0f)
