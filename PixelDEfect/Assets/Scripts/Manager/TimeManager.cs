@@ -12,19 +12,27 @@ public class TimeManager : MonoBehaviour
     [SerializeField] private float timeFreezeCooldown = 15f;
     [SerializeField] private LayerMask timeAffectedLayers;
     [SerializeField] private bool hasTimeStopAbility = false;
-    
-    [Header("시각 효과")] 
-    [SerializeField] private GameObject timeFreezeVFXPrefab;
-    [SerializeField] private GameObject screenOverlayPrefab;
+
+    [Header("시간 정지 이펙트 설정")] 
+    [SerializeField] private float effectExpandDuration = 2f;
+    [SerializeField] private float effectShrinkDuration = 2f;
+    [SerializeField] private float maxEffectScale = 10f;
+    [SerializeField] private AnimationCurve expandCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    [SerializeField] private AnimationCurve shrinkCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
     
     // 상태 변수
     private bool isTimeFrozen = false;
+    private bool effectInProgress = false;
     private float timeFreezeTimer = 0f;
     private float cooldownTimer = 0f;
     private List<ITimeAffected> affectedEntities = new List<ITimeAffected>();
-    private GameObject currentVFX;
-    private GameObject currentOverlay;
     
+    // 시간 정지 이펙트 변수
+    private Transform playerTransform;
+    private GameObject timeEffectFrame;
+    private GameObject timeEffectMaterial;
+    private Vector3 originalEffectScale;
+    private Coroutine effectCoroutine;
     
     // 이벤트
     public System.Action OnTimeStopBegin;
@@ -37,6 +45,9 @@ public class TimeManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(this);
+            
+            // 플레이어 찾기 및 이펙트 오브젝트 참조
+            FindPlayerAndEffects();
         }
         else
         {
@@ -54,7 +65,7 @@ public class TimeManager : MonoBehaviour
         }
         
         // 시간 정지 타이머 업데이트
-        if (isTimeFrozen)
+        if (isTimeFrozen && !effectInProgress)
         {
             timeFreezeTimer -= Time.deltaTime;
             if (timeFreezeTimer <= 0)
@@ -104,23 +115,10 @@ public class TimeManager : MonoBehaviour
         if (!isTimeFrozen)
             return;
 
-        isTimeFrozen = false;
-        cooldownTimer = timeFreezeCooldown;
-        
-        // 모든 개체 시간 재개
-        foreach (var entity in affectedEntities)
-        {
-            entity.OnTimeResume();
-        }
+        effectInProgress = true;
         
         // 시각 효과 제거
         RemoveVisualEffects();
-        
-        // 목록 초기화
-        affectedEntities.Clear();
-        
-        // 이벤트 호출
-        OnTimeStopEnd?.Invoke();
     }
     
     // 시간 정지 중 데미지 적용
@@ -160,13 +158,165 @@ public class TimeManager : MonoBehaviour
     // 시각 효과 생성
     private void CreateVisualEffects(Vector3 position)
     {
+        // 플레이어나 이펙트 오브젝트가 없으면 반환
+        if (playerTransform == null || timeEffectFrame == null || timeEffectMaterial == null)
+        {
+            Debug.LogWarning("TimeManager: 시간 정지 이펙트를 위한 오브젝트가 설정되지 않았습니다.");
+            return;
+        }
         
+        // 이펙트 활성화
+        timeEffectFrame.SetActive(true);
+        
+        // 이벤트 확장 코루틴 시작
+        if (effectCoroutine != null)
+        {
+            StopCoroutine(effectCoroutine);
+        }
+
+        effectCoroutine = StartCoroutine(ExpandEffect());
     }
     
     // 시각 효과 제거
     private void RemoveVisualEffects()
     {
+        if (timeEffectFrame == null || timeEffectMaterial == null)
+        {
+            CompleteTimeResume();
+            return;
+        }
         
+        // 이펙트 축소 코루틴 시작
+        if (effectCoroutine != null)
+        {
+            StopCoroutine(effectCoroutine);
+        }
+
+        effectCoroutine = StartCoroutine(ShrinkEffect());
+    }
+
+    // 이펙트 확장 코루틴
+    private IEnumerator ExpandEffect()
+    {
+        float elapsedTime = 0f;
+        Vector3 startScale = Vector3.zero;
+        Vector3 targetScale = originalEffectScale * maxEffectScale;
+        
+        // 시작 스케일을 0으로 설정
+        timeEffectMaterial.transform.localScale = startScale;
+        
+        while (elapsedTime < effectExpandDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            
+            float progress = elapsedTime / effectExpandDuration;
+            float curveValue = expandCurve.Evaluate(progress);
+            
+            Vector3 currentScale = Vector3.Lerp(startScale, targetScale, curveValue);
+            timeEffectMaterial.transform.localScale = currentScale;
+
+            yield return null;
+        }
+        
+        // 최종 스케일 설정
+        timeEffectMaterial.transform.localScale = targetScale;
+        effectCoroutine = null;
+    }
+
+    private void CompleteTimeResume()
+    {
+        isTimeFrozen = false;
+        cooldownTimer = timeFreezeCooldown;
+        effectInProgress = false;
+        
+        // 모든 개체 시간 재개
+        foreach (var entity in affectedEntities)
+        {
+            entity.OnTimeResume();
+        }
+        
+        // 목록 초기화
+        affectedEntities.Clear();
+        
+        // 이벤트 호출
+        OnTimeStopEnd?.Invoke();
+    }
+    
+    // 이펙트 축소 코루틴
+    private IEnumerator ShrinkEffect()
+    {
+        float elapsedTime = 0f;
+        Vector3 startScale = Vector3.zero;
+        Vector3 targetScale = timeEffectMaterial.transform.localScale;
+
+        while (elapsedTime < effectShrinkDuration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float progress = elapsedTime / effectShrinkDuration;
+            float curveValue = shrinkCurve.Evaluate(progress);
+            
+            Vector3 currentScale = Vector3.Lerp(startScale, targetScale, curveValue);
+            timeEffectMaterial.transform.localScale = currentScale;
+
+            yield return null;
+        }
+        
+        // 최종 스케일 설정 및 비활성화
+        timeEffectMaterial.transform.localScale = targetScale;
+        timeEffectFrame.SetActive(false);
+        
+        // 원래 스케일로 복원
+        timeEffectMaterial.transform.localScale = originalEffectScale;
+        
+        effectCoroutine = null;
+        
+        CompleteTimeResume();
+    }
+    
+    // 플레이어와 이펙트 오브젝트 찾기
+    private void FindPlayerAndEffects()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            playerTransform = player.transform;
+
+            Transform frameTransform = playerTransform.Find("Frame");
+            if (frameTransform != null)
+            {
+                timeEffectFrame = frameTransform.gameObject;
+                
+                // Material 오브젝트 찾기
+                Transform materialTransform = frameTransform.Find("Material");
+                if (materialTransform != null)
+                {
+                    timeEffectMaterial = materialTransform.gameObject;
+                    originalEffectScale = timeEffectMaterial.transform.localScale;
+                    
+                    // 초기에는 비활성화
+                    timeEffectFrame.SetActive(false);
+                }
+                else
+                {
+                    Debug.LogWarning("TimeManager: Frame 하위에 Material 오브젝트를 찾을 수 없습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("TimeManager: Player 하위에 Frame 오브젝트를 찾을 수 없습니다.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("TimeManager: Player 오브젝트를 찾을 수 없습니다.");
+        }
+    }
+    
+    // 씬 변경 시 플레이어와 이펙트 재설정
+    public void RefreshPlayerReference()
+    {
+        FindPlayerAndEffects();
     }
     
     // 상태 확인 메서드들
