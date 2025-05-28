@@ -34,6 +34,8 @@ public class MovementRigidbody2D : MonoBehaviour
 
     public bool IsLongJump { set; get; } = false;
     public bool IsGrounded { private set; get; } = false;
+
+    public LayerMask GroundCheckLayer => groundCheckLayer;
     public float InteractSpeed
     {
         set => runSpeed = initialSpeed * (1 / value);

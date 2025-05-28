@@ -6,14 +6,20 @@ public class ManaBT : EnemyBT
 {
 
     [Header("스킬 관련")]
-    [SerializeField] protected float skillRange = 4f; // 스킬 사용 거리
-    [SerializeField] protected float skillCooldown = 5f; // 
+    [SerializeField]
+    protected float skillRange = 4f; // 스킬 사용 거리
+    [SerializeField]
+    protected float skillCooldown = 5f; // 
 
     protected bool canUseSkill = true;
     protected float skillTimer = 0f;
-
     protected ManaAnimator manaAnimator;
 
+    [Header("점프 관련")]
+    [SerializeField]
+    private float jumpHeight = 10f;
+    [SerializeField]
+    private float jumpForwardOffset = 0.3f;
     protected override void Awake()
     {
         base.Awake();
@@ -33,7 +39,7 @@ public class ManaBT : EnemyBT
             }
         }
     }
-    protected override void SetupBaseBehaviorTree()
+    protected override void SetupBaseBehaviorTree() //BT구성
     {
         // 루트 셀렉터
         Selector rootSelector = new Selector();
@@ -83,7 +89,7 @@ public class ManaBT : EnemyBT
             Blackboard = blackboard
         };
     }
-    protected virtual NodeState UseSkill()
+    protected virtual NodeState UseSkill() // 스킬 사용
     {
         Debug.Log("기본 스킬 사용 - 하위 클래스에서 오버라이드 필요");
 
@@ -105,14 +111,14 @@ public class ManaBT : EnemyBT
         return skillSequence;
     }
 
-    protected virtual bool IsTargetInSkillRange()
+    protected virtual bool IsTargetInSkillRange() // 스킬 범위 내 플레이어 확인
     {
         Transform target = blackboard.GetValue<Transform>("Target");
         if (target == null) return false;
         return Vector2.Distance(transform.position, target.position) <= skillRange;
     }
 
-    protected override NodeState Patrol()
+    protected override NodeState Patrol()// 순찰
     {
         if (isHit || isDead) return NodeState.Failure;
 
@@ -126,9 +132,19 @@ public class ManaBT : EnemyBT
             blackboard.SetValue("PatrolDirection", direction);
         }
 
+        // 점프 시도
+
         // 앞에 벽이 있을 경우 방향 전환
         if (CheckWall(direction))
         {
+
+            if (CanJumpOverWall())
+            {
+                movement.Jump();
+                return NodeState.Running;
+            }
+
+
             direction *= -1;
             blackboard.SetValue("PatrolDirection", direction);
             SetDirection(direction);
@@ -142,7 +158,7 @@ public class ManaBT : EnemyBT
     }
 
 
-    protected override NodeState ChaseTarget()
+    protected override NodeState ChaseTarget() // 플레이어 추적
     {
         if (isHit || isDead) return NodeState.Failure;
 
@@ -152,10 +168,10 @@ public class ManaBT : EnemyBT
         float direction = Mathf.Sign((currentTarget.position - transform.position).x);
         SetDirection(direction);
 
-        // 앞에 벽이 있을 경우 정지
-        if (CheckWall(direction))
+        // 점프 시도
+        if (CanJumpOverWall())
         {
-            movement.MoveTo(0);
+            movement.Jump();
             return NodeState.Running;
         }
 
@@ -163,37 +179,56 @@ public class ManaBT : EnemyBT
         return NodeState.Running;
     }
 
-
-    protected override void DetectTarget()
+    //점프 관련 함수들
+    private bool CanJumpOverWall() // 점프 확인
     {
-        if (isHit || isDead) return;
+        if (movement == null) return false;
 
-        if (ShouldIgnoreTarget())
+        float dir = GetDirection();
+        Vector2 origin = transform.position;
+
+        // 벽 감지 위치와 점프 감지 시작 위치를 동일하게 설정
+        Vector2 wallCheckOrigin = origin + new Vector2(wallCheckDistance * dir, 0.1f);
+        // 2. 벽 위 공간 감지 (OverlapCircle)
+        Vector2 jumpCheckOrigin = wallCheckOrigin + new Vector2(jumpForwardOffset * dir, 0);
+        Vector2 topCheck = jumpCheckOrigin + new Vector2(0, jumpHeight);
+        Collider2D topCollider = Physics2D.OverlapCircle(topCheck, 0.15f, movement.GroundCheckLayer);
+
+        if (topCollider == null)
         {
-            blackboard.SetValue("PlayerDetected", false);
-            return;
+            Debug.Log("[점프 체크] 위 공간 비어 있음 → 점프 가능");
+            return true;
         }
-
-        base.DetectTarget();
+        else
+        {
+            Debug.Log("[점프 체크] 위 공간 막혀 있음 → 점프 불가");
+            return false;
+        }
     }
 
-    protected virtual bool ShouldIgnoreTarget()
-    {
-        if (target == null) return false;
-
-        // TODO: Player 상태를 체크하는 로직 삽입 예정
-        return false;
-    }
-
-    protected override void OnDrawGizmosSelected()
+    protected override void OnDrawGizmosSelected() // 범위 확인
     {
         base.OnDrawGizmosSelected();
 
         float dir = Application.isPlaying ? GetDirection() : 1f;
+        Vector2 position = transform.position;
 
-        Gizmos.color = new Color(0.3f, 0.9f, 1f, 0.6f); // 연한 하늘색
-        Gizmos.DrawWireSphere(transform.position, skillRange);
+        // 벽 감지 위치
+        Vector2 wallCheckOrigin = position + new Vector2(wallCheckDistance * dir, 0.1f);
+        Gizmos.color = Color.white;
+        Gizmos.DrawLine(wallCheckOrigin, wallCheckOrigin + Vector2.right * dir * 0.1f);
 
+        // 점프 가능성 확인 위치 (벽보다 더 앞쪽)
+        Vector2 jumpCheckOrigin = wallCheckOrigin + new Vector2(jumpForwardOffset * dir, 0);
+        Vector2 topCheck = jumpCheckOrigin + new Vector2(0, jumpHeight);
+
+        // 점프 감지 선 (노란색)
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(jumpCheckOrigin, topCheck);
+
+        // 점프 확인 지점 (초록 원)
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(topCheck, 0.15f);
 
     }
 
