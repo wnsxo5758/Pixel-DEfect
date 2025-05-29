@@ -10,9 +10,7 @@ public class ManaAnimator : MonoBehaviour
 
     // Hash된 파라미터 이름들
     private readonly int castSkill = Animator.StringToHash("Skill");
-    private readonly int manaDeath = Animator.StringToHash("ManaDeath");
-    private readonly int jump = Animator.StringToHash("Jump");
-
+    private readonly int castMove = Animator.StringToHash("Move");
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -28,6 +26,12 @@ public class ManaAnimator : MonoBehaviour
     {
         animator?.SetTrigger(castSkill);
     }
+
+    public void TriggerPatrolAnim()
+    {
+        animator?.SetTrigger(castMove);
+    }
+
     public void OnSkillEvent()
     {
         HammerBT hammer = GetComponentInParent<HammerBT>();

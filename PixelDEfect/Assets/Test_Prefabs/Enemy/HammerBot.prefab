@@ -70,15 +70,11 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 4680
-  jumpForce: 7
-  maxJumpObstacleHeight: 5
-  maxJumpGapWidth: 4
-  gapcheckDistance: 3
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 4168
+  isPatrol: 0
   skillRange: 4
   skillCooldown: 5
+  jumpHeight: 4.5
+  jumpForwardOffset: 0.3
   attackRange: 2
   attackCooldown: 2
   attackDamage: 2
@@ -88,7 +84,7 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
-  lightningPrefab: {fileID: 0}
+  lightningPrefab: {fileID: 3283074314457490184, guid: db61657805db1384db884178d99647e6, type: 3}
   skillSpawnDelay: 0.5
 --- !u!70 &80686468026598119
 CapsuleCollider2D:
@@ -143,12 +139,13 @@ MonoBehaviour:
   belowCollisionLayer:
     serializedVersion: 2
     m_Bits: 0
-  runSpeed: 0
+  runSpeed: 5
   crawlSpeed: 0
   climbSpeed: 0
-  jumpForce: 0
+  jumpForce: 30
   lowGravityScale: 0
   highGravityScale: 0
+  movementLocked: 0
 --- !u!50 &101884625652215795
 Rigidbody2D:
   serializedVersion: 4
@@ -251,7 +248,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: 1654885178, guid: 5971345dd4fee0b4fb34b35b0b5dbde9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

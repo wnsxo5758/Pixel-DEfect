@@ -106,7 +106,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: 356209508, guid: 2984ed59e5fd8754bb60d42127caa79d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -265,8 +265,11 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 4680
+  isPatrol: 0
   skillRange: 6
   skillCooldown: 5
+  jumpHeight: 3
+  jumpForwardOffset: 0.3
   attackCooldown: 2
   wrenchPrefab: {fileID: 2788398159146907001, guid: 848ceb4f3196eba4594eddf1a194b002, type: 3}
   firePos: {fileID: 5448218630321133868}
@@ -333,7 +336,7 @@ MonoBehaviour:
   runSpeed: 3
   crawlSpeed: 0
   climbSpeed: 0
-  jumpForce: 15
+  jumpForce: 30
   lowGravityScale: 10
   highGravityScale: 10
   movementLocked: 0

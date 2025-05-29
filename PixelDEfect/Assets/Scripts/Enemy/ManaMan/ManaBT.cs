@@ -5,6 +5,9 @@ using UnityEngine;
 public class ManaBT : EnemyBT
 {
 
+    [Header("상태 관련")]
+    [SerializeField]
+    private bool isPatrol = false;
     [Header("스킬 관련")]
     [SerializeField]
     protected float skillRange = 4f; // 스킬 사용 거리
@@ -24,15 +27,16 @@ public class ManaBT : EnemyBT
     {
         base.Awake();
         manaAnimator = GetComponentInChildren<ManaAnimator>();
+        blackboard.SetValue("IsPatrol", isPatrol);
     }
     protected override void Update()
     {
         base.Update();
 
-        if(!canUseSkill)
+        if (!canUseSkill)
         {
             skillTimer += Time.deltaTime;
-            if(skillTimer >= skillCooldown)
+            if (skillTimer >= skillCooldown)
             {
                 skillTimer = 0f;
                 canUseSkill = true;
@@ -54,7 +58,7 @@ public class ManaBT : EnemyBT
         hitSequence.AddChild(new ConditionNode(() => blackboard.GetValue<bool>("IsHit")));
         hitSequence.AddChild(new ActionNode(HandleHit));
 
-        // 스킬 시퀀스 (여기만 ManaBT 추가)
+        // 스킬 시퀀스
         Node skillSequence = CreateSkillSequence();
 
         // 공격 중 시퀀스
@@ -62,7 +66,7 @@ public class ManaBT : EnemyBT
         attackingSequence.AddChild(new ConditionNode(() => blackboard.GetValue<bool>("IsAttacking")));
         attackingSequence.AddChild(new ActionNode(MaintainAttackState));
 
-        // 공격 시퀀스 (하위 클래스에서 생성)
+        // 공격 시퀀스
         Node attackSequence = CreateAttackSequence();
 
         // 추적 시퀀스
@@ -70,25 +74,113 @@ public class ManaBT : EnemyBT
         chaseSequence.AddChild(new ConditionNode(() => blackboard.GetValue<bool>("PlayerDetected")));
         chaseSequence.AddChild(new ActionNode(ChaseTarget));
 
-        // 패트롤 시퀀스
+        // 순찰 시퀀스
         Sequence patrolSequence = new Sequence();
+        ConditionNode patrolEnabledCondition = new ConditionNode(() => blackboard.GetValue<bool>("IsPatrol"));
+        patrolSequence.AddChild(patrolEnabledCondition);
         patrolSequence.AddChild(new ActionNode(Patrol));
 
-        // 우선순위에 따라 트리 구성
+        // 대기 시퀀스
+        Sequence idleSequence = new Sequence();
+        idleSequence.AddChild(new ConditionNode(() => !blackboard.GetValue<bool>("IsPatrol")));
+        idleSequence.AddChild(new ActionNode(Idle));
+
+
+        // 트리 구성 순서
         rootSelector.AddChild(deathSequence);
         rootSelector.AddChild(hitSequence);
-        rootSelector.AddChild(skillSequence);      // 
+        rootSelector.AddChild(skillSequence);
         rootSelector.AddChild(attackingSequence);
         rootSelector.AddChild(attackSequence);
         rootSelector.AddChild(chaseSequence);
         rootSelector.AddChild(patrolSequence);
+        rootSelector.AddChild(idleSequence);
 
-        // 트리 생성
+
         behaviorTree = new BehaviorTree(rootSelector)
         {
             Blackboard = blackboard
         };
     }
+
+    protected virtual NodeState Idle() // 대기 상태(앉아서 대기)
+    {
+        if (isDead || isHit) return NodeState.Failure;
+
+        movement.MoveTo(0);
+        animator?.SetMovementAnim(0f);
+        Debug.Log("대기 중...");
+        return NodeState.Running;
+    }
+    protected override void DetectTarget()
+    {
+        if (isHit || isDead) return;
+
+        bool previouslyDetected = blackboard.GetValue<bool>("PlayerDetected");
+        bool currentlyDetected = previouslyDetected;
+
+        if (target == null)
+        {
+            Collider2D playerCollider = Physics2D.OverlapCircle(transform.position, detectionRange, targetLayer);
+            if (playerCollider != null)
+            {
+                target = playerCollider.transform;
+                blackboard.SetValue("Target", target);
+                currentlyDetected = true;
+            }
+        }
+        else
+        {
+            float distanceToTarget = Vector2.Distance(transform.position, target.position);
+
+            if (previouslyDetected)
+            {
+                if (distanceToTarget > loseTargetRange)
+                    currentlyDetected = false;
+                else
+                    currentlyDetected = true;
+            }
+            else
+            {
+                if (distanceToTarget <= detectionRange)
+                {
+                    Vector2 dirToTarget = (target.position - transform.position).normalized;
+                    RaycastHit2D hit = Physics2D.Raycast(transform.position, dirToTarget, detectionRange, targetLayer);
+                    Debug.DrawRay(transform.position, dirToTarget * detectionRange, Color.red);
+
+                    if (hit.collider != null && hit.collider.transform == target)
+                        currentlyDetected = true;
+                }
+            }
+        }
+
+        blackboard.SetValue("PlayerDetected", currentlyDetected);
+
+        // 상태 변화가 감지되었을 때 처리
+        if (previouslyDetected != currentlyDetected)
+        {
+            if (animator != null)
+            {
+                animator.SetChasingState(currentlyDetected);
+            }
+
+            // Idle 상태 → 플레이어 감지 → Patrol 상태로 전환
+            if (currentlyDetected && !isPatrol)
+            {
+                Debug.Log("[DetectTarget] 플레이어 감지됨. Idle → Patrol 전환");
+                isPatrol = true;
+                blackboard.SetValue("IsPatrol", true);
+                manaAnimator?.TriggerPatrolAnim();
+            }
+
+            // 추적 포기 시
+            if (!currentlyDetected && previouslyDetected)
+            {
+                HandleLostTarget();
+            }
+        }
+    }
+
     protected virtual NodeState UseSkill() // 스킬 사용
     {
         Debug.Log("기본 스킬 사용 - 하위 클래스에서 오버라이드 필요");
@@ -121,7 +213,7 @@ public class ManaBT : EnemyBT
     protected override NodeState Patrol()// 순찰
     {
         if (isHit || isDead) return NodeState.Failure;
-
+        manaAnimator.TriggerPatrolAnim();
         animator?.SetChasingState(false);
 
         float direction = blackboard.GetValue<float>("PatrolDirection");
@@ -161,7 +253,7 @@ public class ManaBT : EnemyBT
     protected override NodeState ChaseTarget() // 플레이어 추적
     {
         if (isHit || isDead) return NodeState.Failure;
-
+        manaAnimator.TriggerPatrolAnim();
         Transform currentTarget = blackboard.GetValue<Transform>("Target");
         if (currentTarget == null) return NodeState.Failure;
 
