@@ -153,9 +153,9 @@ public class ManaBT : EnemyBT
                 }
                 else if (previouslyDetected)
                     {
-                        if (distanceToTarget > loseTargetRange)
-                            currentlyDetected = false;
-                        else
+                        //if (distanceToTarget > loseTargetRange)
+                        //    currentlyDetected = false;
+                        //else
                             currentlyDetected = true;
                     }
                 else
@@ -244,10 +244,6 @@ public class ManaBT : EnemyBT
             direction = 1f;
             blackboard.SetValue("PatrolDirection", direction);
         }
-
-        // 점프 시도
-
-
 
         if (CheckWall(direction))
         {
