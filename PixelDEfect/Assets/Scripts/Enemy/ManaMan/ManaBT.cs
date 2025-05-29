@@ -8,6 +8,14 @@ public class ManaBT : EnemyBT
     [Header("상태 관련")]
     [SerializeField]
     private bool isPatrol = false;
+
+    private readonly HashSet<string> ignoredStates = new HashSet<string>
+    {
+        "Crawl",
+        "Attack"
+    };
+
+
     [Header("스킬 관련")]
     [SerializeField]
     protected float skillRange = 4f; // 스킬 사용 거리
@@ -23,6 +31,8 @@ public class ManaBT : EnemyBT
     private float jumpHeight = 10f;
     [SerializeField]
     private float jumpForwardOffset = 0.3f;
+    [SerializeField]
+    private LayerMask canJumpLayer;
     protected override void Awake()
     {
         base.Awake();
@@ -126,35 +136,44 @@ public class ManaBT : EnemyBT
             {
                 target = playerCollider.transform;
                 blackboard.SetValue("Target", target);
-                currentlyDetected = true;
             }
         }
         else
         {
+            //플레이어 상태 감지
+            PlayerController player = target.GetComponent<PlayerController>();
             float distanceToTarget = Vector2.Distance(transform.position, target.position);
-
-            if (previouslyDetected)
+            if (player != null)
             {
-                if (distanceToTarget > loseTargetRange)
-                    currentlyDetected = false;
-                else
-                    currentlyDetected = true;
-            }
-            else
-            {
-                if (distanceToTarget <= detectionRange)
+                string playerState = player.GetCurrentStateName();
+                if (ignoredStates.Contains(playerState)) // HashSet<string> ignoredStates는 클래스 필드로 선언
                 {
-                    Vector2 dirToTarget = (target.position - transform.position).normalized;
-                    RaycastHit2D hit = Physics2D.Raycast(transform.position, dirToTarget, detectionRange, targetLayer);
-                    Debug.DrawRay(transform.position, dirToTarget * detectionRange, Color.red);
+                    Debug.Log($"[ManaBT] 플레이어 상태 '{playerState}' 감지 무시됨");
+                    currentlyDetected = false;
+                }
+                else if (previouslyDetected)
+                    {
+                        if (distanceToTarget > loseTargetRange)
+                            currentlyDetected = false;
+                        else
+                            currentlyDetected = true;
+                    }
+                else
+                {
+                    if (distanceToTarget <= detectionRange)
+                    {
+                        Vector2 dirToTarget = (target.position - transform.position).normalized;
+                        RaycastHit2D hit = Physics2D.Raycast(transform.position, dirToTarget, detectionRange, targetLayer);
+                        Debug.DrawRay(transform.position, dirToTarget * detectionRange, Color.red);
 
-                    if (hit.collider != null && hit.collider.transform == target)
-                        currentlyDetected = true;
+                        if (hit.collider != null && hit.collider.transform == target)
+                            currentlyDetected = true;
+                    }
                 }
             }
         }
-
         blackboard.SetValue("PlayerDetected", currentlyDetected);
+
 
         // 상태 변화가 감지되었을 때 처리
         if (previouslyDetected != currentlyDetected)
@@ -205,6 +224,8 @@ public class ManaBT : EnemyBT
 
     protected virtual bool IsTargetInSkillRange() // 스킬 범위 내 플레이어 확인
     {
+        if (!blackboard.GetValue<bool>("PlayerDetected")) return false;
+
         Transform target = blackboard.GetValue<Transform>("Target");
         if (target == null) return false;
         return Vector2.Distance(transform.position, target.position) <= skillRange;
@@ -226,17 +247,30 @@ public class ManaBT : EnemyBT
 
         // 점프 시도
 
-        // 앞에 벽이 있을 경우 방향 전환
+
+
         if (CheckWall(direction))
         {
+            bool hitEnemyWall = blackboard.GetValue<bool>("HitEnemyWallCheck");
 
+            if (hitEnemyWall)
+            {
+                // 그냥 뒤돌기
+                direction *= -1;
+                blackboard.SetValue("PatrolDirection", direction);
+                SetDirection(direction);
+                movement.MoveTo(0);
+                return NodeState.Running;
+            }
+
+            // 점프 가능한 경우
             if (CanJumpOverWall())
             {
                 movement.Jump();
                 return NodeState.Running;
             }
 
-
+            // 점프도 안되면 뒤돌기
             direction *= -1;
             blackboard.SetValue("PatrolDirection", direction);
             SetDirection(direction);
@@ -249,7 +283,26 @@ public class ManaBT : EnemyBT
         return NodeState.Running;
     }
 
+    protected override bool CheckWall(float direction)
+    {
+        Vector2 originPos = (Vector2)transform.position +
+                            new Vector2(wallCheckOffset.x * direction, wallCheckOffset.y);
 
+        RaycastHit2D hit = Physics2D.Raycast(originPos, new Vector2(direction, 0), wallCheckDistance, wallLayer);
+        Debug.DrawRay(originPos, new Vector2(direction, 0) * wallCheckDistance, hit ? Color.red : Color.green);
+
+        // EnemyWallCheck 레이어에 닿았으면 감지는 하되, 블랙보드에 기록
+        if (hit.collider != null && hit.collider.gameObject.layer == LayerMask.NameToLayer("EnemyWall"))
+        {
+            blackboard.SetValue("HitEnemyWallCheck", true);
+        }
+        else
+        {
+            blackboard.SetValue("HitEnemyWallCheck", false);
+        }
+
+        return hit.collider != null;
+    }
     protected override NodeState ChaseTarget() // 플레이어 추적
     {
         if (isHit || isDead) return NodeState.Failure;
@@ -261,10 +314,15 @@ public class ManaBT : EnemyBT
         SetDirection(direction);
 
         // 점프 시도
-        if (CanJumpOverWall())
+        if (CheckWall(direction))
         {
-            movement.Jump();
-            return NodeState.Running;
+
+            // 점프 가능한 경우
+            if (CanJumpOverWall())
+            {
+                movement.Jump();
+                return NodeState.Running;
+            }
         }
 
         movement.MoveToFast(direction);
@@ -284,7 +342,7 @@ public class ManaBT : EnemyBT
         // 2. 벽 위 공간 감지 (OverlapCircle)
         Vector2 jumpCheckOrigin = wallCheckOrigin + new Vector2(jumpForwardOffset * dir, 0);
         Vector2 topCheck = jumpCheckOrigin + new Vector2(0, jumpHeight);
-        Collider2D topCollider = Physics2D.OverlapCircle(topCheck, 0.15f, movement.GroundCheckLayer);
+        Collider2D topCollider = Physics2D.OverlapCircle(topCheck, 0.15f, canJumpLayer);
 
         if (topCollider == null)
         {

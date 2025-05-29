@@ -51,8 +51,8 @@ public class LightningStrike : MonoBehaviour
             PlayerHp hp = other.GetComponent<PlayerHp>();
             if (hp != null)
             {
-                //DeathData deathData = new DeathData(DeathCause.SkillAttack, 0); // dir篮 寇何 贸府
-                //hp.DecreaseHp(damage, Vector2.zero, deathData, false);
+                DeathData deathData = new DeathData(DeathCause.Press, 0); // dir篮 寇何 贸府
+                hp.DecreaseHp(damage, Vector2.zero, deathData, false);
             }
         }
     }

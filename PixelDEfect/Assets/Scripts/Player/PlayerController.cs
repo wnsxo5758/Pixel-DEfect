@@ -464,7 +464,7 @@ public class PlayerController : MonoBehaviour
     }
     
     // 현재 상태 이름을 문자열로 반환
-    private string GetCurrentStateName()
+    public string GetCurrentStateName()
     {
         var currentState = GetCurrentState();
         if (currentState == null) return "None";
