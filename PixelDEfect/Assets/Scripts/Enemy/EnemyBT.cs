@@ -46,6 +46,9 @@ public class EnemyBT : MonoBehaviour
     protected float stunTimer = 0f;
     protected bool isTimeFrozen = false; // 시간 정지 관련 변수
     
+    public int MaxHp => maxHp;
+    public int CurrentHp => currentHp;
+    
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();

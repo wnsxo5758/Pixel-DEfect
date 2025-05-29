@@ -15,6 +15,7 @@ TagManager:
   - ImpactNormal
   - EnemyProjectile
   - Weapon
+  - VendingMachine
   layers:
   - Default
   - TransparentFX
