@@ -19,6 +19,7 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int hasWeapon = Animator.StringToHash("HasWeapon");
     private readonly int attack = Animator.StringToHash("Attack");
     private readonly int throwWeapon = Animator.StringToHash("Throw");
+    private readonly int isHealing = Animator.StringToHash("isHealing");
     private readonly int hit = Animator.StringToHash("Hit");
     private readonly int revive = Animator.StringToHash("Revive");
     
@@ -296,6 +297,11 @@ public class PlayerAnimator : MonoBehaviour
         isPlayingTeleportAnimation = false;
         playerAttack?.OnTeleportEndAnim();
     }
+
+    public void SetHealingAnim(bool healing)
+    {
+        animator.SetBool(isHealing, healing);
+    }
     
     public void TriggerHitAnim()
     {
@@ -367,6 +373,9 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool(isClimbing, false);
         animator.SetBool(isConnected, false);
         animator.SetBool(hasWeapon, playerAttack.HasWeapon());
+        animator.SetBool(turnValve, false);
+        animator.SetBool(afterPull, false);
+        animator.SetBool(isHealing, false);
         
         animator.ResetTrigger(jump);
         animator.ResetTrigger(roll);

@@ -117,6 +117,9 @@ public class FlyRangeEnemy : EnemyBT
     {
         base.Update(); // EnemyBT의 Update 호출
 
+        if (isTimeFrozen)
+            return;
+        
         if (!isHit && isTilted)
         {
             transform.localRotation = originalRotation;

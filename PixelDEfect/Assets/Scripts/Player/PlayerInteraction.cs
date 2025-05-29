@@ -21,6 +21,7 @@ public class PlayerInteraction : MonoBehaviour
     private ValveButton currentValve;
     private ButtonBase currentButton;
     private DoorBase currentDoor;
+    private VendingMachine currentVendingMachine;
     
     // Raycast로 감지할 오브젝트
     private HoldObject currentHoldObject;
@@ -42,7 +43,8 @@ public class PlayerInteraction : MonoBehaviour
         Holdable,
         Valve,
         Button,
-        Door
+        Door,
+        VendingMachine
     }
     
     // 현재 상호작용 타입
@@ -143,6 +145,14 @@ public class PlayerInteraction : MonoBehaviour
         {
             currentDoor = other.GetComponent<DoorBase>();
         }
+        else if (other.CompareTag("VendingMachine"))
+        {
+            currentVendingMachine = other.GetComponent<VendingMachine>();
+            if (currentVendingMachine != null)
+            {
+                // 들어왔을 때 프롬프트 처리
+            }
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -161,8 +171,13 @@ public class PlayerInteraction : MonoBehaviour
         {
             currentDoor = null;
         }
-        
+        else if (other.CompareTag("VendingMachine"))
+        {
+            // 나갔을 때 프롬프트 처리
+            currentVendingMachine = null;
+        }
     }
+    
     // 상호작용 타입 결정 (우선순위 설정)
     private void DetermineInteractionType()
     {
@@ -200,6 +215,10 @@ public class PlayerInteraction : MonoBehaviour
         else if (currentDoor != null)
         {
             currentInteractionType = InteractionType.Door;
+        }
+        else if (currentVendingMachine != null)
+        {
+            currentInteractionType = InteractionType.VendingMachine;
         }
         else
         {
@@ -250,6 +269,8 @@ public class PlayerInteraction : MonoBehaviour
                 return currentButton?.gameObject;
             case InteractionType.Door:
                 return currentDoor?.gameObject;
+            case InteractionType.VendingMachine:
+                return currentVendingMachine?.gameObject;
             default:
                 return null;
         }
@@ -273,7 +294,8 @@ public class PlayerInteraction : MonoBehaviour
     {
         // 잡고 있는 물체가 있고, 문이나 밸브 상호작용이 있는 경우 물체 놓기
         if (isHolding && (currentInteractionType == InteractionType.Door ||
-                          currentInteractionType == InteractionType.Valve))
+                          currentInteractionType == InteractionType.Valve ||
+                          currentInteractionType == InteractionType.VendingMachine))
         {
             StopHolding();
         }
@@ -321,6 +343,12 @@ public class PlayerInteraction : MonoBehaviour
                 if (currentDoor != null)
                 {
                     currentDoor.ActiveDoor(gameObject);
+                }
+                break;
+            case InteractionType.VendingMachine:
+                if (currentVendingMachine != null)
+                {
+                    currentVendingMachine.TryUseVendingMachine(gameObject);
                 }
                 break;
         }

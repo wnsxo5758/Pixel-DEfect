@@ -765,6 +765,114 @@ namespace PlayerStates
         }
     }
 
+    public class VendingMachineHeal : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private MovementRigidbody2D movement;
+        private PlayerHp playerHp;
+        private VendingMachineHealContext context;
+
+        private float healTimer = 0f;
+        private float nextHealTime = 0f;
+        private bool isHealingComplete = false;
+
+        public VendingMachineHeal(VendingMachineHealContext healContext)
+        {
+            context = healContext;
+            context.CalculateHealTime();
+        }
+
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            movement = player.GetComponent<MovementRigidbody2D>();
+            playerHp = player.GetComponent<PlayerHp>();
+
+            if (movement != null)
+            {
+                movement.MoveTo(0);
+            }
+            
+            // 회복 애니메이션 시작
+            if (animator != null)
+            {
+                animator.SetHealingAnim(true);
+            }
+
+            healTimer = 0f;
+            nextHealTime = 1f;
+            isHealingComplete = false;
+            context.elapsedTime = 0f;
+            context.healedAmount = 0;
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            healTimer += Time.deltaTime;
+            context.elapsedTime += Time.deltaTime;
+            
+            // 회복 처리
+            if (healTimer >= nextHealTime && !isHealingComplete)
+            {
+                PerformHeal();
+                healTimer = 0f;
+            }
+            
+            // 회복 완료 확인
+            if (context.IsHealComplete() || isHealingComplete)
+            {
+                CompleteHealing(player);
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            if (animator != null)
+            {
+                animator.SetHealingAnim(false);
+            }
+        }
+
+        private void PerformHeal()
+        {
+            if (playerHp == null) return;
+
+            int currentHp = playerHp.GetCurrentHp();
+            int maxHp = playerHp.GetMaxHp();
+
+            if (currentHp > maxHp)
+            {
+                isHealingComplete = true;
+                return;
+            }
+            
+            // 회복할 양 계산
+            int remainingHeal = context.healAmount - context.healedAmount;
+            int maxPossibleHeal = maxHp - currentHp;
+            int healAmount = Mathf.Min(remainingHeal, maxPossibleHeal, (int)context.healRate);
+
+            if (healAmount > 0)
+            {
+                // 체력 회복
+                playerHp.IncreaseHp(healAmount);
+                context.healedAmount += healAmount;
+            }
+            
+            // 회복 완료 확인
+            if (context.healedAmount >= context.healAmount || playerHp.GetCurrentHp() >= maxHp)
+            {
+                isHealingComplete = true;
+            }
+        }
+
+        private void CompleteHealing(PlayerController player)
+        {
+            isHealingComplete = true;
+            
+            player.ChangeState(new Idle());
+        }
+    }
+    
     public class Hit : State<PlayerController>
     {
         private PlayerAnimator animator;

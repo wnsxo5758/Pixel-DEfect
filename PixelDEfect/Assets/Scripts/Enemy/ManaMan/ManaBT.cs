@@ -119,7 +119,7 @@ public class ManaBT : EnemyBT
 
         movement.MoveTo(0);
         animator?.SetMovementAnim(0f);
-        Debug.Log("대기 중...");
+        // Debug.Log("대기 중...");
         return NodeState.Running;
     }
     protected override void DetectTarget()
