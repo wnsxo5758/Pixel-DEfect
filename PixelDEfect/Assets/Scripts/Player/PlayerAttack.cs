@@ -33,7 +33,8 @@ public class PlayerAttack : MonoBehaviour
     private MovementRigidbody2D movement;
     private ThrownWeapon lastThrownWeapon;
     private GameObject attackColliderObject;
-    
+
+    private bool canAttack = true;
     private bool isAttacking = false;
     private bool hasWeapon = false;
     private bool canThrow = true;
@@ -90,8 +91,9 @@ public class PlayerAttack : MonoBehaviour
     // PlayerController에서 호출되는 근접 공격
     public void PerformMeleeAttack()
     {
-        if (CanPlayerAttack() && !isAttacking && currentWeapon != null)
+        if (CanPlayerAttack() && !isAttacking && canAttack && currentWeapon != null)
         {
+            canAttack = false;
             isAttacking = true;
             
             MeleeAttackAnimation();
@@ -247,7 +249,7 @@ public class PlayerAttack : MonoBehaviour
     private IEnumerator AttackCooldownTimer()
     {
         yield return new WaitForSeconds(currentWeapon.AttackCooldown);
-        isAttacking = false;
+        canAttack = true;
     }
     
     // 던지기 쿨타임 코루틴
@@ -292,6 +294,8 @@ public class PlayerAttack : MonoBehaviour
     {
         if (currentWeapon != null && isAttacking)
         {
+            isAttacking = false;
+            
             movement.MoveTo(0);
             controller.ChangeState(new PlayerStates.Idle());
         }

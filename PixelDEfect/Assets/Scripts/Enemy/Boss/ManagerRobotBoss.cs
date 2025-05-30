@@ -326,8 +326,6 @@ public class ManagerRobotBoss : BossBT
                 break;
             
             case SummonState.Ending:
-                // 패턴 종료 처리
-                EndSummonPattern();
                 break;
         }
         
@@ -652,6 +650,10 @@ public class ManagerRobotBoss : BossBT
             // 패턴이 종료되었으면 성공 상태 반환
             if (currentSummonState == SummonState.Ending)
             {
+                // 패턴 종료 처리
+                Debug.Log("Ending State Start");
+                EndSummonPattern();
+                
                 SetSummonState(SummonState.None);
                 return NodeState.Success;
             }
@@ -895,6 +897,7 @@ public class ManagerRobotBoss : BossBT
         
         // 쿨다운 설정
         canSummon = false;
+        blackboard.SetValue("CanSummon", false);
         StartCoroutine(SummonCooldownRoutine());
     }
     
@@ -1120,7 +1123,10 @@ public class ManagerRobotBoss : BossBT
     {
         // 무적 상태면 데미지 무시
         if (isInvulnerable)
+        {
             return;
+
+        }
         
         base.DecreaseHp(damage, isThrownWeapon);
     }
