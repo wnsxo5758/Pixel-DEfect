@@ -26,17 +26,19 @@ public class ManagerRobotBoss : BossBT
     [SerializeField] private BoxCollider2D headbuttCollider;    // 박치기 충돌 박스
 
     [Header("로봇 소환 패턴 설정")] 
-    [SerializeField] private float summonCooldown = 20f;    // 로봇 소환 패턴 쿨다운
-    [SerializeField] private float ascentDuration = 2f;     // 천장에 올라가는 시간
-    [SerializeField] private float descentDuration = 2f;    // 내려오는 시간
-    [SerializeField] private float ceilingHeight = 10f;      // 천장 높이
-    [SerializeField] private GameObject[] robotPrefabs;     // 소환할 로봇 프리팹
-    [SerializeField] private int initialRobotCount = 5;     // 초기 소환 로봇 수
-    [SerializeField] private int maxRobotCount = 7;         // 최대 소환 로봇 수
-    [SerializeField] private float minSpawnTime = 5f;       // 소환 최소 간격
-    [SerializeField] private float maxSpawnTime = 10f;      // 소환 최대 간격
-    [SerializeField] private bool useDirectPositioning = true; // 물리 무시하고 직접 위치 설정
-    [SerializeField] private Transform ceilingPoint;        // 천장 위치
+    [SerializeField] private float summonCooldown = 20f;        // 로봇 소환 패턴 쿨다운
+    [SerializeField] private float moveToCenterDuration = 1f;   // 중앙으로 이동하는 시간
+    [SerializeField] private float ascentDuration = 2f;         // 천장에 올라가는 시간
+    [SerializeField] private float descentDuration = 2f;        // 내려오는 시간
+    [SerializeField] private float ceilingHeight = 10f;         // 천장 높이
+    [SerializeField] private GameObject[] robotPrefabs;         // 소환할 로봇 프리팹
+    [SerializeField] private int initialRobotCount = 5;         // 초기 소환 로봇 수
+    [SerializeField] private int maxRobotCount = 7;             // 최대 소환 로봇 수
+    [SerializeField] private float minSpawnTime = 5f;           // 소환 최소 간격
+    [SerializeField] private float maxSpawnTime = 10f;          // 소환 최대 간격
+    [SerializeField] private bool useDirectPositioning = true;  // 물리 무시하고 직접 위치 설정
+    [SerializeField] private Transform ceilingPoint;            // 천장 위치
+    [SerializeField] private Transform centerPoint;             // 보스방 중앙 위치 포인트
     
     
     // 공격 상태 관리
@@ -54,13 +56,14 @@ public class ManagerRobotBoss : BossBT
     private bool hasHitWall;            // 벽 충돌 추적
     
     // 로봇 소환 패턴 상태 관리
-    private enum SummonState { None, Ascending, Summoning, Descending, Ending }
+    private enum SummonState { None, MovingToCenter, Ascending, Summoning, Descending, Ending }
     private SummonState currentSummonState = SummonState.None;
     private float nextRobotSpawnTime;
     private bool canSummon = true;
     private List<GameObject> summonedRobots = new List<GameObject>();
     private bool isInvulnerable = false;
     private Vector3 originalPosition;       // 원래 위치 저장
+    private Vector3 centerPosition;
     private Quaternion originalRotation;    // 원래 회전 저장
     private bool wasGravityEnabled = true;  // 중력 활성화 상태 저장
     private bool initialSpawnComplete = false; // 초기 소환 완료 여부
@@ -121,6 +124,11 @@ public class ManagerRobotBoss : BossBT
         if (headbuttCollider != null)
         {
             headbuttCollider.enabled = false;
+        }
+
+        if (centerPoint == null)
+        {
+            Debug.LogWarning("보스의 CenterPoint가 설정되지 않았습니다. 보스방 중앙 위치를 설정해주세요.");
         }
         
         // 페이즈 체력 임계값 설정 (50% 체력)
@@ -266,6 +274,22 @@ public class ManagerRobotBoss : BossBT
 
         switch (currentSummonState)
         {
+            case SummonState.MovingToCenter:
+                // 보스가 중앙으로 이동하는 상태
+                summonStateTimer += Time.deltaTime;
+                
+                // 중앙으로 이동
+                float moveCenterProgress = Mathf.Clamp01(summonStateTimer / moveToCenterDuration);
+                MoveTowardsCenter(moveCenterProgress);
+                
+                // 중앙 이동 완료되면 상승 단계로 전환
+                if (summonStateTimer >= moveToCenterDuration)
+                {
+                    SetSummonState(SummonState.Ascending);
+                    summonStateTimer = 0f;
+                }
+                break;
+            
             case SummonState.Ascending:
                 // 보스가 천장으로 올라가는 상태
                 summonStateTimer += Time.deltaTime;
@@ -840,6 +864,17 @@ public class ManagerRobotBoss : BossBT
         originalPosition = transform.position;
         originalRotation = transform.rotation;
         
+        // 중앙 위치 설정
+        if (centerPoint != null)
+        {
+            centerPosition = centerPoint.position;
+        }
+        else
+        {
+            // centerPoint가 없으면 현재 위치를 중앙으로 사용
+            centerPosition = transform.position;
+        }
+        
         // 리지드바디 상태 저장
         if (rb != null)
         {
@@ -865,7 +900,7 @@ public class ManagerRobotBoss : BossBT
         summonStateTimer = 0f;
         
         // 소환 상태로 전환
-        SetSummonState(SummonState.Ascending);
+        SetSummonState(SummonState.MovingToCenter);
     }
     
     // 소환 패턴 종료
@@ -901,6 +936,16 @@ public class ManagerRobotBoss : BossBT
         StartCoroutine(SummonCooldownRoutine());
     }
     
+    // 중앙으로 이동하는 메서드
+    private void MoveTowardsCenter(float progress)
+    {
+        if (useDirectPositioning)
+        {
+            // 직접 위치 설정으로 중앙까지 이동
+            transform.position = Vector3.Lerp(originalPosition, centerPosition, progress);
+        }
+    }
+    
     // 천장으로 이동
     private void MoveTowardsCeiling(float progress)
     {
@@ -914,20 +959,20 @@ public class ManagerRobotBoss : BossBT
         }
         else
         {
-            ceilingPosition = originalPosition + new Vector3(0, ceilingHeight, 0);
+            ceilingPosition = centerPosition + new Vector3(0, ceilingHeight, 0);
         }
         
         if (useDirectPositioning)
         {
             // 직접 위치 설정
-            transform.position = Vector3.Lerp(originalPosition, ceilingPosition, progress);
+            transform.position = Vector3.Lerp(centerPosition, ceilingPosition, progress);
         }
         else
         {
             // 리지드바디로 이동
             if (rb != null)
             {
-                Vector3 targetPosition = Vector3.Lerp(originalPosition, ceilingPosition, progress);
+                Vector3 targetPosition = Vector3.Lerp(centerPosition, ceilingPosition, progress);
                 rb.MovePosition(targetPosition);
             }
         }
@@ -944,19 +989,19 @@ public class ManagerRobotBoss : BossBT
         }
         else
         {
-            ceilingPosition = originalPosition + new Vector3(0, ceilingHeight, 0);
+            ceilingPosition = centerPosition + new Vector3(0, ceilingHeight, 0);
         }
         
         if (useDirectPositioning)
         {
             // 반대 방향으로 보간
-            transform.position = Vector3.Lerp(ceilingPosition, originalPosition, progress);
+            transform.position = Vector3.Lerp(ceilingPosition, centerPosition, progress);
         }
         else
         {
             if (rb != null)
             {
-                Vector3 targetPosition = Vector3.Lerp(ceilingPosition, originalPosition, progress);
+                Vector3 targetPosition = Vector3.Lerp(ceilingPosition, centerPosition, progress);
                 rb.MovePosition(targetPosition);
             }
         }
@@ -1019,7 +1064,7 @@ public class ManagerRobotBoss : BossBT
     private Vector2 CalculateSpawnPosition(int index, int totalCount)
     {
         // 기본 위치
-        Vector2 basePosition = new Vector2(transform.position.x, originalPosition.y);
+        Vector2 basePosition = new Vector2(centerPosition.x, centerPosition.y);
         
         // 소환 범위
         float spawnWidth = 10f;
@@ -1028,7 +1073,7 @@ public class ManagerRobotBoss : BossBT
         float playerOffset = 0f;
         if (target != null)
         {
-            playerOffset = target.position.x - transform.position.x;
+            playerOffset = target.position.x - centerPosition.x;
             // 범위 제한
             playerOffset = Mathf.Clamp(playerOffset, -5f, 5f);
         }
@@ -1063,11 +1108,11 @@ public class ManagerRobotBoss : BossBT
     private Vector2 CalculateSpawnPosition()
     {
         // 기본 위치
-        Vector2 basePosition = new Vector2(transform.position.x, originalPosition.y);
+        Vector2 basePosition = new Vector2(transform.position.x, centerPosition.y);
         
         // 소환 방향 랜덤화
         float spawnDir = (target != null && Random.value < 0.7f) 
-            ? Mathf.Sign(target.position.x - transform.position.x)
+            ? Mathf.Sign(target.position.x - centerPosition.x)
             : (Random.value < 0.5f ? 1f : -1f);
         
         // 소환 거리 랜덤화
