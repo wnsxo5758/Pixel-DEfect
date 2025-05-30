@@ -52,7 +52,7 @@ MonoBehaviour:
   normalStunDuration: 0.5
   throwStunDuration: 3
   knockBackForce: 8
-  deathDelay: 2
+  deathDelay: 3
   detectionRange: 20
   loseTargetRange: 22
   target: {fileID: 0}
@@ -82,23 +82,36 @@ MonoBehaviour:
   initialDelay: 1
   stunDuration: 4
   stunThreshold: 3
-  basicAttackRange: 4.5
-  basicAttackCooldown: 5
-  attackPrepTime: 1
+  basicAttackRange: 10
+  basicAttackCooldown: 3
+  attackPrepTime: 0.5
   attackExecuteTime: 0.5
   basicAttackDamage: 2
   attackPoint: {fileID: 0}
-  attackHitBoxSize: {x: 5, y: 2}
-  attackHitBoxOffset: {x: 2, y: 0}
+  attackHitBoxSize: {x: 12, y: 4}
+  attackHitBoxOffset: {x: 6, y: 1}
   headbuttPrepTime: 1
   headbuttSpeed: 15
-  headbuttCooldown: 8
+  headbuttCooldown: 10
   headbuttDamage: 3
   headbuttKnockBackForce: 7
   headbuttLayer:
     serializedVersion: 2
     m_Bits: 72
   headbuttCollider: {fileID: 0}
+  summonCooldown: 30
+  ascentDuration: 2
+  descentDuration: 2
+  ceilingHeight: 8
+  robotPrefabs:
+  - {fileID: 6289588865983769723, guid: daa93609b330577489e689b906114e0f, type: 3}
+  - {fileID: 3521060120655573095, guid: 8ec2c8a821ca9ff4f89777c263cf3524, type: 3}
+  initialRobotCount: 2
+  maxRobotCount: 7
+  minSpawnTime: 5
+  maxSpawnTime: 10
+  useDirectPositioning: 1
+  ceilingPoint: {fileID: 0}
 --- !u!114 &4615694838762613502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,6 +136,7 @@ MonoBehaviour:
   jumpForce: 0
   lowGravityScale: 0
   highGravityScale: 10
+  movementLocked: 0
 --- !u!50 &8106223180327749795
 Rigidbody2D:
   serializedVersion: 4
@@ -194,22 +208,22 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 1.6, y: 7.15}
-      - {x: -2.9, y: 7.15}
-      - {x: -2.9, y: 5.2}
-      - {x: -3.9, y: 5.1}
-      - {x: -3.9, y: 2.7}
-      - {x: -3.45, y: 2.6}
-      - {x: -3.45, y: 1.2}
-      - {x: -4.2, y: 1.2}
-      - {x: -4.5, y: 0.5}
-      - {x: -3.9, y: 0}
-      - {x: 2.5, y: 0}
-      - {x: 2.87, y: 0.5}
-      - {x: 2.6, y: 1.07}
-      - {x: 1.88, y: 1.07}
-      - {x: 2, y: 4.6}
-      - {x: 1.6, y: 4.7}
+    - - {x: 2.3, y: 7.15}
+      - {x: -2.2, y: 7.15}
+      - {x: -2.2, y: 5.2}
+      - {x: -3.2, y: 5.1}
+      - {x: -3.2, y: 2.7}
+      - {x: -2.75, y: 2.6}
+      - {x: -2.75, y: 1.2}
+      - {x: -3.5, y: 1.2}
+      - {x: -3.8, y: 0.5}
+      - {x: -3.2, y: 0}
+      - {x: 3.2, y: 0}
+      - {x: 3.57, y: 0.5}
+      - {x: 3.3, y: 1.07}
+      - {x: 2.58, y: 1.07}
+      - {x: 2.7, y: 4.6}
+      - {x: 2.3, y: 4.7}
   m_UseDelaunayMesh: 0
 --- !u!1 &8386435950001853139
 GameObject:
@@ -286,7 +300,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 1186796396, guid: 7259fdfa210d7a744ad75a018aa3cc37, type: 3}
+  m_Sprite: {fileID: 1371527030, guid: fcd48619784fd064bb4b7c0fcfe39c10, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

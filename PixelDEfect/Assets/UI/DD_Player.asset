@@ -47,3 +47,17 @@ MonoBehaviour:
     waitAfterLine: 1
   - line: "\uD574\uBCF4\uC790!"
     waitAfterLine: 1
+  - line: "\uBB50\uC57C"
+    waitAfterLine: 1
+  - line: "\uC5EC\uAE34 \uC880 \uB2E4\uB978\uB370?"
+    waitAfterLine: 2
+  - line: "\uC544\uB2C8..."
+    waitAfterLine: 2
+  - line: "\uB098 \uAC07\uD614\uC5B4?"
+    waitAfterLine: 2
+  - line: "\uD070\uC77C\uB0AC\uB2E4"
+    waitAfterLine: 1
+  - line: "\uBCF4\uD1B5 \uC774\uCBE4\uB418\uBA74 \uBB54\uAC00..."
+    waitAfterLine: 1.5
+  - line: "\uC544... \uC81C\uBC1C..."
+    waitAfterLine: 1.5

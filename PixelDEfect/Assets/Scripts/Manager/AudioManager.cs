@@ -9,10 +9,11 @@ public class AudioManager : MonoBehaviour
 
     [Header("#BGM")]
     [SerializeField]
-    private AudioClip bgmClip; // 배경음
+    private AudioClip bgmClip;      // 배경음
     [SerializeField]
-    private float bgmVolume; // 배경음 볼륨
-    private AudioSource bgmPlayer; // 배경음 담당
+    private AudioSource bgmPlayer;  // 배경음 담당
+    [SerializeField, Range(0, 100)]
+    private float bgmVolume = 100;
 
     [Header("#SFX")]
     [SerializeField]
@@ -42,10 +43,10 @@ public class AudioManager : MonoBehaviour
         //배경음 플레이어 초기화
         GameObject bgmObject = new GameObject("BgmPlayer"); // 배경음 담당 오브젝트 생성
         bgmObject.transform.parent = transform;
-        bgmPlayer = bgmObject.AddComponent<AudioSource>(); // 배경음 담당 오브젝트에 사운드 소스 추가
+        bgmPlayer = bgmObject.AddComponent<AudioSource>();  // 배경음 담당 오브젝트에 사운드 소스 추가
         bgmPlayer.playOnAwake = false;
         bgmPlayer.loop = true;
-        bgmPlayer.volume = bgmVolume;
+        bgmPlayer.volume = bgmVolume / 100f;
         bgmPlayer.clip = bgmClip;
 
         //효과음 플레이어 초기화
@@ -76,6 +77,17 @@ public class AudioManager : MonoBehaviour
             sfxPlayers[loopIndex].Play();
             break;
         }
+    }
+
+    public void ChangeBGM(AudioClip newClip, float volume = 100f)
+    {
+        if (bgmPlayer.clip == newClip)
+            return;
+
+        bgmPlayer.Stop();
+        bgmPlayer.clip = newClip;
+        bgmPlayer.volume = volume / 100f;
+        bgmPlayer.Play();
     }
 
     public void PlaySfxLoop(Sfx sfx)
