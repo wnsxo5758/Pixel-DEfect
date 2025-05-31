@@ -387,6 +387,9 @@ public class PlayerAttack : MonoBehaviour
 
         pendingTeleportWeapon = targetWeapon;
         
+        // 방향 계산
+        controller.SpriteFlipX(targetWeapon.transform.position.x - transform.position.x);
+        
         // 텔레포트 시작 상태로 전환
         controller.ChangeState(new PlayerStates.TeleportStart());
     }
@@ -413,9 +416,6 @@ public class PlayerAttack : MonoBehaviour
                                  targetWeapon.transform.parent != null && 
                                  targetWeapon.transform.parent.CompareTag("Enemy");
         
-        // 짧은 대기 시간 (텔레포트 이펙트용)
-        yield return new WaitForSeconds(0.1f);
-        
         // 무기가 파괴되었는지 확인
         if (targetWeapon == null)
         {
@@ -426,12 +426,15 @@ public class PlayerAttack : MonoBehaviour
         // 텔레포트 위치 계산
         Vector3 teleportPosition = CalculateTeleportPosition(targetWeapon);
         
-        // 무기 처리
-        HandleWeaponDuringTeleport(targetWeapon);
-        
         // 플레이어 위치 이동
         transform.position = teleportPosition;
         
+        // 짧은 대기 시간 (텔레포트 이펙트용)
+        yield return new WaitForSeconds(0.1f);
+
+        // 무기 처리
+        HandleWeaponDuringTeleport(targetWeapon);
+
         // 텔레포트 완료 처리
         CompleteTeleportSequence(wasAttachedToEnemy);
     }
@@ -484,12 +487,11 @@ public class PlayerAttack : MonoBehaviour
         
         if (!isAttachedToEnemy)
         {
-            Debug.Log("[Teleport] 일반 무기 - 즉시 제거");
             Destroy(weapon.gameObject);
         }
         else
         {
-            Debug.Log("[Teleport] 적 부착 무기 - 뽑기 애니메이션 후 제거 예정");
+            weapon.SetVisible(false);
             // 적에게 붙어있던 무기는 나중에 뽑기 애니메이션 완료 시 제거
         }
     }
@@ -773,15 +775,6 @@ public class PlayerAttack : MonoBehaviour
     private bool CanPlayerAttack()
     {
         var currentState = controller.GetCurrentState();
-
-        // 낙하 중에는 공격 불가
-        if (currentState is PlayerStates.Idle || currentState is PlayerStates.Run)
-        {
-            if (!movement.IsGrounded)
-            {
-                return false;
-            }
-        }
         
         // 공격 가능한 상태 확인
         if (currentState is PlayerStates.Idle or PlayerStates.Run or PlayerStates.Jump)

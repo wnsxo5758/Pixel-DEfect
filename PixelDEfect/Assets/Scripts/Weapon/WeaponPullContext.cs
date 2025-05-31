@@ -28,7 +28,7 @@ public class WeaponPullContext
         isTeleportPull = false;
         
         // 기본 넉백 힘 설정
-        knockBackForce = new Vector2(10f, 20f);
+        knockBackForce = new Vector2(30f, 60f);
 
         if (!isGrounded)
         {
@@ -38,7 +38,7 @@ public class WeaponPullContext
 
     public WeaponPullContext()
     {
-        knockBackForce = new Vector2(10f, 20f);
+        knockBackForce = new Vector2(30f, 60f);
     }
     
     public static WeaponPullContext CreateTeleportPull(ThrownWeapon weapon, Vector3 playerPos, bool playerGrounded)
@@ -66,7 +66,7 @@ public class WeaponPullContext
     
     private void CalculateKnockBackDirection(Vector3 playerPos)
     {
-        knockBackForce = new Vector2(10f, 20f);
+        knockBackForce = new Vector2(30f, 60f);
         
         // 플레이어에서 무기로의 방향 벡터
         Vector2 toWeapon = (weaponPosition - playerPos).normalized;

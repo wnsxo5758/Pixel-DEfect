@@ -1,3 +1,4 @@
+using System.Threading;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -399,11 +400,14 @@ namespace PlayerStates
     public class Attack : State<PlayerController>
     {
         MovementRigidbody2D movement;
+        private float attackTimer = 0f;
+        private const float MAX_ATTACK_DURATION = 3f;
         
         public override void Enter(PlayerController player)
         {
             movement = player.GetComponent<MovementRigidbody2D>();
-
+            attackTimer = 0f;
+            
             if (player.IsGrounded())
             {
                 movement.MoveTo(0);
@@ -412,12 +416,18 @@ namespace PlayerStates
 
         public override void Execute(PlayerController player)
         {
-            
+            attackTimer += Time.deltaTime;
+
+            if (attackTimer >= MAX_ATTACK_DURATION)
+            {
+                Debug.LogWarning("3초 이상 공격 이상 상태 감지");
+                player.ChangeState(new Idle());
+            }
         }
 
         public override void Exit(PlayerController player)
         {
-            
+            attackTimer = 0f;
         }
     }
 
@@ -610,7 +620,6 @@ namespace PlayerStates
                 if (playerAttack != null)
                 {
                     
-                    Debug.Log($"텔레포트 시작 애니메이션 완료, {player.IsGrounded()}");
                     playerAttack.ExecuteTeleportMovement();
                 }
                 animationFinished = false;
@@ -702,9 +711,9 @@ namespace PlayerStates
         private void DetermineAndStartPullState(PlayerController player, WeaponPullContext context)
         {
             // 현재 플레이어가 공중에 있는지 확인
-            bool isPlayerInAir = !player.IsGrounded();
+            bool isPlayerInAir = !context.isGrounded;
             
-            context.isGrounded = !isPlayerInAir;
+            Debug.Log(isPlayerInAir);
             
             if (isPlayerInAir)
             {
