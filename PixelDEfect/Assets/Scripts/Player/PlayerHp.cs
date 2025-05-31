@@ -125,8 +125,9 @@ public class PlayerHp : MonoBehaviour
     {
         var currentState = player.GetCurrentState();
         bool isSpecialState = currentState is PlayerStates.Climb or PlayerStates.Hold or
-            PlayerStates.Valve or PlayerStates.Attack or PlayerStates.PullWeaponGround or
-            PlayerStates.PullWeaponAir or PlayerStates.TeleportStart or PlayerStates.TeleportEnd;
+            PlayerStates.Valve or PlayerStates.VendingMachineHeal or PlayerStates.Attack or 
+            PlayerStates.PullWeaponGround or PlayerStates.PullWeaponAir or 
+            PlayerStates.TeleportStart or PlayerStates.TeleportEnd;
         
         // 경직 시간 설정
         currentHitStunDuration = isSpecialState ? specialStunDuration : hitStunDuration;

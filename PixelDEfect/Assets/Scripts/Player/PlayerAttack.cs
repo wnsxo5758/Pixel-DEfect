@@ -40,7 +40,7 @@ public class PlayerAttack : MonoBehaviour
     private bool canThrow = true;
     private bool canTeleport = true;
     private bool isTeleporting = false;
-    
+
     public bool AfterPulling { get; set; }
     
     // 무기 뽑기 상태 관리
@@ -255,9 +255,6 @@ public class PlayerAttack : MonoBehaviour
     // 던지기 쿨타임 코루틴
     private IEnumerator ThrowCooldownTimer()
     {
-        canThrow = false;
-        yield return new WaitForSeconds(0.2f);
-        canTeleport = true;
         yield return new WaitForSeconds(throwCooldown);
         canThrow = true;
     }
@@ -266,6 +263,8 @@ public class PlayerAttack : MonoBehaviour
     private void ThrowWeapon()
     {
         if (currentWeapon == null || !hasWeapon) return;
+        
+        controller.UpdateMove(0);
         
         controller.ChangeState(new PlayerStates.Attack());
         
@@ -305,6 +304,10 @@ public class PlayerAttack : MonoBehaviour
     public void FinishedThrowAnim()
     {
         movement.MoveTo(0);
+        
+        isAttacking = false;
+        canTeleport = true;
+        
         controller.ChangeState(new PlayerStates.Idle());
     }
 
@@ -328,7 +331,9 @@ public class PlayerAttack : MonoBehaviour
                 thrownWeapon.Initialize(currentWeapon, throwForceVector, direction, transform.position);
 
                 lastThrownWeapon = thrownWeapon;
-                
+
+                isAttacking = true;
+                canThrow = false;
                 canTeleport = false;
                 
                 UnEquipWeapon();

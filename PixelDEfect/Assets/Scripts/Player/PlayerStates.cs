@@ -580,7 +580,7 @@ namespace PlayerStates
     {
         private PlayerAnimator animator;
         private MovementRigidbody2D movement;
-        private bool animationFinished = false;
+        private bool animationFinished;
 
         public override void Enter(PlayerController player)
         {
@@ -609,7 +609,8 @@ namespace PlayerStates
                 PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
                 if (playerAttack != null)
                 {
-                    Debug.Log("텔레포트 시작 애니메이션 완료");
+                    
+                    Debug.Log($"텔레포트 시작 애니메이션 완료, {player.IsGrounded()}");
                     playerAttack.ExecuteTeleportMovement();
                 }
                 animationFinished = false;

@@ -118,7 +118,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.phase == InputActionPhase.Performed)
         {
-            if (GetCurrentState() is PlayerStates.Idle || GetCurrentState() is PlayerStates.Run)
+            if (GetCurrentState() is PlayerStates.Idle or PlayerStates.Run)
             {
                 if (movement.IsGrounded && canRoll)
                 {
