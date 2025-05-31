@@ -25,7 +25,7 @@ public class CheckPoint : MonoBehaviour
         // 체크포인트 활성화
         isActivated = true;
 
-        Vector2 spawnPos = new Vector2(transform.position.x, transform.position.y - collider.bounds.min.y + 1.6f);
+        Vector2 spawnPos = new Vector2(transform.position.x, transform.position.y - collider.size.y/2 + 1f);
         
         // 체크포인트 매니저에 등록
         CheckpointManager.Instance.SetActiveCheckpoint(checkpointID, spawnPos);
