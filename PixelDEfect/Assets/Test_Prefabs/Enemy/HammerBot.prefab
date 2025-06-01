@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 80686468026598119}
   - component: {fileID: 2217178688571010545}
   - component: {fileID: 101884625652215795}
+  - component: {fileID: 4704805162367914870}
   m_Layer: 8
   m_Name: HammerBot
   m_TagString: Enemy
@@ -54,7 +55,7 @@ MonoBehaviour:
   throwStunDuration: 3
   knockBackForce: 3
   deathDelay: 2
-  detectionRange: 5
+  detectionRange: 12
   loseTargetRange: 6
   target: {fileID: 0}
   targetLayer:
@@ -75,6 +76,9 @@ MonoBehaviour:
   skillCooldown: 5
   jumpHeight: 4.5
   jumpForwardOffset: 0.3
+  canJumpLayer:
+    serializedVersion: 2
+    m_Bits: 0
   attackRange: 2
   attackCooldown: 2
   attackDamage: 2
@@ -173,6 +177,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &4704805162367914870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094357048903286401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e9b99cfde2577c459e0f612375f4695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sentences:
+  - "\uB9E4\uC77C \uC2F8\uC6B8 \uC218 \uC788\uC5B4!"
+  - "\uC9C0\uB098 \uAC08\uAC8C"
+  deathSentences:
+  - "\uC774\uB7F4 \uC904 \uC54C\uC558\uC5B4..."
+  chatTr: {fileID: 0}
+  chatBoxPrefab: {fileID: 0}
+  player: {fileID: 0}
+  distanceThreshold: 4
+  sentenceDelay: 2
 --- !u!1 &6830838432024467762
 GameObject:
   m_ObjectHideFlags: 0
@@ -330,7 +356,7 @@ Transform:
   m_GameObject: {fileID: 8832530783174628187}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.009, z: 0}
+  m_LocalPosition: {x: 0, y: 0.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
