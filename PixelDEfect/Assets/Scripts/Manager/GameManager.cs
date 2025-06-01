@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,6 +15,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject toBeCon;
     private GameObject player;
+    
+    private bool isPlayerDead = false;
     
     private void Awake()
     {
@@ -32,14 +35,14 @@ public class GameManager : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
     }
 
-    public void ProcessPlayerFall(GameObject player, int fallDamage)
+    public void ProcessPlayerFall(int fallDamage)
     {
         if (player == null) return;
         
-        StartCoroutine(FallRespawnProcess(player, fallDamage));
+        StartCoroutine(FallRespawnProcess(fallDamage));
     }
 
-    private IEnumerator FallRespawnProcess(GameObject player, int fallDamage)
+    private IEnumerator FallRespawnProcess(int fallDamage)
     {
         PlayerHp playerHp = player.GetComponent<PlayerHp>();
         if (playerHp != null)
@@ -52,7 +55,7 @@ public class GameManager : MonoBehaviour
                 yield break;
             }
             
-            playerHp.OnInvincibility(2f);
+            playerHp.OnInvincibility(respawnInvulnerabilityTime);
         }
 
         // 즉시 체크포인트로 이동
@@ -64,9 +67,8 @@ public class GameManager : MonoBehaviour
     
     public void PlayerDied()
     {
+        isPlayerDead = true;
         DisableTimeEvents();
-        
-        StartCoroutine(RespawnProcess());
     }
 
     // 타임 매니저 이벤트 중지
@@ -78,7 +80,15 @@ public class GameManager : MonoBehaviour
         }
     }
     
-    private IEnumerator RespawnProcess()
+    // 수동 부활 메서드
+    public void RespawnPlayer()
+    {
+        if (!isPlayerDead) return;
+
+        StartCoroutine(ManualRespawnProcess());
+    }
+
+    private IEnumerator ManualRespawnProcess()
     {
         // 딜레이 
         yield return new WaitForSeconds(respawnDelay);
@@ -93,6 +103,8 @@ public class GameManager : MonoBehaviour
             }
             
             CheckpointManager.Instance.RespawnCheckpoint(player);
+            
+            isPlayerDead = false;
         }
         else
         {

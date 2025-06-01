@@ -338,8 +338,6 @@ public class PlayerController : MonoBehaviour
         EnablePlayerControl();
         
         ChangeState(new PlayerStates.Idle());
-        
-
     }
     
     private void DisablePlayerControl()

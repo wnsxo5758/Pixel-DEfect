@@ -5,15 +5,19 @@ using UnityEngine.UI;
 
 public class UIDeath : MonoBehaviour
 {
-    [SerializeField] private Image backgroundImage; // ¹è°æ¿ë ÀÌ¹ÌÁö (¿¹: °ËÁ¤ ¹ÝÅõ¸í)
-    [SerializeField] private Image foregroundImage; // Àü°æ UI (¿¹: "YOU DIED" ÅØ½ºÆ® µî)
+    [SerializeField] private Image backgroundImage; // ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ (ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+    [SerializeField] private Image foregroundImage; // ï¿½ï¿½ï¿½ï¿½ UI (ï¿½ï¿½: "YOU DIED" ï¿½Ø½ï¿½Æ® ï¿½ï¿½)
     [SerializeField] private float fadeDuration = 1f;
-
+    [SerializeField] private Button respawnButton;
+    [SerializeField] private float buttonAppearDelay = 2f;
+    
     private bool isFading = false;
+    private bool isShowing = false;
 
     void Start()
     {
         SetUp();
+        SetupButton();
     }
 
     private void InitImage(Image img)
@@ -26,11 +30,24 @@ public class UIDeath : MonoBehaviour
             img.raycastTarget = false;
         }
     }
+    
     public void SetUp()
     {
         InitImage(backgroundImage);
         InitImage(foregroundImage);
+
+        isShowing = false;
     }
+
+    private void SetupButton()
+    {
+        if (respawnButton != null)
+        {
+            respawnButton.onClick.AddListener(OnRespawnButtonClicked);
+            respawnButton.gameObject.SetActive(false);
+        }
+    }
+    
     public void ShowDeathUI()
     {
         if (!isFading && backgroundImage != null && foregroundImage != null)
@@ -42,6 +59,8 @@ public class UIDeath : MonoBehaviour
     private IEnumerator FadeInImages()
     {
         isFading = true;
+        isShowing = true;
+        
         float elapsed = 0f;
 
         Color bgColor = backgroundImage.color;
@@ -61,7 +80,7 @@ public class UIDeath : MonoBehaviour
             yield return null;
         }
 
-        // ÃÖÁ¾ º¸Á¤
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (backgroundImage != null)
         {
             backgroundImage.color = new Color(bgColor.r, bgColor.g, bgColor.b, 1f);
@@ -75,5 +94,128 @@ public class UIDeath : MonoBehaviour
         }
 
         isFading = false;
+        
+        yield return new WaitForSeconds(buttonAppearDelay);
+        ShowButton();
+    }
+
+    private void ShowButton()
+    {
+        if (respawnButton != null)
+        {
+            respawnButton.gameObject.SetActive(true);
+            StartCoroutine(FadeInButton(respawnButton));
+        }
+    }
+
+    private IEnumerator FadeInButton(Button button, float delay = 0f)
+    {
+        if (button == null) yield break;
+        
+        yield return new WaitForSeconds(delay);
+        
+        CanvasGroup canvasGroup = button.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = button.gameObject.AddComponent<CanvasGroup>();
+        }
+        
+        canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false;
+        
+        float elapsed = 0f;
+        float buttonFadeDuration = 0.3f;
+        
+        while (elapsed < buttonFadeDuration)
+        {
+            float alpha = Mathf.Lerp(0f, 1f, elapsed / buttonFadeDuration);
+            canvasGroup.alpha = alpha;
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        canvasGroup.alpha = 1f;
+        canvasGroup.interactable = true;
+    }
+
+    public void HideDeathUI()
+    {
+        if (!isShowing) return;
+
+        StartCoroutine(FadeOutImages());
+    }
+    
+    private IEnumerator FadeOutImages()
+    {
+        float elapsed = 0f;
+        float fadeOutDuration = 0.5f;
+
+        Color bgColor = backgroundImage.color;
+        Color fgColor = foregroundImage.color;
+
+        // ë²„íŠ¼ ë¨¼ì € ìˆ¨ê¸°ê¸°
+        if (respawnButton != null)
+            respawnButton.gameObject.SetActive(false);
+        
+
+        // ì´ë¯¸ì§€ íŽ˜ì´ë“œì•„ì›ƒ
+        while (elapsed < fadeOutDuration)
+        {
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeOutDuration);
+
+            if (backgroundImage != null)
+                backgroundImage.color = new Color(bgColor.r, bgColor.g, bgColor.b, alpha);
+
+            if (foregroundImage != null)
+                foregroundImage.color = new Color(fgColor.r, fgColor.g, fgColor.b, alpha);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // ìµœì¢… ë³´ì •
+        if (backgroundImage != null)
+        {
+            backgroundImage.color = new Color(bgColor.r, bgColor.g, bgColor.b, 0f);
+            backgroundImage.raycastTarget = false;
+        }
+
+        if (foregroundImage != null)
+        {
+            foregroundImage.color = new Color(fgColor.r, fgColor.g, fgColor.b, 0f);
+            foregroundImage.raycastTarget = false;
+        }
+        
+        isShowing = false;
+    }
+    
+    // ë²„íŠ¼ ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬ë“¤
+    private void OnRespawnButtonClicked()
+    {
+        Debug.Log("Respawn ë²„íŠ¼ í´ë¦­ë¨");
+        
+        // ë²„íŠ¼ ë¹„í™œì„±í™” (ì¤‘ë³µ í´ë¦­ ë°©ì§€)
+        if (respawnButton != null)
+            respawnButton.interactable = false;
+        
+        // ì‚¬ë§ UI ìˆ¨ê¸°ê¸°
+        HideDeathUI();
+        
+        // GameManagerì—ê²Œ ë¶€í™œ ìš”ì²­
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RespawnPlayer();
+        }
+        else
+        {
+            Debug.LogError("GameManager.Instanceê°€ nullìž…ë‹ˆë‹¤!");
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (respawnButton != null)
+            respawnButton.onClick.RemoveListener(OnRespawnButtonClicked);
     }
 }

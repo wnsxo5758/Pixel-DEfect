@@ -14,7 +14,7 @@ public class FallZone : MonoBehaviour
     {
         if (collision.CompareTag("Player") && !isProcessingFall)
         {
-            StartCoroutine(ProcessPlayerFall(collision.gameObject));
+            StartCoroutine(ProcessPlayerFall());
         }
         else if (collision.CompareTag("Weapon") || collision.gameObject.layer == LayerMask.NameToLayer("Weapon"))
         {
@@ -26,7 +26,7 @@ public class FallZone : MonoBehaviour
         } 
     }
 
-    private IEnumerator ProcessPlayerFall(GameObject player)
+    private IEnumerator ProcessPlayerFall()
     {
         isProcessingFall = true;
         
@@ -34,7 +34,7 @@ public class FallZone : MonoBehaviour
 
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.ProcessPlayerFall(player, fallDamage);
+            GameManager.Instance.ProcessPlayerFall(fallDamage);
         }
 
         isProcessingFall = false;
