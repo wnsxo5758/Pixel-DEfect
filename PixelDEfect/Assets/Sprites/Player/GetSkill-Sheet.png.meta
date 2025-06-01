@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 575559a837f494942a10636bf1616a12
+guid: 1e967aa10ca5ffa46b4568afa48807c8
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,7 +97,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: TeleportEnd_0
+      name: GetSkill-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
@@ -111,14 +111,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8c9138c0d3f7e8a4d8ee9ae67259d4c2
-      internalID: -1628010421
+      spriteID: 249542246d04fa446b3f48ee702f6dff
+      internalID: -1062914907
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportEnd_1
+      name: GetSkill-Sheet_1
       rect:
         serializedVersion: 2
         x: 96
@@ -132,14 +132,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 37f3a380e4f68e742b6fc2e57a237442
-      internalID: 706366508
+      spriteID: 3a7651d3d73590c4db796d2505318a64
+      internalID: 1687919443
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportEnd_2
+      name: GetSkill-Sheet_2
       rect:
         serializedVersion: 2
         x: 192
@@ -153,14 +153,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b793cca260f1ac9439e7505ebb083397
-      internalID: -353011131
+      spriteID: d35c43e6626029b49a162eb2e19ac866
+      internalID: -1140857908
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportEnd_3
+      name: GetSkill-Sheet_3
       rect:
         serializedVersion: 2
         x: 288
@@ -174,14 +174,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e0c4448b93bdec74287d708108951d99
-      internalID: -1779681971
+      spriteID: 6c9bd0aab22840549a2a5136b8c468d6
+      internalID: 1224083363
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportEnd_4
+      name: GetSkill-Sheet_4
       rect:
         serializedVersion: 2
         x: 384
@@ -195,8 +195,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0cad3f2c65d91b841b39a5ab815ecec7
-      internalID: -346280709
+      spriteID: 5814b79e92f14394888676d5e4c38653
+      internalID: -226886002
       vertices: []
       indices: 
       edges: []
@@ -212,11 +212,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      TeleportEnd_0: -1628010421
-      TeleportEnd_1: 706366508
-      TeleportEnd_2: -353011131
-      TeleportEnd_3: -1779681971
-      TeleportEnd_4: -346280709
+      GetSkill-Sheet_0: -1062914907
+      GetSkill-Sheet_1: 1687919443
+      GetSkill-Sheet_2: -1140857908
+      GetSkill-Sheet_3: 1224083363
+      GetSkill-Sheet_4: -226886002
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

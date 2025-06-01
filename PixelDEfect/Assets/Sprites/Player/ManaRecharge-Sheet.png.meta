@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 042ca348f4b58b6469f165217f33ca76
+guid: ed4e2ddef2320cd4d884f669aeebba02
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,7 +97,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: TeleportStart_2_0
+      name: ManaRecharge-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
@@ -111,14 +111,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ac33ce096ad306e4ea15f69b28b0eb7b
-      internalID: 175035248
+      spriteID: d0a6dda841c9f144fa0692c377d385ef
+      internalID: -462041399
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportStart_2_1
+      name: ManaRecharge-Sheet_1
       rect:
         serializedVersion: 2
         x: 96
@@ -132,14 +132,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d85f4884dc126be44961dec600fbe749
-      internalID: 1578371712
+      spriteID: d627a91d49abeac46ba284a256e78b7f
+      internalID: 1296541030
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportStart_2_2
+      name: ManaRecharge-Sheet_2
       rect:
         serializedVersion: 2
         x: 192
@@ -153,14 +153,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c8ad00846bb090e42b232cf73ae556a2
-      internalID: 1997387635
+      spriteID: 932fcb2e29138e34b8db013481dbfc5d
+      internalID: -1453315944
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportStart_2_3
+      name: ManaRecharge-Sheet_3
       rect:
         serializedVersion: 2
         x: 288
@@ -174,14 +174,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e4e4c4db50e27d24ba227395f63a0a91
-      internalID: -1107021533
+      spriteID: dfabe08e7cff0d5429498b0ee2840a55
+      internalID: 1475663786
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportStart_2_4
+      name: ManaRecharge-Sheet_4
       rect:
         serializedVersion: 2
         x: 384
@@ -195,14 +195,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0aafd5915c008dd4193135210b336408
-      internalID: -1743905472
+      spriteID: bbd08f2eddc352f4798bea531f6034f0
+      internalID: -963624648
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportStart_2_5
+      name: ManaRecharge-Sheet_5
       rect:
         serializedVersion: 2
         x: 480
@@ -216,8 +216,134 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 863af93e8fb7bad4dbaead68c063b72c
-      internalID: -1866484123
+      spriteID: 761d46ea59ccc2849962d8d40a3577e9
+      internalID: 96865699
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharge-Sheet_6
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e138f0769c8d1be478216b0c48581e69
+      internalID: -2126149968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharge-Sheet_7
+      rect:
+        serializedVersion: 2
+        x: 672
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e3cd17f0afd0c74da35d9c186303150
+      internalID: -706250424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharge-Sheet_8
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 918e2fb667265fd43829c210138c0ae9
+      internalID: -548000203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharge-Sheet_9
+      rect:
+        serializedVersion: 2
+        x: 864
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff98ce78457a9274bb7de7b6af1daeaa
+      internalID: 1669486650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharge-Sheet_10
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88c3de2d261fbf34d8a04e0aa8c29e02
+      internalID: 896358473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharge-Sheet_11
+      rect:
+        serializedVersion: 2
+        x: 1056
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd79ae58225e415408308525a7e95e85
+      internalID: 1196731049
       vertices: []
       indices: 
       edges: []
@@ -233,12 +359,18 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      TeleportStart_2_0: 175035248
-      TeleportStart_2_1: 1578371712
-      TeleportStart_2_2: 1997387635
-      TeleportStart_2_3: -1107021533
-      TeleportStart_2_4: -1743905472
-      TeleportStart_2_5: -1866484123
+      ManaRecharge-Sheet_0: -462041399
+      ManaRecharge-Sheet_1: 1296541030
+      ManaRecharge-Sheet_10: 896358473
+      ManaRecharge-Sheet_11: 1196731049
+      ManaRecharge-Sheet_2: -1453315944
+      ManaRecharge-Sheet_3: 1475663786
+      ManaRecharge-Sheet_4: -963624648
+      ManaRecharge-Sheet_5: 96865699
+      ManaRecharge-Sheet_6: -2126149968
+      ManaRecharge-Sheet_7: -706250424
+      ManaRecharge-Sheet_8: -548000203
+      ManaRecharge-Sheet_9: 1669486650
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

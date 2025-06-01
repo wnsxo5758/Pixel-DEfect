@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 575559a837f494942a10636bf1616a12
+guid: 051ce310da478ea46a90d5b3685fb881
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,7 +97,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: TeleportEnd_0
+      name: ManaRecharging-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
@@ -111,14 +111,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8c9138c0d3f7e8a4d8ee9ae67259d4c2
-      internalID: -1628010421
+      spriteID: 1064f8f65cf265a4aadc76412b1e8014
+      internalID: -703546200
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportEnd_1
+      name: ManaRecharging-Sheet_1
       rect:
         serializedVersion: 2
         x: 96
@@ -132,14 +132,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 37f3a380e4f68e742b6fc2e57a237442
-      internalID: 706366508
+      spriteID: 2b8fda336b078a947946a8d7e096bd93
+      internalID: 479179217
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportEnd_2
+      name: ManaRecharging-Sheet_2
       rect:
         serializedVersion: 2
         x: 192
@@ -153,14 +153,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b793cca260f1ac9439e7505ebb083397
-      internalID: -353011131
+      spriteID: 4b0144d804a6bd647b9a52df2b8402f6
+      internalID: 419220853
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportEnd_3
+      name: ManaRecharging-Sheet_3
       rect:
         serializedVersion: 2
         x: 288
@@ -174,14 +174,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e0c4448b93bdec74287d708108951d99
-      internalID: -1779681971
+      spriteID: 4f55ff235d5fd154584c34ea2cee108f
+      internalID: -607051174
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TeleportEnd_4
+      name: ManaRecharging-Sheet_4
       rect:
         serializedVersion: 2
         x: 384
@@ -195,8 +195,113 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0cad3f2c65d91b841b39a5ab815ecec7
-      internalID: -346280709
+      spriteID: f11e7d09f1c863342be9d0836d9e7130
+      internalID: -110531200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharging-Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c25d11dcf75a0694dade67132ebff658
+      internalID: 624860960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharging-Sheet_6
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c21c4a1f40464284caaf4e1a09a29ce5
+      internalID: 600958580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharging-Sheet_7
+      rect:
+        serializedVersion: 2
+        x: 672
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5535251cd86930c4da79a7957c4960e4
+      internalID: -659739062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharging-Sheet_8
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73791178c280e8143aab40643eeee66c
+      internalID: -1676390181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManaRecharging-Sheet_9
+      rect:
+        serializedVersion: 2
+        x: 864
+        y: 0
+        width: 96
+        height: 84
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 26a6d282073f7374b9a9a1ee780c1cc1
+      internalID: -1471936574
       vertices: []
       indices: 
       edges: []
@@ -212,11 +317,16 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      TeleportEnd_0: -1628010421
-      TeleportEnd_1: 706366508
-      TeleportEnd_2: -353011131
-      TeleportEnd_3: -1779681971
-      TeleportEnd_4: -346280709
+      ManaRecharging-Sheet_0: -703546200
+      ManaRecharging-Sheet_1: 479179217
+      ManaRecharging-Sheet_2: 419220853
+      ManaRecharging-Sheet_3: -607051174
+      ManaRecharging-Sheet_4: -110531200
+      ManaRecharging-Sheet_5: 624860960
+      ManaRecharging-Sheet_6: 600958580
+      ManaRecharging-Sheet_7: -659739062
+      ManaRecharging-Sheet_8: -1676390181
+      ManaRecharging-Sheet_9: -1471936574
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
