@@ -6,6 +6,10 @@ public class MovementEffects : MonoBehaviour
 {
     private MovementRigidbody2D movement;
 
+    [Header("마나 수집")]
+    [SerializeField] 
+    private ParticleSystem manaEffect;
+
     [Header("플레이어 이동시")]
     [SerializeField]
     private ParticleSystem footStepEffect;
@@ -42,4 +46,22 @@ public class MovementEffects : MonoBehaviour
         }
         wasOnGround = movement.IsGrounded;
     }
+
+    public void PlayEffect()
+    {
+        if (manaEffect != null && !manaEffect.isPlaying)
+        {
+            manaEffect.Play();
+        }
+    }
+
+    // 파티클 정지 함수
+    public void StopEffect()
+    {
+        if (manaEffect != null && manaEffect.isPlaying)
+        {
+            manaEffect.Stop();
+        }
+    }
+
 }
