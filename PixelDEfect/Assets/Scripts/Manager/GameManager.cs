@@ -9,7 +9,10 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private float respawnDelay = 1f;
     [SerializeField] private float respawnInvulnerabilityTime = 2f;
-    
+
+    [Header("투비 컨티뉴")]
+    [SerializeField]
+    private GameObject toBeCon;
     private GameObject player;
     
     private void Awake()
@@ -110,5 +113,10 @@ public class GameManager : MonoBehaviour
         
         CheckpointManager.Instance.ResetCheckpoints();
         SceneManager.LoadScene(currentScene.name);
+    }
+
+    public void ToBe()
+    {
+        toBeCon.SetActive(true);
     }
 }
