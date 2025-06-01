@@ -10,11 +10,9 @@ public class HPIcon : MonoBehaviour
     [SerializeField]
     private int currentHP;
 
-
     Animator animator;
     private void Awake()
     {
-
         animator = GetComponent<Animator>();
     }
     private void Start()
