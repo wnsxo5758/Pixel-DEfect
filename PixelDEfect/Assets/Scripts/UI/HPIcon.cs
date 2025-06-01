@@ -15,19 +15,20 @@ public class HPIcon : MonoBehaviour
     {
         animator = GetComponent<Animator>();
     }
-    private void Start()
-    {
-        SetState(currentHP); 
-    }
 
+    public void SetHP(int _currentHP)
+    {
+        currentHP = _currentHP;
+        SetHPAnim();
+    }
     public void SetState(int damage) 
     {
         currentHP -= damage;
-        SetHPAnim(currentHP);
+        SetHPAnim();
     }
 
-    private void SetHPAnim(int _currentHP)
+    private void SetHPAnim()
     {
-        animator.SetInteger("currentHP", _currentHP);
+        animator.SetInteger("currentHP", currentHP);
     }
 }
