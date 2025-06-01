@@ -20,6 +20,6 @@ MonoBehaviour:
   - line: "\uB10C \uC5EC\uAE30\uC11C"
     waitAfterLine: 1
   - line: "\uBB34\uC870\uAC74 \uC81C\uAC70\uB41C\uB2E4"
-    waitAfterLine: 0.5
-  - line: "\uAC00\uB8E8\uB85C \uB9CC\uB4E4\uC5B4\uC8FC\uB9C8"
-    waitAfterLine: 0.5
+    waitAfterLine: 1
+  - line: "1\uBD84\uB3C4 \uBC84\uD2F0\uC9C0 \uBABB\uD560 \uAC83\uC774\uB2E4"
+    waitAfterLine: 1.5

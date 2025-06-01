@@ -100,6 +100,7 @@ MonoBehaviour:
     m_Bits: 72
   headbuttCollider: {fileID: 0}
   summonCooldown: 30
+  moveToCenterDuration: 2
   ascentDuration: 2
   descentDuration: 2
   ceilingHeight: 8
@@ -112,6 +113,7 @@ MonoBehaviour:
   maxSpawnTime: 10
   useDirectPositioning: 1
   ceilingPoint: {fileID: 0}
+  centerPoint: {fileID: 0}
 --- !u!114 &4615694838762613502
 MonoBehaviour:
   m_ObjectHideFlags: 0

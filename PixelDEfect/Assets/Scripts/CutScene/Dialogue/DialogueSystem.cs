@@ -14,6 +14,8 @@ public class DialogueSystem : MonoBehaviour
     private Queue<string> sentences;        // 대사 큐
     private Transform followTarget;         // 따라갈 대상 (보통 캐릭터 머리 위)
     public TextMeshPro sizeCalculatorText;  // 말풍선 크기 계산
+    float paddingX = 0.8f;                  // 말풍선 x 여백
+    float paddingY = 0.4f;                  // 말풍선 y 여백
 
 
     public void StartDialogue(string[] lines, Transform target)
@@ -41,7 +43,7 @@ public class DialogueSystem : MonoBehaviour
         sizeCalculatorText.text = sentence;
         yield return null;      // 다음 프레임까지 기다려야 계산됨
 
-        float width = Mathf.Min(sizeCalculatorText.preferredWidth + 0.3f, 3f);
+        float width = Mathf.Min(sizeCalculatorText.preferredWidth + 0.3f);
         float height = sizeCalculatorText.preferredHeight + 0.3f;
 
         TextBox.transform.localScale = new Vector2(width, height);
@@ -86,8 +88,8 @@ public class DialogueSystem : MonoBehaviour
     {
         sizeCalculatorText.text = sentence;
         sizeCalculatorText.ForceMeshUpdate(); // 텍스트 길이 정확히 반영
-        float width = Mathf.Min(sizeCalculatorText.preferredWidth + 0.3f, 3f);
-        float height = sizeCalculatorText.preferredHeight + 0.3f;
+        float width = Mathf.Min(sizeCalculatorText.preferredWidth + paddingX);
+        float height = sizeCalculatorText.preferredHeight + paddingY;
 
         TextBox.transform.localScale = new Vector2(width, height);
     }
