@@ -20,8 +20,8 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int attack = Animator.StringToHash("Attack");
     private readonly int throwWeapon = Animator.StringToHash("Throw");
     private readonly int isHealing = Animator.StringToHash("isHealing");
+    private readonly int manaDrain = Animator.StringToHash("ManaDrain");
     private readonly int hit = Animator.StringToHash("Hit");
-    private readonly int revive = Animator.StringToHash("Revive");
     
     // 무기 뽑기 애니메이션
     private readonly int pullGround = Animator.StringToHash("PullGround");
@@ -32,7 +32,8 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int teleportPre = Animator.StringToHash("TeleportPre");
     private readonly int teleportPost = Animator.StringToHash("TeleportPost");
     
-    // 사망 원인
+    // 사망 관련
+    private readonly int revive = Animator.StringToHash("Revive");
     private readonly int death = Animator.StringToHash("Death");
     private readonly int deathMelee = Animator.StringToHash("DeathMelee");
     private readonly int deathRanged = Animator.StringToHash("DeathRanged");
@@ -159,6 +160,14 @@ public class PlayerAnimator : MonoBehaviour
     public void SetValveAnim(bool valveState)
     {
         animator.SetBool(turnValve, valveState);
+    }
+
+    public void SetManaDrainAnim(bool isDraining)
+    {
+        if (animator != null)
+        {
+            animator.SetBool(manaDrain, isDraining);
+        }
     }
 
     public void SetHasWeapon(bool weapon)

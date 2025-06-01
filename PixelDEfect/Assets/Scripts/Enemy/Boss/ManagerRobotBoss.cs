@@ -39,7 +39,16 @@ public class ManagerRobotBoss : BossBT
     [SerializeField] private bool useDirectPositioning = true;  // 물리 무시하고 직접 위치 설정
     [SerializeField] private Transform ceilingPoint;            // 천장 위치
     [SerializeField] private Transform centerPoint;             // 보스방 중앙 위치 포인트
+
+    [Header("마나 드레인 설정")] 
+    [SerializeField] private GameObject manaColliderPrefab;     // 마나 콜라이더 프리팹
+    [SerializeField] private Transform manaColliderSpawnPoint;  // 마나 콜라이더 생성 위치
+    [SerializeField] private bool enableManaDrain = true;
     
+    // 마나 드레인 관련 변수
+    private GameObject activeManaCollider;
+    private bool canManaDrain = false;
+    private bool isManaDraining = false;
     
     // 공격 상태 관리
     private enum AttackState { None, Preparation, Execute, Cooldown }
@@ -129,6 +138,14 @@ public class ManagerRobotBoss : BossBT
         if (centerPoint == null)
         {
             Debug.LogWarning("보스의 CenterPoint가 설정되지 않았습니다. 보스방 중앙 위치를 설정해주세요.");
+        }
+
+        if (manaColliderSpawnPoint == null)
+        {
+            GameObject spawnPointObj = new GameObject("ManaColliderSpawnPoint");
+            spawnPointObj.transform.parent = transform;
+            spawnPointObj.transform.localPosition = new Vector3(0, 0, 0);
+            manaColliderSpawnPoint = spawnPointObj.transform;
         }
         
         // 페이즈 체력 임계값 설정 (50% 체력)
@@ -1176,6 +1193,83 @@ public class ManagerRobotBoss : BossBT
         base.DecreaseHp(damage, isThrownWeapon);
     }
     
+    protected override void StartStun()
+    {
+        base.StartStun();
+        
+        // 마나 드레인 활성화
+        if (enableManaDrain)
+        {
+            ActivateManaDrain();
+        }
+    }
+
+    protected override void RecoverFromStun()
+    {
+        base.RecoverFromStun();
+
+        DeactivateManaDrain();
+    }
+
+    private void ActivateManaDrain()
+    {
+        if (activeManaCollider != null || !enableManaDrain) return;
+
+        canManaDrain = true;
+        
+        // 마나 콜라이더 생성
+        if (manaColliderPrefab != null)
+        {
+            activeManaCollider = Instantiate(manaColliderPrefab, manaColliderSpawnPoint.position, Quaternion.identity);
+            activeManaCollider.transform.SetParent(transform);
+            
+            ManaCollider manaColliderComponent = activeManaCollider.GetComponent<ManaCollider>();
+            if (manaColliderComponent != null)
+            {
+                manaColliderComponent.SetBossReference(this);
+            }
+            
+            Debug.Log("마나 드레인 콜라이더 활성화");
+        }
+        else
+        {
+            Debug.LogWarning("마나 콜라이더 프리팹이 설정되지 않았습니다.");
+        }
+    }
+
+    private void DeactivateManaDrain()
+    {
+        canManaDrain = false;
+        isManaDraining = false;
+
+        if (activeManaCollider != null)
+        {
+            Destroy(activeManaCollider);
+            activeManaCollider = null;
+            Debug.Log("마나 드레인 콜라이더 비활성화");
+        }
+    }
+
+    public bool CanManaDrain()
+    {
+        return canManaDrain && isStunned && !isDead;
+    }
+
+    public void StartManaDraining()
+    {
+        isManaDraining = true;
+    }
+
+    public void StopManaDraining()
+    {
+        isManaDraining = false;
+    }
+
+    public bool IsManaDraining()
+    {
+        return isManaDraining;
+    }
+    
     // 애니메이션 이벤트 (애니메이션에서 호출 가능)
     public void OnAttackHitFrame()
     {
@@ -1232,6 +1326,13 @@ public class ManagerRobotBoss : BossBT
         }
 
         return -1;
+    }
+
+    protected override NodeState HandleDeath()
+    {
+        DeactivateManaDrain();
+
+        return base.HandleDeath();
     }
     
     // 디버그용 시각화

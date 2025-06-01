@@ -29,6 +29,8 @@ public class PlayerInteraction : MonoBehaviour
     // 원형 범위로 감지할 오브젝트들(무기)
     private WeaponPickup nearbyWeapon;
     private ThrownWeapon nearbyThrownWeapon;
+
+    private ManagerRobotBoss currentManaDrainBoss;
     
     private FixedJoint2D holdJoint;
     private bool isHolding = false;
@@ -40,6 +42,7 @@ public class PlayerInteraction : MonoBehaviour
         None,
         WeaponPickup,
         ThrownWeapon,
+        ManaDrain,
         Holdable,
         Valve,
         Button,
@@ -153,6 +156,14 @@ public class PlayerInteraction : MonoBehaviour
                 // 들어왔을 때 프롬프트 처리
             }
         }
+        else if (other.CompareTag("Boss"))
+        {
+            ManagerRobotBoss boss = other.GetComponentInParent<ManagerRobotBoss>();
+            if (boss != null && boss.IsStunned() && boss.CanManaDrain())
+            {
+                currentManaDrainBoss = boss;
+            }
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -175,6 +186,10 @@ public class PlayerInteraction : MonoBehaviour
         {
             // 나갔을 때 프롬프트 처리
             currentVendingMachine = null;
+        }
+        else if (other.CompareTag("Boss"))
+        {
+            currentManaDrainBoss = null;
         }
     }
     
@@ -199,6 +214,10 @@ public class PlayerInteraction : MonoBehaviour
         else if (nearbyThrownWeapon != null)
         {
             currentInteractionType = InteractionType.ThrownWeapon;
+        }
+        else if (currentManaDrainBoss != null)
+        {
+            currentInteractionType = InteractionType.ManaDrain;
         }
         else if (currentHoldObject != null)
         {
@@ -261,6 +280,8 @@ public class PlayerInteraction : MonoBehaviour
                 return nearbyWeapon?.gameObject;
             case InteractionType.ThrownWeapon:
                 return nearbyThrownWeapon?.gameObject;
+            case InteractionType.ManaDrain:
+                return currentManaDrainBoss.gameObject;
             case InteractionType.Holdable:
                 return currentHoldObject?.gameObject;
             case InteractionType.Valve:
@@ -306,6 +327,13 @@ public class PlayerInteraction : MonoBehaviour
             case InteractionType.WeaponPickup:
             case InteractionType.ThrownWeapon:
                 PickupWeapon();
+                break;
+            
+            case InteractionType.ManaDrain:
+                if (currentManaDrainBoss != null)
+                {
+                    StartManaDrain();
+                }
                 break;
             
             case InteractionType.Holdable:
@@ -375,6 +403,9 @@ public class PlayerInteraction : MonoBehaviour
         {
             StopHolding();
         }
+        
+        // 마나 드레인 중이었다면
+        
     }
     
     // 물체 잡기 시작
@@ -485,6 +516,31 @@ public class PlayerInteraction : MonoBehaviour
         if (playerAttack != null)
         {
             playerAttack.ProcessWeaponPickup(nearbyWeapon, nearbyThrownWeapon);
+        }
+    }
+
+    private void StartManaDrain()
+    {
+        if (currentManaDrainBoss == null && !currentManaDrainBoss.CanManaDrain() &&
+            currentManaDrainBoss.IsManaDraining()) return;
+        
+        // 마나 드레인 컨텍스트 생성
+        ManaDrainContext drainContext = new ManaDrainContext(currentManaDrainBoss);
+        
+        // 마나 드레인 상태로 전환
+        PlayerController controller = GetComponent<PlayerController>();
+        if (controller != null)
+        {
+            controller.ChangeState(new PlayerStates.ManaDrain(drainContext));
+        }
+    }
+
+    private void StopManaDrain()
+    {
+        PlayerController controller = GetComponent<PlayerController>();
+        if (controller != null && controller.GetCurrentState() is PlayerStates.ManaDrain)
+        {
+            controller.ChangeState(new PlayerStates.Idle());
         }
     }
     

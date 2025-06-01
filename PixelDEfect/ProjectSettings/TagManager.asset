@@ -16,6 +16,7 @@ TagManager:
   - EnemyProjectile
   - Weapon
   - VendingMachine
+  - Boss
   layers:
   - Default
   - TransparentFX

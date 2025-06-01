@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
 
     [Header("구르기")] 
     [SerializeField] private float rollCooldown = 1f;
+
+    [Header("리스폰 딜레이")] 
+    [SerializeField] private float respawnDelay = 2f;
     
     private MovementRigidbody2D movement;
     private PlayerHp playerHp;
@@ -316,6 +319,17 @@ public class PlayerController : MonoBehaviour
 
     public void ResetOnRespawn()
     {
+        ResetAllPlayerStates();
+
+        ResetAnimationsToCurrentState();
+        
+        StartCoroutine(DelayedRespawn());
+    }
+
+    private IEnumerator DelayedRespawn()
+    {
+        yield return new WaitForSeconds(respawnDelay);
+        
         if (playerHp != null)
         {
             playerHp.ResetDeathState();
@@ -324,10 +338,8 @@ public class PlayerController : MonoBehaviour
         EnablePlayerControl();
         
         ChangeState(new PlayerStates.Idle());
+        
 
-        ResetAllPlayerStates();
-
-        ResetAnimationsToCurrentState();
     }
     
     private void DisablePlayerControl()
@@ -368,11 +380,12 @@ public class PlayerController : MonoBehaviour
             playerInteraction.enabled = true;
         }
     }
-
+    
     private void ResetAllPlayerStates()
     {
         // 입력 변수 초기화
         moveInput = Vector2.zero;
+        UpdateMove(0);
         
         // 상호작용 관련 초기화
         canInteract = false;
@@ -390,7 +403,7 @@ public class PlayerController : MonoBehaviour
     {
         if (animator != null)
         {
-            
+            animator.MovementAnim(0);
             animator.SetCrouchAnim(false);
             animator.SetClimbAnim(false);
             animator.SetHasWeapon(playerAttack != null && playerAttack.HasWeapon());

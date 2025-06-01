@@ -401,7 +401,7 @@ namespace PlayerStates
     {
         MovementRigidbody2D movement;
         private float attackTimer = 0f;
-        private const float MAX_ATTACK_DURATION = 3f;
+        private const float MAX_ATTACK_DURATION = 2f;
         
         public override void Enter(PlayerController player)
         {
@@ -775,6 +775,107 @@ namespace PlayerStates
         }
     }
 
+    public class ManaDrain : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private MovementRigidbody2D movement;
+        private PlayerHp playerHp;
+        private ManaDrainContext context;
+
+        private float drainTimer = 0f;
+        private bool isDrainComplete = false;
+
+        public ManaDrain(ManaDrainContext drainContext)
+        {
+            context = drainContext;
+        }
+
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            movement = player.GetComponent<MovementRigidbody2D>();
+            playerHp = player.GetComponent<PlayerHp>();
+            
+            // 이동 완전 정지
+            player.UpdateMove(0);
+            
+            // 마나 드레인 애니메이션 시작
+            if (animator != null)
+            {
+                animator.SetManaDrainAnim(true);
+            }
+
+            drainTimer = 0f;
+            isDrainComplete = false;
+            context.elapsedTime = 0f;
+            context.nextDrainTime = context.drainInterval;
+            
+            Debug.Log("마나 드레인 시작");
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            drainTimer += Time.deltaTime;
+            context.elapsedTime += Time.deltaTime;
+            
+            // 드레인 실행
+            if (context.CanPerformDrain())
+            {
+                PerformDrain();
+            }
+            
+            // 드레인 완료 확인
+            if (context.IsDrainComplete() || isDrainComplete)
+            {
+                CompleteDrain(player);
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            if (animator != null)
+            {
+                animator.SetManaDrainAnim(false);
+            }
+            
+            // 드레인 중단
+            if (context != null)
+            {
+                context.StopDrain();
+            }
+        }
+
+        private void PerformDrain()
+        {
+            if (context.targetBoss == null || playerHp == null) return;
+            
+            // 보스 체력 감소
+            if (context.targetBoss.CurrentHp > 0)
+            {
+                context.targetBoss.DecreaseHp(context.drainAmount, false);
+                
+                // 플레이어 체력 회복
+                int currentHp = playerHp.GetCurrentHp();
+                int maxHp = playerHp.GetMaxHp();
+
+                if (currentHp < maxHp)
+                {
+                    playerHp.IncreaseHp(context.drainAmount);
+                }
+                
+                // 드레인 완료 처리
+                context.OnDrainPerformed();
+            }
+        }
+
+        private void CompleteDrain(PlayerController player)
+        {
+            isDrainComplete = true;
+            
+            player.ChangeState(new Idle());
+        }
+    }
+    
     public class VendingMachineHeal : State<PlayerController>
     {
         private PlayerAnimator animator;

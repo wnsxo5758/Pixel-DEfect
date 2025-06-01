@@ -12,7 +12,8 @@ public class MeleeEnemy : EnemyBT
     [SerializeField] private Vector2 attackBoxOffset = new Vector2(0.6f, 0);
     [SerializeField] private LayerMask playerLayer;
 
-    [Header("접촉 데미지 설정")] [SerializeField] private bool enableContactDamage = true;
+    [Header("접촉 데미지 설정")] 
+    [SerializeField] private bool enableContactDamage = true;
     [SerializeField] private int contactDamage = 1;
     [SerializeField] private float contactDamageCooldown = 2f;
     [SerializeField] private float contactRange = 1f;
@@ -244,7 +245,7 @@ public class MeleeEnemy : EnemyBT
     // 플레이어 접촉 처리
     private void CheckPlayerContact()
     {
-        if (!canDealContactDamage)
+        if (!canDealContactDamage && isTimeFrozen)
             return;
 
         // 플레이어 감지

@@ -256,7 +256,6 @@ public class PlayerHp : MonoBehaviour
         SetHp(GetMaxHp());
         
         // 무적 상태 설정
-        OnInvincibility(2f);
         uiPlayer.ResetDeathUI();
     }
 
