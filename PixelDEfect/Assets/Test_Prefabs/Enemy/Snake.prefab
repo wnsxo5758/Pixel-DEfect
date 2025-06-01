@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 9160932450118622671}
   - component: {fileID: 2930466545611048249}
   - component: {fileID: 7764311372527771036}
-  - component: {fileID: 1517184804468206047}
+  - component: {fileID: 5278457600026172756}
   m_Layer: 0
   m_Name: Renderer
   m_TagString: Untagged
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 845593577
-  m_SortingLayer: 2
+  m_SortingLayer: 4
   m_SortingOrder: 1
   m_Sprite: {fileID: -1570254234, guid: 3c83ec2f02fc3e14b8dadbb2213ba8c9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -107,7 +107,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1517184804468206047
+--- !u!114 &5278457600026172756
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -116,10 +116,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1476354080468084013}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14afb9960da1b2b419d82ea7fe4b17b6, type: 3}
+  m_Script: {fileID: 11500000, guid: 8d2423c732661c94aa2dad554e80c161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isAttack: 0
+  DeathAnimLength: 0
 --- !u!1 &2967437566215161168
 GameObject:
   m_ObjectHideFlags: 0
@@ -176,13 +177,13 @@ MonoBehaviour:
   belowCollisionLayer:
     serializedVersion: 2
     m_Bits: 0
-  walkSpeed: 2
   runSpeed: 2
   crawlSpeed: 0
   climbSpeed: 0
   jumpForce: 0
   lowGravityScale: 10
   highGravityScale: 10
+  movementLocked: 0
 --- !u!114 &5146291448446600192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,10 +208,9 @@ MonoBehaviour:
   hitClip: {fileID: 0}
   deadClip: {fileID: 0}
   attackClip: {fileID: 0}
-  hitTime: 0
   durationHit: 0
-  coins: {fileID: 0}
-  amount: 0
+  normalHitDelay: 1
+  stunHitDelay: 3
   waitTime: 0
   WanderTime: 0
   target: {fileID: 0}

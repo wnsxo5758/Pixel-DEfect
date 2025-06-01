@@ -23,8 +23,8 @@ public class MeleeEnemyFSM : EnemyFSM
         while (true)
         {
             movement.MoveTo(0);
-            // animator.isAttack = true;
-            // animator.UpdateAnimation(0);
+            animator.isAttack = true;
+            animator.UpdateAnimation(0);
             StartCoroutine(nameof(MeleeAttack));
             CalculateDistanceToTargetAndSelectState();
             yield return null;
@@ -55,7 +55,7 @@ public class MeleeEnemyFSM : EnemyFSM
         attackCollider.enabled = false;
         while (currentCoolTime > 0)
         {
-            // animator.isAttack = false;
+            animator.isAttack = false;
             currentCoolTime -= Time.deltaTime;
             yield return null;
         }
@@ -63,15 +63,21 @@ public class MeleeEnemyFSM : EnemyFSM
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        float dir = GetDirection();
         if(collision.CompareTag("Player"))
         {
             PlayerHp playerHp = collision.GetComponent<PlayerHp>();
             if(playerHp != null)
             {
                 Debug.Log($"{gameObject.name}의 공격이 플레이어에게 {damage}의 데미지 부여");
+                DeathData deathData = new DeathData(DeathCause.MeleeAttack, dir);
+                playerHp.DecreaseHp(damage, deathData, true, true);
             }
         }
     }
-
+    protected float GetDirection()
+    {
+        return Mathf.Sign(transform.localScale.x);
+    }
 
 }

@@ -58,7 +58,7 @@ public abstract class EnemyFSM : MonoBehaviour
 
     protected Rigidbody2D rb;
     protected MovementRigidbody2D movement;
-    protected EnemyAnimator animator;
+    protected SnakeAnimator animator;
     protected AudioSource audioSource;
     protected SpriteRenderer spriteRenderer;
     private Color originalColor;
@@ -67,7 +67,7 @@ public abstract class EnemyFSM : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         movement = GetComponent<MovementRigidbody2D>();
-        animator = GetComponentInChildren<EnemyAnimator>();
+        animator = GetComponentInChildren<SnakeAnimator>();
         audioSource = GetComponent<AudioSource>();
 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>(); // EnemyAnimator와 같은 자식 오브젝트라면
@@ -148,7 +148,7 @@ public abstract class EnemyFSM : MonoBehaviour
     protected virtual IEnumerator Idle() // 정지(휴식)
     {
         movement.MoveTo(0);
-        // animator.UpdateAnimation(0);
+        animator.UpdateAnimation(0);
 
         StartCoroutine(nameof(AutoChangeFromIdleToWander));
         while (true)
@@ -171,12 +171,12 @@ public abstract class EnemyFSM : MonoBehaviour
             if (IsFacingRight)
             {
                 movement.MoveTo(x);
-                // animator.UpdateAnimation(x);
+                animator.UpdateAnimation(x);
             }
             else
             {
                 movement.MoveTo(-x);
-                // animator.UpdateAnimation(-x);
+                animator.UpdateAnimation(-x);
             }
             CheckWall();
             if (currentTime >= maxTime)
@@ -303,7 +303,7 @@ public abstract class EnemyFSM : MonoBehaviour
                 speed = -1;
             }
             movement.MoveTo(speed);
-            // animator.UpdateAnimation(speed);
+            animator.UpdateAnimation(speed);
             CalculateDistanceToTargetAndSelectState();
             yield return null;
         }
@@ -323,8 +323,8 @@ public abstract class EnemyFSM : MonoBehaviour
         {
             col.enabled = false;
         }
-        // animator.Death(); // 적 사망 애니메이션 
-        // yield return new WaitForSeconds((animator.DeathAnimLength+1f));
+        animator.Death(); // 적 사망 애니메이션 
+        yield return new WaitForSeconds((animator.DeathAnimLength+1f));
         
         ThrownWeapon attachedWeapon = GetComponentInChildren<ThrownWeapon>();
         if (attachedWeapon != null)
