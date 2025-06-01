@@ -167,6 +167,7 @@ public class PlayerHp : MonoBehaviour
         playerAnimator.TriggerDeathAnim(currentDeathData);
         OnPlayerDeath?.Invoke();
         OnPlayerDeathWithCause?.Invoke(lastDeathCause);
+        uiPlayer.SetDeathUI();
     }
     
     public void OnInvincibility(float time) // 무적상태
@@ -256,6 +257,7 @@ public class PlayerHp : MonoBehaviour
         
         // 무적 상태 설정
         OnInvincibility(2f);
+        uiPlayer.ResetDeathUI();
     }
 
     public void TakeFallDamage(int damage)

@@ -13,8 +13,7 @@ public class UIDeath : MonoBehaviour
 
     void Start()
     {
-        InitImage(backgroundImage);
-        InitImage(foregroundImage);
+        SetUp();
     }
 
     private void InitImage(Image img)
@@ -27,7 +26,11 @@ public class UIDeath : MonoBehaviour
             img.raycastTarget = false;
         }
     }
-
+    public void SetUp()
+    {
+        InitImage(backgroundImage);
+        InitImage(foregroundImage);
+    }
     public void ShowDeathUI()
     {
         if (!isFading && backgroundImage != null && foregroundImage != null)
