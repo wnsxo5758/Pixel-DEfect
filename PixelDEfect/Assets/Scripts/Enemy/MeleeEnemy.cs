@@ -246,7 +246,7 @@ public class MeleeEnemy : EnemyBT
     // 플레이어 접촉 처리
     private void CheckPlayerContact()
     {
-        if (!canDealContactDamage && isTimeFrozen)
+        if (!canDealContactDamage || isTimeFrozen)
             return;
 
         // 플레이어 감지
