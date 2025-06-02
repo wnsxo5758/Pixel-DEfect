@@ -6,6 +6,9 @@ public class TimeManager : MonoBehaviour
 {
     public static TimeManager Instance { get; private set; }
 
+
+    [SerializeField]
+    private SkillCoolUI skillCoolUI;
     [Header("시간 정지 설정")] 
     [SerializeField] private float timeFreezeRadius = 20f;
     [SerializeField] private float timeFreezeDuration = 5f;
@@ -38,7 +41,10 @@ public class TimeManager : MonoBehaviour
     public System.Action OnTimeStopBegin;
     public System.Action OnTimeStopEnd;
     public System.Action<float> OnCooldownUpdate; // 쿨다운 업데이트 0~1
-    
+
+    public float TimeFreezeCoolDown => timeFreezeCooldown;
+
+
     private void Awake()
     {
         if (Instance == null)
@@ -98,7 +104,7 @@ public class TimeManager : MonoBehaviour
 
         isTimeFrozen = true;
         timeFreezeTimer = timeFreezeDuration;
-        
+        skillCoolUI.StartCooldown();
         // 영향 범위 내 모든 개체 찾기
         FindAndRegisterTimeAffectedEntities(originPosition);
         
