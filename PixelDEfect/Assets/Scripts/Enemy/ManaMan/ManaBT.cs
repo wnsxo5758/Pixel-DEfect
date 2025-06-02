@@ -300,7 +300,7 @@ public class ManaBT : EnemyBT
             blackboard.SetValue("HitEnemyWallCheck", false);
         }
 
-        return hit.collider != null;
+        return hit;
     }
     protected override NodeState ChaseTarget() // 플레이어 추적
     {
@@ -308,6 +308,15 @@ public class ManaBT : EnemyBT
         manaAnimator.TriggerPatrolAnim();
         Transform currentTarget = blackboard.GetValue<Transform>("Target");
         if (currentTarget == null) return NodeState.Failure;
+
+        float distance = Mathf.Abs(currentTarget.position.x - transform.position.x);
+
+        // 1. 충분히 가까워졌다면 멈추고 상태 유지
+        if (distance < 0.2f) // ← 오차 허용 (값은 속도/프레임에 따라 조정)
+        {
+            movement.MoveTo(0); // 속도 0 처리
+            return NodeState.Running; // 또는 Running, 상황에 맞게
+        }
 
         float direction = Mathf.Sign((currentTarget.position - transform.position).x);
         SetDirection(direction);
@@ -336,21 +345,29 @@ public class ManaBT : EnemyBT
         float dir = GetDirection();
         Vector2 origin = transform.position;
 
-        // 벽 감지 위치와 점프 감지 시작 위치를 동일하게 설정
+        // 1. 벽 앞 위치 계산
         Vector2 wallCheckOrigin = origin + new Vector2(wallCheckDistance * dir, 0.1f);
-        // 2. 벽 위 공간 감지 (OverlapCircle)
-        Vector2 jumpCheckOrigin = wallCheckOrigin + new Vector2(jumpForwardOffset * dir, 0);
-        Vector2 topCheck = jumpCheckOrigin + new Vector2(0, jumpHeight);
-        Collider2D topCollider = Physics2D.OverlapCircle(topCheck, 0.15f, canJumpLayer);
+
+        // ✅ 2. 점프 착지 예상 위치: 벽 옆으로 충분히 떨어진 위치
+        Vector2 jumpLandingPos = wallCheckOrigin + new Vector2(jumpForwardOffset * dir, 0);
+
+        // 3. 그 위 공간 체크 위치
+        Vector2 topCheck = jumpLandingPos + new Vector2(0, jumpHeight);
+
+        // ✅ 4. 모든 레이어 대상 검사
+        Collider2D topCollider = Physics2D.OverlapCircle(topCheck, 0.15f, ~0);
+
+        // 디버그 시각화
+        Debug.DrawLine(topCheck + Vector2.left * 0.1f, topCheck + Vector2.right * 0.1f, Color.cyan, 0.2f);
 
         if (topCollider == null)
         {
-            Debug.Log("[점프 체크] 위 공간 비어 있음 → 점프 가능");
+            Debug.Log("[점프 체크] 벽 옆 착지 위치 위 공간 비어 있음 → 점프 가능");
             return true;
         }
         else
         {
-            Debug.Log("[점프 체크] 위 공간 막혀 있음 → 점프 불가");
+            Debug.Log($"[점프 체크] 점프 도착 지점 위 공간 막힘: {topCollider.name} → 점프 불가");
             return false;
         }
     }

@@ -892,7 +892,7 @@ GameObject:
   - component: {fileID: 314948593}
   - component: {fileID: 314948592}
   - component: {fileID: 314948594}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: ValveLinkedDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51603,7 +51603,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1622323244292651294, guid: 889cb501e0ff8f7479f88754088dfb39, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 18.9
+      value: 36.14
       objectReference: {fileID: 0}
     - target: {fileID: 1622323244292651294, guid: 889cb501e0ff8f7479f88754088dfb39, type: 3}
       propertyPath: m_LocalPosition.y
@@ -51665,6 +51665,10 @@ PrefabInstance:
       propertyPath: lightningPrefab
       value: 
       objectReference: {fileID: 3283074314457490184, guid: db61657805db1384db884178d99647e6, type: 3}
+    - target: {fileID: 3818545935961364611, guid: 889cb501e0ff8f7479f88754088dfb39, type: 3}
+      propertyPath: canJumpLayer.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -52011,6 +52015,14 @@ PrefabInstance:
     - target: {fileID: 7718354453857979170, guid: 420879180bbb55447a9394ecf88a4a41, type: 3}
       propertyPath: isPatrol
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7718354453857979170, guid: 420879180bbb55447a9394ecf88a4a41, type: 3}
+      propertyPath: jumpForwardOffset
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7718354453857979170, guid: 420879180bbb55447a9394ecf88a4a41, type: 3}
+      propertyPath: canJumpLayer.m_Bits
+      value: 584
       objectReference: {fileID: 0}
     - target: {fileID: 8700790810545068082, guid: 420879180bbb55447a9394ecf88a4a41, type: 3}
       propertyPath: m_Name
