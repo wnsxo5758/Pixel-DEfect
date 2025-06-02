@@ -175,6 +175,7 @@ public class HammerBT : ManaBT
     {
         Vector2 pos = blackboard.GetValue<Vector2>("SkillTargetPosition");
 
+        PlaySound(skillClip);
         if (lightningPrefab != null)
         {
             Instantiate(lightningPrefab, pos, Quaternion.identity);

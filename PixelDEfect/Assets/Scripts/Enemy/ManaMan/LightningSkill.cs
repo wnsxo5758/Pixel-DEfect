@@ -31,8 +31,9 @@ public class LightningStrike : MonoBehaviour
 
     // === Animation Events ===
 
-    public void OnSkillReady()
+    public void OnSkillReady() // 스킬 시작시 
     {
+        //시작 사운드 
         PlaySound(lightingClip);
     }
     public void OnSkillReadyEnd()
@@ -40,7 +41,10 @@ public class LightningStrike : MonoBehaviour
         animator?.Play("SkillAttack");
         isActive = true;
     }
-
+    public void OnSkillAttackStart()
+    {
+        PlaySound(attackClip);
+    }
     public void OnSkillAttackEnd()
     {
         animator?.Play("SkillEnd");
