@@ -250,7 +250,7 @@ MonoBehaviour:
   throwStunDuration: 3
   knockBackForce: 3
   deathDelay: 2
-  detectionRange: 12
+  detectionRange: 10
   loseTargetRange: 6
   target: {fileID: 0}
   targetLayer:

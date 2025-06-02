@@ -114,6 +114,9 @@ MonoBehaviour:
   useDirectPositioning: 1
   ceilingPoint: {fileID: 0}
   centerPoint: {fileID: 0}
+  manaColliderPrefab: {fileID: 0}
+  manaColliderSpawnPoint: {fileID: 0}
+  enableManaDrain: 1
 --- !u!114 &4615694838762613502
 MonoBehaviour:
   m_ObjectHideFlags: 0
