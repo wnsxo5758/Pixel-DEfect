@@ -324,7 +324,6 @@ public class ManaBT : EnemyBT
         // 점프 시도
         if (CheckWall(direction))
         {
-
             // 점프 가능한 경우
             if (CanJumpOverWall())
             {

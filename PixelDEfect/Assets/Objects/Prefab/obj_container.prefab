@@ -167,7 +167,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 4
+  m_Constraints: 7
 --- !u!114 &1652914236008772990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,6 +180,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fa625c113ea8834e8966047daeaede4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  normalLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
   impactPrefab:
   - {fileID: 7075850266487279244, guid: 48ae48c14134bea41b7106302d6294f2, type: 3}
 --- !u!114 &7572191766510799416
