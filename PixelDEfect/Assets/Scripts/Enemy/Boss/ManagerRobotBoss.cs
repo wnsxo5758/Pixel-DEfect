@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class ManagerRobotBoss : BossBT
@@ -44,6 +45,17 @@ public class ManagerRobotBoss : BossBT
     [SerializeField] private GameObject manaColliderPrefab;     // 마나 콜라이더 프리팹
     [SerializeField] private Transform manaColliderSpawnPoint;  // 마나 콜라이더 생성 위치
     [SerializeField] private bool enableManaDrain = true;
+
+    [Header("사망 잔해 설정")] 
+    [SerializeField] private BoxCollider2D remainsCollider;     // 잔해용 콜라이더
+    [SerializeField] private Transform skillTokenSpawnPoint;    // 스킬 토큰 생성 위치
+    [SerializeField] private GameObject skillTokenPrefab;       // 스킬 토큰 프리팹
+    [SerializeField] private float remainsColliderWidth = 6.4f;   // 잔해 콜라이더 너비
+    [SerializeField] private float remainsColliderHeight = 2.5f;  // 잔해 콜라이더 높이
+    [SerializeField] private Vector2 remainsColliderOffset = new Vector2(0.5f, -1.75f);
+    
+    // 사망 잔해 관련 변수
+    private bool hasTransformedToRemains = false;
     
     // 마나 드레인 관련 변수
     private GameObject activeManaCollider;
@@ -148,6 +160,8 @@ public class ManagerRobotBoss : BossBT
             manaColliderSpawnPoint = spawnPointObj.transform;
         }
         
+        SetupRemainsCollider();
+        
         // 페이즈 체력 임계값 설정 (50% 체력)
         if (phaseHpThreshold.Length > 1)
         {
@@ -157,6 +171,8 @@ public class ManagerRobotBoss : BossBT
 
     protected override void Update()
     {
+        if (hasTransformedToRemains) return;
+        
         base.Update();
         
         // 공격 쿨다운 관리
@@ -1328,11 +1344,131 @@ public class ManagerRobotBoss : BossBT
         return -1;
     }
 
+    private void SetupRemainsCollider()
+    {
+        if (remainsCollider == null)
+        {
+            GameObject remainsColliderObj = new GameObject("RemainsCollider");
+            remainsColliderObj.transform.SetParent(transform);
+            remainsColliderObj.transform.localPosition = Vector3.zero;
+            
+            remainsCollider = remainsColliderObj.AddComponent<BoxCollider2D>();
+            remainsCollider.size = new Vector2(remainsColliderWidth, remainsColliderHeight);
+            remainsCollider.offset = remainsColliderOffset;
+            remainsCollider.enabled = false;
+        }
+        else
+        {
+            remainsCollider.enabled = false;
+        }
+        
+        // 스킬 토큰 생성 포인트 설정
+        if (skillTokenSpawnPoint == null)
+        {
+            GameObject spawnPointObj = new GameObject("SkillTokenSpawnPoint");
+            spawnPointObj.transform.SetParent(transform);
+            spawnPointObj.transform.localPosition = new Vector3(0, 2f, 0);
+            skillTokenSpawnPoint = spawnPointObj.transform;
+        }
+    }
+    
     protected override NodeState HandleDeath()
     {
+        if (isDeathProcessed)
+        {
+            return NodeState.Success;
+        }
+        
+        isDeathProcessed = true;
+        
+        // 움직임 멈춤
+        if (movement != null)
+        {
+            movement.MoveTo(0);
+        }
+        
+        // 물리 정지
+        if (rb != null)
+        {
+            rb.bodyType = RigidbodyType2D.Static;
+        }
+        
+        // 기존 적 콜라이더 비활성화
+        if (enemyCollider != null)
+        {
+            enemyCollider.enabled = false;
+        }
+        
+        // 마나 드레인 비활성화
         DeactivateManaDrain();
+        
+        // 사망 애니메이션 재생
+        if (animator != null)
+        {
+            animator.SetMovementAnim(0);
+            animator.SetChasingState(false);
+            animator.TriggerDeathAnim();
+        }
+        
+        // PlaySound(deadClip);
 
-        return base.HandleDeath();
+        StartCoroutine(TransformToRemainsAfterAnimation());
+        
+        return NodeState.Success;
+    }
+
+    private IEnumerator TransformToRemainsAfterAnimation()
+    {
+        yield return new WaitForSeconds(deathDelay);
+        
+        // 잔해로 변환
+        TransformToRemains();
+    }
+    
+    // 잔해 상태로 변환
+    private void TransformToRemains()
+    {
+        if (hasTransformedToRemains) return;
+
+        hasTransformedToRemains = true;
+
+        if (animator != null)
+        {
+            Animator animatorComponent = animator.GetComponent<Animator>();
+            if (animatorComponent != null)
+            {
+                animatorComponent.enabled = false;
+            }
+        }
+
+        if (remainsCollider != null)
+        {
+            remainsCollider.enabled = true;
+
+            remainsCollider.gameObject.layer = LayerMask.NameToLayer("Ground");
+        }
+        
+        // 스킬 토큰 생성
+        // SpawnSkillToken();
+
+        if (bossHpBar != null)
+        {
+            bossHpBar.SetActive(false);
+        }
+    }
+
+    private void SpawnSkillToken()
+    {
+        if (skillTokenSpawnPoint == null) return;
+
+        if (skillTokenPrefab != null)
+        {
+            GameObject skillToken = Instantiate(skillTokenPrefab,
+                skillTokenSpawnPoint.position,
+                Quaternion.identity);
+            
+            
+        }
     }
     
     // 디버그용 시각화
