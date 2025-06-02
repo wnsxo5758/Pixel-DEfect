@@ -949,10 +949,6 @@ public class ManagerRobotBoss : BossBT
         }
         summonedRobots.Clear();
         
-        // 원래 상태로 복구
-        transform.position = originalPosition;
-        transform.rotation = originalRotation;
-        
         // 리지드바디 상태 복구
         if (rb != null)
         {
@@ -1029,6 +1025,7 @@ public class ManagerRobotBoss : BossBT
         {
             // 반대 방향으로 보간
             transform.position = Vector3.Lerp(ceilingPosition, centerPosition, progress);
+            Debug.Log(transform.position);
         }
         else
         {
@@ -1367,7 +1364,7 @@ public class ManagerRobotBoss : BossBT
         {
             GameObject spawnPointObj = new GameObject("SkillTokenSpawnPoint");
             spawnPointObj.transform.SetParent(transform);
-            spawnPointObj.transform.localPosition = new Vector3(0, 2f, 0);
+            spawnPointObj.transform.localPosition = new Vector3(0, 1f, 0);
             skillTokenSpawnPoint = spawnPointObj.transform;
         }
     }
@@ -1449,7 +1446,7 @@ public class ManagerRobotBoss : BossBT
         }
         
         // 스킬 토큰 생성
-        // SpawnSkillToken();
+        SpawnSkillToken();
 
         if (bossHpBar != null)
         {
@@ -1466,8 +1463,6 @@ public class ManagerRobotBoss : BossBT
             GameObject skillToken = Instantiate(skillTokenPrefab,
                 skillTokenSpawnPoint.position,
                 Quaternion.identity);
-            
-            
         }
     }
     

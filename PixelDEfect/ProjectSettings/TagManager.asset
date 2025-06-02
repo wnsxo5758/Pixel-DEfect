@@ -17,6 +17,7 @@ TagManager:
   - Weapon
   - VendingMachine
   - Boss
+  - SkillToken
   layers:
   - Default
   - TransparentFX

@@ -398,6 +398,10 @@ public class PlayerAnimator : MonoBehaviour
         ResetTeleportAnimationTriggers();
         ResetAllDeathTrigger();
         
+        isPlayingClimbingAnimation = false;
+        isPlayingPullAnimation = false;
+        isPlayingTeleportAnimation = false;
+        
         animator.SetTrigger(revive);
     }
 

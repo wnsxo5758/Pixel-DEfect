@@ -11,19 +11,18 @@ public class SkillToken : MonoBehaviour
     [Header("시각 효과")]
     [SerializeField] private float floatHeight = 0.3f;
     [SerializeField] private float floatSpeed = 2f;
-    [SerializeField] private bool enableGlow = true;
-    [SerializeField] private float glowSpeed = 3f;
-    [SerializeField] private Color glowColor = Color.yellow;
+    
+    [Header("획득 효과")]
+    [SerializeField] private float acquisitionAnimationDuration = 1f;
+    [SerializeField] private AnimationCurve acquisitionCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    [SerializeField] private float floatUpDistance = 2f;
     
     [Header("사운드")]
     [SerializeField] private AudioClip pickupSound;
     [SerializeField] private AudioSource audioSource;
     
     private Vector3 startPosition;
-    private bool isPlayerNearby = false;
     private bool isAcquired = false;
-    private Color originalColor;
-    private ParticleSystem particles;
 
     private void Awake()
     {
@@ -37,21 +36,21 @@ public class SkillToken : MonoBehaviour
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
         
-        if (tokenSprite != null)
-            originalColor = tokenSprite.color;
-        
         // 트리거 설정
         if (tokenCollider != null)
             tokenCollider.isTrigger = true;
+        
+        // 태그 설정 확인
+        if (!gameObject.CompareTag("SkillToken"))
+        {
+            gameObject.tag = "SkillToken";
+        }
     }
     
     
     private void Start()
     {
         startPosition = transform.position;
-        
-        // 파티클 시스템 설정
-        SetupParticleSystem();
     }
 
     private void Update()
@@ -60,71 +59,12 @@ public class SkillToken : MonoBehaviour
 
         // 부유 효과
         ApplyFloatingEffect();
-        
-        // 글로우 효과
-        if (enableGlow)
-            ApplyGlowEffect();
     }
 
     // 스킬 토큰 초기화
     public void Initialize(SkillType skill)
     {
         skillType = skill;
-        
-        // 스킬에 따른 스프라이트 설정 (나중에 구현)
-        SetTokenAppearance();
-    }
-
-    // 토큰 외형 설정
-    private void SetTokenAppearance()
-    {
-        if (tokenSprite == null) return;
-
-        // 스킬 타입에 따른 색상 설정
-        switch (skillType)
-        {
-            case SkillType.Teleport:
-                tokenSprite.color = Color.cyan;
-                glowColor = Color.cyan;
-                break;
-            case SkillType.TimeStop:
-                tokenSprite.color = Color.yellow;
-                glowColor = Color.yellow;
-                break;
-            default:
-                tokenSprite.color = Color.white;
-                glowColor = Color.white;
-                break;
-        }
-        
-        originalColor = tokenSprite.color;
-    }
-
-    // 파티클 시스템 설정
-    private void SetupParticleSystem()
-    {
-        particles = GetComponentInChildren<ParticleSystem>();
-        if (particles == null)
-        {
-            // 간단한 파티클 이펙트 생성
-            GameObject particleObj = new GameObject("SkillTokenParticles");
-            particleObj.transform.SetParent(transform);
-            particleObj.transform.localPosition = Vector3.zero;
-            
-            particles = particleObj.AddComponent<ParticleSystem>();
-            var main = particles.main;
-            main.startColor = glowColor;
-            main.startSize = 0.1f;
-            main.startSpeed = 1f;
-            main.maxParticles = 10;
-            
-            var emission = particles.emission;
-            emission.rateOverTime = 5f;
-            
-            var shape = particles.shape;
-            shape.shapeType = ParticleSystemShapeType.Circle;
-            shape.radius = 0.5f;
-        }
     }
 
     // 부유 효과
@@ -134,31 +74,63 @@ public class SkillToken : MonoBehaviour
         transform.position = new Vector3(startPosition.x, newY, startPosition.z);
     }
 
-    // 글로우 효과
-    private void ApplyGlowEffect()
+    // 토클 획득 처리
+    public void OnTokenAcquired()
     {
-        if (tokenSprite == null) return;
+        if (isAcquired) return;
 
-        float glow = (Mathf.Sin(Time.time * glowSpeed) + 1f) / 2f; // 0~1 사이 값
-        Color currentColor = Color.Lerp(originalColor, glowColor, glow * 0.5f);
-        tokenSprite.color = currentColor;
+        isAcquired = true;
+        
+        // 획득 사운드 재생
+        
+        // 획득 애니메이션 시작
+        StartCoroutine(AcquisitionAnimation());
     }
-
-    // 플레이어 트리거 감지
-    private void OnTriggerEnter2D(Collider2D other)
+    
+    // 획득 애니메이션
+    private IEnumerator AcquisitionAnimation()
     {
-        if (other.CompareTag("Player") && !isAcquired)
+        Vector3 startPos = transform.position;
+        Vector3 targetPos = startPos + Vector3.up * floatUpDistance;
+        Color startColor = tokenSprite.color;
+        Color targetColor = new Color(startColor.r, startColor.g, startColor.b, 0f);
+        
+        float elapsedTime = 0f;
+        
+        while (elapsedTime < acquisitionAnimationDuration)
         {
-            isPlayerNearby = true;
+            elapsedTime += Time.deltaTime;
+            float progress = elapsedTime / acquisitionAnimationDuration;
+            float curveValue = acquisitionCurve.Evaluate(progress);
+            
+            // 위치 애니메이션
+            transform.position = Vector3.Lerp(startPos, targetPos, curveValue);
+            
+            // 투명도 애니메이션
+            if (tokenSprite != null)
+            {
+                Color currentColor = Color.Lerp(startColor, targetColor, curveValue);
+                tokenSprite.color = currentColor;
+            }
+            
+            // 크기 애니메이션 (점점 커지다가 작아짐)
+            float scale = 1f + Mathf.Sin(curveValue * Mathf.PI) * 0.5f;
+            transform.localScale = Vector3.one * scale;
+            
+            yield return null;
         }
+        
+        // 획득 완료 후 파괴
+        Destroy(gameObject);
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    public SkillType GetSkillType()
     {
-        if (other.CompareTag("Player"))
-        {
-            isPlayerNearby = false;
-        }
+        return skillType;
     }
 
+    public bool IsAcquired()
+    {
+        return isAcquired;
+    }
 }

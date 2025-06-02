@@ -118,6 +118,12 @@ public class PlayerAttack : MonoBehaviour
     // PlayerController에서 호출되는 텔레포트
     public void PerformTeleport()
     {
+        if (SkillManager.Instance == null || !SkillManager.Instance.HasSkill(SkillType.Teleport))
+        {
+            Debug.Log("텔레포트 스킬을 보유하고 있지 않습니다.");
+            return;
+        }
+        
         if (lastThrownWeapon != null && canTeleport && !isTeleporting &&
             controller.GetCurrentState() is PlayerStates.Idle or PlayerStates.Run or PlayerStates.Jump)
         {
@@ -801,6 +807,37 @@ public class PlayerAttack : MonoBehaviour
         return currentWeapon;
     }
 
+    public void ResetOnRespawn()
+    {
+        if (lastThrownWeapon != null && !hasWeapon)
+        {
+            RecallWeaponInstant(lastThrownWeapon);
+        }
+        
+        isAttacking = false;
+        isTeleporting = false;
+        isTeleportInProgress = false;
+
+        canAttack = hasWeapon;
+        canThrow = hasWeapon;
+        canTeleport = false;
+
+        pendingPullContext = null;
+        hasPendingWeaponPull = false;
+        AfterPulling = false;
+
+
+        if (attackColliderObject != null)
+        {
+            attackColliderObject.SetActive(hasWeapon);
+        }
+
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetHasWeapon(hasWeapon);
+        }
+    }
+    
     private void OnDrawGizmosSelected()
     {
         if (lastThrownWeapon != null && lastThrownWeapon.IsStuck())
@@ -831,15 +868,15 @@ public class PlayerAttack : MonoBehaviour
                     float diagonalX = Mathf.Sign(normal.x);
                     teleportDirection = new Vector2(diagonalX, 1f).normalized;
                     teleportDistance = playerSize.x * 2f;
-                    Gizmos.color = Color.magenta;
                 }
                 else
                 {
                     teleportDirection = normal.y < 0 ? Vector2.down : Vector2.up;
                     teleportDistance = playerSize.y;
-                    Gizmos.color = Color.green;
                 }
 
+                Gizmos.color = IsTeleportPossible(lastThrownWeapon) ? Color.green : Color.red;
+                    
                 Vector2 teleportPos = (Vector2)weaponPos + teleportDirection * teleportDistance;
                 
                 Gizmos.DrawLine(adjustedStartPosition, teleportPos);

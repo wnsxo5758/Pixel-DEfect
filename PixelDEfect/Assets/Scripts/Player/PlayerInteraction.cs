@@ -22,6 +22,7 @@ public class PlayerInteraction : MonoBehaviour
     private ButtonBase currentButton;
     private DoorBase currentDoor;
     private VendingMachine currentVendingMachine;
+    private SkillToken currentSkillToken;
     
     // Raycast로 감지할 오브젝트
     private HoldObject currentHoldObject;
@@ -47,7 +48,8 @@ public class PlayerInteraction : MonoBehaviour
         Valve,
         Button,
         Door,
-        VendingMachine
+        VendingMachine,
+        SkillToken
     }
     
     // 현재 상호작용 타입
@@ -164,6 +166,14 @@ public class PlayerInteraction : MonoBehaviour
                 currentManaDrainBoss = boss;
             }
         }
+        else if (other.CompareTag("SkillToken"))
+        {
+            SkillToken skillToken = other.GetComponent<SkillToken>();
+            if (skillToken != null && !skillToken.IsAcquired())
+            {
+                currentSkillToken = skillToken;
+            }
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -190,6 +200,10 @@ public class PlayerInteraction : MonoBehaviour
         else if (other.CompareTag("Boss"))
         {
             currentManaDrainBoss = null;
+        }
+        else if (other.CompareTag("SkillToken"))
+        {
+            currentSkillToken = null;
         }
     }
     
@@ -218,6 +232,10 @@ public class PlayerInteraction : MonoBehaviour
         else if (currentManaDrainBoss != null)
         {
             currentInteractionType = InteractionType.ManaDrain;
+        }
+        else if (currentSkillToken != null)
+        {
+            currentInteractionType = InteractionType.SkillToken;
         }
         else if (currentHoldObject != null)
         {
@@ -282,6 +300,8 @@ public class PlayerInteraction : MonoBehaviour
                 return nearbyThrownWeapon?.gameObject;
             case InteractionType.ManaDrain:
                 return currentManaDrainBoss.gameObject;
+            case InteractionType.SkillToken:
+                return currentSkillToken.gameObject;
             case InteractionType.Holdable:
                 return currentHoldObject?.gameObject;
             case InteractionType.Valve:
@@ -334,6 +354,10 @@ public class PlayerInteraction : MonoBehaviour
                 {
                     StartManaDrain();
                 }
+                break;
+            
+            case InteractionType.SkillToken:
+                AcquireSkillToken();
                 break;
             
             case InteractionType.Holdable:
@@ -541,6 +565,38 @@ public class PlayerInteraction : MonoBehaviour
         if (controller != null && controller.GetCurrentState() is PlayerStates.ManaDrain)
         {
             controller.ChangeState(new PlayerStates.Idle());
+        }
+    }
+    
+    // 스킬 토큰 획득 메서드
+    private void AcquireSkillToken()
+    {
+        if (currentSkillToken == null || currentSkillToken.IsAcquired())
+            return;
+
+        SkillType skillType = currentSkillToken.GetSkillType();
+        
+        // 이미 획득한 스킬인지 확인
+        if (SkillManager.Instance != null && SkillManager.Instance.HasSkill(skillType))
+        {
+            Debug.Log($"이미 획득한 스킬입니다: {skillType}");
+            return;
+        }
+
+        // 스킬 획득 처리
+        if (SkillManager.Instance != null)
+        {
+            SkillManager.Instance.UnlockSkill(skillType);
+            
+            // 토큰 획득 처리
+            currentSkillToken.OnTokenAcquired();
+            
+            // 현재 토큰 참조 제거
+            currentSkillToken = null;
+        }
+        else
+        {
+            Debug.LogError("SkillManager.Instance가 null입니다!");
         }
     }
     

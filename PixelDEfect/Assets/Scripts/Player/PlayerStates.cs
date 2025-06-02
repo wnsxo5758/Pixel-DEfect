@@ -291,8 +291,8 @@ namespace PlayerStates
                 if (TimeManager.Instance.HasTimeStopAbility())
                 {
                     TimeManager.Instance.TriggerTimeStopOnDodge(player.transform.position);
-                    return true;
                 }
+                return true;
             }
 
             return false;

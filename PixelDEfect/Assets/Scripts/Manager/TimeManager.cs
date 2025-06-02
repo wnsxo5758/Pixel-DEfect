@@ -14,7 +14,6 @@ public class TimeManager : MonoBehaviour
     [SerializeField] private float timeFreezeDuration = 5f;
     [SerializeField] private float timeFreezeCooldown = 15f;
     [SerializeField] private LayerMask timeAffectedLayers;
-    [SerializeField] private bool hasTimeStopAbility = false;
 
     [Header("시간 정지 이펙트 설정")] 
     [SerializeField] private float effectExpandDuration = 2f;
@@ -81,19 +80,19 @@ public class TimeManager : MonoBehaviour
         }
     }
     
-    // 시간 정지 스킬 획득
-    public void UnlockTimeStopAbility()
-    {
-        hasTimeStopAbility = true;
-    }
-    
     // 플레이어의 회피 성공 시 호출될 메서드
     public void TriggerTimeStopOnDodge(Vector3 position)
     {
-        if (!hasTimeStopAbility || isTimeFrozen || cooldownTimer > 0)
+        if (SkillManager.Instance == null || !SkillManager.Instance.HasSkill(SkillType.TimeStop))
+        {
+            Debug.Log("시간정지 스킬을 보유하고 있지 않습니다.");
             return;
+        }
 
-        FreezeTime(position);
+        if (!isTimeFrozen && cooldownTimer <= 0)
+        {
+            FreezeTime(position);
+        }
     }
     
     // 시간 정지 실행
@@ -327,7 +326,11 @@ public class TimeManager : MonoBehaviour
     
     // 상태 확인 메서드들
     public bool IsTimeFrozen() => isTimeFrozen;
-    public bool HasTimeStopAbility() => hasTimeStopAbility;
+
+    public bool HasTimeStopAbility()
+    {
+        return SkillManager.Instance != null && SkillManager.Instance.HasSkill(SkillType.TimeStop);
+    }
     public float GetCooldownPercentage() => cooldownTimer > 0 ? cooldownTimer / timeFreezeCooldown : 0f;
     public float GetRemainingFreezeDuration() => timeFreezeTimer;
 }

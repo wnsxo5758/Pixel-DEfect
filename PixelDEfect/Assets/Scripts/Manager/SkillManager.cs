@@ -68,9 +68,6 @@ public class SkillManager : MonoBehaviour
             // 이벤트 호출
             OnSkillAcquired?.Invoke(skillType);
             
-            // 관련 시스템에 알림
-            NotifySkillSystems(skillType);
-            
             // UI 표시
         }
     }
@@ -114,24 +111,6 @@ public class SkillManager : MonoBehaviour
         }
         
         return null;
-    }
-    
-    // 관련 시스템에 스킬 획득 알림
-    private void NotifySkillSystems(SkillType skillType)
-    {
-        switch (skillType)
-        {
-            case SkillType.Teleport:
-                break;
-            
-            case SkillType.TimeStop:
-                if (TimeManager.Instance != null)
-                {
-                    TimeManager.Instance.UnlockTimeStopAbility();
-                }
-
-                break;
-        }
     }
     
     // 스킬 획득 UI 표시

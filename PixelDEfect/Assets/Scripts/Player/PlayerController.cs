@@ -58,8 +58,6 @@ public class PlayerController : MonoBehaviour
         {
             playerHp.OnPlayerDeath += OnPlayerDeath;
         }
-        
-        TimeManager.Instance.UnlockTimeStopAbility();
     }
     
     private void Update()
@@ -320,6 +318,8 @@ public class PlayerController : MonoBehaviour
 
     public void ResetOnRespawn()
     {
+        EnablePlayerControl();
+        
         ResetAllPlayerStates();
 
         ResetAnimationsToCurrentState();
@@ -335,8 +335,6 @@ public class PlayerController : MonoBehaviour
         {
             playerHp.ResetDeathState();
         }
-        
-        EnablePlayerControl();
         
         ChangeState(new PlayerStates.Idle());
     }
@@ -389,6 +387,9 @@ public class PlayerController : MonoBehaviour
         // 상호작용 관련 초기화
         canInteract = false;
         currentInteractionType = PlayerInteraction.InteractionType.None;
+        
+        // 공격 관련 초기화
+        playerAttack.ResetOnRespawn();
         
         // 액션 관련 초기화
         canRoll = true;
