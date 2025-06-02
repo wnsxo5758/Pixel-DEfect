@@ -52208,6 +52208,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1662638053}
   - component: {fileID: 1662638054}
+  - component: {fileID: 1662638055}
   m_Layer: 7
   m_Name: AudioSource
   m_TagString: Untagged
@@ -52326,6 +52327,29 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1662638055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1662638052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24bf49a1d401d1c428cdd1cde3be0b77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkClip: {fileID: 8300000, guid: 00645b43e4ffdc948850918fe723ba0a, type: 3}
+  runClip: {fileID: 8300000, guid: f6650da1087c6a649990fa76a9727bf0, type: 3}
+  crawlClip: {fileID: 0}
+  climbClip: {fileID: 0}
+  jumpClip: {fileID: 8300000, guid: 5fb9dc314ca01cd47a250dd9577eb51d, type: 3}
+  landClip: {fileID: 8300000, guid: e49129ae10b7f334abeabda36c6c7177, type: 3}
+  deathClip: {fileID: 8300000, guid: 2ea4fb9f67181cf499cad61b7d7791f3, type: 3}
+  hitClip: {fileID: 8300000, guid: 75f734f6ec584e243bb6aa52a34e0dcb, type: 3}
+  teleportClip: {fileID: 8300000, guid: 97647468ab9ce704d87447ca8296228b, type: 3}
+  attackClip: {fileID: 8300000, guid: 31b6f7f79ddf96d4b9344c753dd11fea, type: 3}
+  throwClip: {fileID: 8300000, guid: 0cc2eefac6229f8468fbf93ef8d37c63, type: 3}
 --- !u!1 &1688187140
 GameObject:
   m_ObjectHideFlags: 0

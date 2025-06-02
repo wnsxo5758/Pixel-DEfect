@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
     private PlayerInteraction playerInteraction;
     private PlayerStateMachine<PlayerController> stateMachine;
     private PlayerAnimator animator;
-    
+    private PlayerSound playerSound;
     // 이동 입력 저장용 변수
     private Vector2 moveInput;
 
@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     
     private void Awake()
     {
+        playerSound = GetComponentInChildren<PlayerSound>();
         movement = GetComponent<MovementRigidbody2D>();
         playerAttack = GetComponent<PlayerAttack>();
         playerHp = GetComponent<PlayerHp>();
@@ -85,7 +86,7 @@ public class PlayerController : MonoBehaviour
                 if (movement.IsGrounded)
                 {
                     movement.Jump();
-
+                    playerSound.JumpSound();
                     if (animator != null)
                     {
                         animator.JumpAnim();

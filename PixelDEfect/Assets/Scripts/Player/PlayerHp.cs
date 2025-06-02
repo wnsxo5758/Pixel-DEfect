@@ -24,6 +24,8 @@ public class PlayerHp : MonoBehaviour
     private Rigidbody2D rb;
     private MovementRigidbody2D movement;
 
+    private PlayerSound playerSound;
+
     private float currentHitStunDuration; // 현재 적용중인 경직 시간
     private bool isHit; // 피격 중인가
     private bool isDead;
@@ -43,6 +45,7 @@ public class PlayerHp : MonoBehaviour
     private void Awake()
     {
         currentHp = maxHp;
+        playerSound = GetComponentInChildren<PlayerSound>();
         player = GetComponent<PlayerController>();
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
@@ -79,7 +82,7 @@ public class PlayerHp : MonoBehaviour
         else
         {
             Debug.Log("플레이어에게 " + damage + "데미지");
-            
+            playerSound.HitSound();
             HandleHit(Vector2.zero);
         }
 
@@ -113,6 +116,7 @@ public class PlayerHp : MonoBehaviour
         }
         else
         {
+            playerSound.HitSound();
             Debug.Log("플레이어에게 " + damage + "데미지");
             
             HandleHit(knockBack);
@@ -162,7 +166,7 @@ public class PlayerHp : MonoBehaviour
     {
         isDead = true;
         currentHp = 0;
-
+        playerSound.DeadthSound();
         ApplyDeathPhysics();
         playerAnimator.TriggerDeathAnim(currentDeathData);
         OnPlayerDeath?.Invoke();

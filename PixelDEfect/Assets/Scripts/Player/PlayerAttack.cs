@@ -34,6 +34,9 @@ public class PlayerAttack : MonoBehaviour
     private ThrownWeapon lastThrownWeapon;
     private GameObject attackColliderObject;
 
+    private PlayerSound playerSound;
+
+
     private bool canAttack = true;
     private bool isAttacking = false;
     private bool hasWeapon = false;
@@ -56,7 +59,7 @@ public class PlayerAttack : MonoBehaviour
         controller = GetComponent<PlayerController>();
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         movement = GetComponent<MovementRigidbody2D>();
-
+        playerSound = GetComponentInChildren<PlayerSound>();
         // 공격 범위 초기화
         InitializeAttackCollider();
     }
@@ -95,7 +98,7 @@ public class PlayerAttack : MonoBehaviour
         {
             canAttack = false;
             isAttacking = true;
-            
+            playerSound.MeleeAttackSound();
             MeleeAttackAnimation();
             StartCoroutine(AttackCooldownTimer());
             
@@ -271,6 +274,7 @@ public class PlayerAttack : MonoBehaviour
         // 던지기 애니메이션 재생
         if (playerAnimator != null)
         {
+            playerSound.ThrowAttackSound();
             playerAnimator.TriggerThrowAnim();
         }
         
@@ -389,7 +393,7 @@ public class PlayerAttack : MonoBehaviour
         
         // 방향 계산
         controller.SpriteFlipX(targetWeapon.transform.position.x - transform.position.x);
-        
+        playerSound.StartTeleport();
         // 텔레포트 시작 상태로 전환
         controller.ChangeState(new PlayerStates.TeleportStart());
     }
