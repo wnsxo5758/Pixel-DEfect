@@ -7,12 +7,19 @@ public class LightningStrike : MonoBehaviour
     [Header("설정")]
     public int damage = 2;
     public LayerMask targetLayer;
+    [Header("스킬 사운드")]
+    [SerializeField]
+    private AudioClip lightingClip;
+    [SerializeField]
+    private AudioClip attackClip;
 
     private bool isActive = false;
     private Animator animator;
 
+    private AudioSource audioSource;
     private void Awake()
     {
+        audioSource = GetComponentInChildren<AudioSource>();
         animator = GetComponent<Animator>();
     }
 
@@ -24,6 +31,10 @@ public class LightningStrike : MonoBehaviour
 
     // === Animation Events ===
 
+    public void OnSkillReady()
+    {
+        PlaySound(lightingClip);
+    }
     public void OnSkillReadyEnd()
     {
         animator?.Play("SkillAttack");
@@ -41,6 +52,12 @@ public class LightningStrike : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    private void PlaySound(AudioClip _clip)
+    {
+        audioSource.Stop();
+        audioSource.clip = _clip;
+        audioSource.Play();
+    }
     // === 충돌 시 데미지 ===
     private void OnTriggerEnter2D(Collider2D other)
     {

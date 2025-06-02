@@ -27,7 +27,7 @@ public class BulletBase : MonoBehaviour
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
-        audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponentInChildren<AudioSource>();
         animator = GetComponentInChildren<Animator>();
         collider2D = GetComponent<Collider2D>();
     }
@@ -79,8 +79,10 @@ public class BulletBase : MonoBehaviour
     protected virtual IEnumerator DestroyBullet()
     {
         GetComponent<Collider2D>().enabled = false;
-        yield return null;
+
+        PlaySound(hitSound);
         memoryPool.DeactivatePoolItems(gameObject);
+        yield return null;
     }
 
     //»ç¿îµÎ

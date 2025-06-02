@@ -21,6 +21,9 @@ public class ManaBT : EnemyBT
     protected float skillRange = 4f; // 스킬 사용 거리
     [SerializeField]
     protected float skillCooldown = 5f; // 
+    [SerializeField]
+    protected AudioClip skillClip;
+
 
     protected bool canUseSkill = true;
     protected float skillTimer = 0f;

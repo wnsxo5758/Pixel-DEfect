@@ -29,7 +29,16 @@ public class EnemyBT : MonoBehaviour
     [SerializeField] protected Vector2 groundCheckOffset = new Vector2(0.5f, -0.5f);
     [SerializeField] protected LayerMask wallLayer; // 벽 레이어
     [SerializeField] protected LayerMask groundLayer; // 지면 레이어
-    
+
+    [Header("사운드 설정")]
+    [SerializeField]
+    protected AudioClip hitClip;
+    [SerializeField]
+    protected AudioClip attackClip;
+    [SerializeField]
+    protected AudioClip deadClip;
+
+    protected AudioSource audioSource;
     protected Rigidbody2D rb;
     protected MovementRigidbody2D movement;
     protected EnemyAnimator animator;
@@ -56,7 +65,7 @@ public class EnemyBT : MonoBehaviour
         animator = GetComponentInChildren<EnemyAnimator>();
         enemyCollider = GetComponent<Collider2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-
+        audioSource = GetComponentInChildren<AudioSource>();
         if (spriteRenderer != null)
         {
             originalColor = spriteRenderer.color;
@@ -435,6 +444,7 @@ public class EnemyBT : MonoBehaviour
         {
             animator.SetMovementAnim(0);
             animator.TriggerHitAnim();
+            PlaySound(hitClip);
         }
 
         return NodeState.Running;
@@ -475,6 +485,7 @@ public class EnemyBT : MonoBehaviour
             animator.SetChasingState(false);
             animator.TriggerDeathAnim();
         }
+        PlaySound(deadClip);
         
         // 오브젝트 제거 (딜레이 적용)
         StartCoroutine(DestroyAfterDelay(deathDelay));
@@ -688,6 +699,22 @@ public class EnemyBT : MonoBehaviour
 
     public virtual void OnAttackAnimationFinished()
     { }
+
+
+    protected void PlaySound(AudioClip _clip)
+    {
+        audioSource.Stop();
+        audioSource.clip = _clip;
+        audioSource.Play();
+    }
+
+    protected void StopSound()
+    {
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+    }
 
     protected virtual void OnDrawGizmosSelected()
     {

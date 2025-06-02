@@ -212,6 +212,7 @@ public class FlyRangeEnemy : EnemyBT
 
         for (int i = 0; i < shotCount; i++)
         {
+            PlaySound(attackClip);
             if (bulletPrefab != null && firePoint != null)
             {
                 GameObject bullet = bulletPool.ActivePoolItem();
@@ -278,7 +279,6 @@ public class FlyRangeEnemy : EnemyBT
             return;
         }
 
-        // 🔁 방향 계산: firePoint에서 target을 바라보도록
         Vector2 targetPos = (Vector2)target.position + new Vector2(0f, 0.8f);
         Vector2 direction = (targetPos - (Vector2)firePoint.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;

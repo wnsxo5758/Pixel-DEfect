@@ -179,6 +179,7 @@ public class MeleeEnemy : EnemyBT
             animator.SetMovementAnim(0);
             animator.SetChasingState(true);
             animator.TriggerAttackAnim();
+            PlaySound(attackClip);
         }
 
         return NodeState.Running;
