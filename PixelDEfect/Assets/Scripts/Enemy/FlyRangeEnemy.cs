@@ -279,7 +279,7 @@ public class FlyRangeEnemy : EnemyBT
             return;
         }
 
-        Vector2 targetPos = (Vector2)target.position + new Vector2(0f, 0.8f);
+        Vector2 targetPos = (Vector2)target.position + new Vector2(0f, 3f);
         Vector2 direction = (targetPos - (Vector2)firePoint.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
