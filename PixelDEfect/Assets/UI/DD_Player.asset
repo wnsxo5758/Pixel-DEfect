@@ -19,15 +19,15 @@ MonoBehaviour:
     waitAfterLine: 2
   - line: "\uBB50\uC9C0?"
     waitAfterLine: 1
-  - line: "\uC548\uB155\uD558\uC138\uC694?"
+  - line: "\uB204\uAD6C\uC138\uC694?"
     waitAfterLine: 1.5
-  - line: "\uB124?? \uB124???"
+  - line: "\uC608????"
     waitAfterLine: 0.8
   - line: "\uC73C\uC544\uC544\uC544!!!!"
     waitAfterLine: 2
   - line: "\uD5C9\uD5C9..."
     waitAfterLine: 1.5
-  - line: "\uB3C4\uB300\uCCB4 \uBB50\uC57C..."
+  - line: "\uB2E4\uC74C \uB300\uC0AC\uB294 \uC0AC\uB791\uD574\uC694\uB77C\uACE0..."
     waitAfterLine: 2
   - line: "\uBB50\uC57C? \uC5B4\uB514\uC57C?"
     waitAfterLine: 2
@@ -65,9 +65,11 @@ MonoBehaviour:
     waitAfterLine: 1
   - line: "\uC65C \uBA48\uCDC4\uC9C0?"
     waitAfterLine: 1
-  - line: "\uC5B4\uB514\uC11C \uB9CE\uC774 \uBCF8 \uC7A5\uBA74\uC778\uB370"
-    waitAfterLine: 1.5
+  - line: "\uC640, \uC774\uC81C\uB294 \uC2DC\uAC04\uB3C4 \uBA48\uCD94\uB124"
+    waitAfterLine: 2
   - line: "\uADF8\uB798\uC11C \uC774\uAC8C \uB3C4\uB300\uCCB4 \uBB54\uB370"
     waitAfterLine: 2
-  - line: "\uB2F9\uC2E0\uBBFF\uACE0 "
+  - line: "\uC9C4\uC9DC \uBD88\uCE5C\uC808\uD558\uB124"
+    waitAfterLine: 1.5
+  - line: "\uB10C \uAE30\uB7EC\uAE30 \uC544\uBE60\uB294 \uBABB \uB418\uACA0\uB2E4"
     waitAfterLine: 2
