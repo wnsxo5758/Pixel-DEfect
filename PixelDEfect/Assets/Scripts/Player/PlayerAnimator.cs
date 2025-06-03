@@ -19,7 +19,8 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int hasWeapon = Animator.StringToHash("HasWeapon");
     private readonly int attack = Animator.StringToHash("Attack");
     private readonly int throwWeapon = Animator.StringToHash("Throw");
-    private readonly int isHealing = Animator.StringToHash("isHealing");
+    private readonly int startHeal = Animator.StringToHash("StartHeal");
+    private readonly int isHealing = Animator.StringToHash("IsHealing");
     private readonly int manaDrain = Animator.StringToHash("ManaDrain");
     private readonly int hit = Animator.StringToHash("Hit");
     private readonly int skillAcquisition = Animator.StringToHash("SkillAcquisition");
@@ -317,6 +318,22 @@ public class PlayerAnimator : MonoBehaviour
         playerAttack?.OnTeleportEndAnim();
     }
 
+    public void StartHealAnim()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(startHeal);
+        }
+    }
+
+    public void OnConnectHealAnimFinished()
+    {
+        if (controller != null && controller.GetCurrentState() is PlayerStates.VendingMachineHeal healState)
+        {
+            healState.OnConnectAnimationFinished();
+        }
+    }
+    
     public void SetHealingAnim(bool healing)
     {
         animator.SetBool(isHealing, healing);
@@ -412,6 +429,7 @@ public class PlayerAnimator : MonoBehaviour
         animator.ResetTrigger(attack);
         animator.ResetTrigger(throwWeapon);
         animator.ResetTrigger(hit);
+        animator.SetTrigger(startHeal);
         
         ResetPullAnimationTriggers();
         ResetTeleportAnimationTriggers();

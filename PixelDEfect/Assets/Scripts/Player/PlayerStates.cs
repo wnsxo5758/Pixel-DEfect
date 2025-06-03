@@ -875,6 +875,112 @@ namespace PlayerStates
             player.ChangeState(new Idle());
         }
     }
+
+    public class VendingMachineMove : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private MovementRigidbody2D movement;
+        private VendingMachineHealContext context;
+        private bool isMovementComplete = false;
+
+        public VendingMachineMove(VendingMachineHealContext vendingContext)
+        {
+            context = vendingContext;
+        }
+
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            movement = player.GetComponent<MovementRigidbody2D>();
+            
+            isMovementComplete = false;
+            context.hasReachedPosition = false;
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            // 목표 위치에 도달했는지 확인
+            if (context.IsAtTargetPosition(player.transform.position))
+            {
+                if (!isMovementComplete)
+                {
+                    CompleteMovement(player);
+                }
+
+                return;
+            }
+
+            MoveTowardsTarget(player);
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            // 이동 정지
+            if (movement != null)
+            {
+                movement.MoveTo(0);
+            }
+            
+            if (animator != null)
+            {
+                animator.MovementAnim(0f);
+            }
+        }
+
+        private void MoveTowardsTarget(PlayerController player)
+        {
+            Vector3 currentPosition = player.transform.position;
+            Vector3 targetPosition = context.targetPosition;
+            
+            Vector3 direction = (targetPosition - currentPosition).normalized;
+            float horizontalDirection = Mathf.Sign(direction.x);
+            
+            // 스프라이트 방향 설정
+            if (Mathf.Abs(horizontalDirection) > 0.1f)
+            {
+                player.SpriteFlipX(horizontalDirection);
+            }
+            
+            // 이동 애니메이션
+            if (animator != null)
+            {
+                animator.MovementAnim(Mathf.Abs(horizontalDirection));
+            }
+            
+            // 실제 이동 (물리 기반)
+            if (movement != null)
+            {
+                movement.MoveTo(horizontalDirection);
+            }
+        }
+        
+        private void CompleteMovement(PlayerController player)
+        {
+            isMovementComplete = true;
+            context.hasReachedPosition = true;
+            
+            // 이동 정지
+            if (movement != null)
+            {
+                movement.MoveTo(0);
+            }
+            
+            if (animator != null)
+            {
+                animator.MovementAnim(0f);
+            }
+            
+            Debug.Log("자판기 위치 도달 완료, 회복 상태로 전환");
+            
+            // 회복 준비 (기존 컨텍스트 재사용)
+            context.CalculateHealTime();
+            context.elapsedTime = 0f;
+            context.healedAmount = 0;
+            
+            // 회복 상태로 전환
+            player.ChangeState(new VendingMachineHeal(context));
+        }
+    }
     
     public class VendingMachineHeal : State<PlayerController>
     {
@@ -883,9 +989,17 @@ namespace PlayerStates
         private PlayerHp playerHp;
         private VendingMachineHealContext context;
 
+        private enum HealPhase
+        {
+            Connecting,
+            Healing
+        }
+
+        private HealPhase currentPhase;
+        private bool isConnectAnimationComplete = false;
+        private bool isHealingComplete = false;
         private float healTimer = 0f;
         private float nextHealTime = 0f;
-        private bool isHealingComplete = false;
 
         public VendingMachineHeal(VendingMachineHealContext healContext)
         {
@@ -903,21 +1017,49 @@ namespace PlayerStates
             {
                 movement.MoveTo(0);
             }
-            
-            // 회복 애니메이션 시작
+
+            currentPhase = HealPhase.Connecting;
+            isConnectAnimationComplete = false;
+            isHealingComplete = false;
+            player.SpriteFlipX(1f);
+
             if (animator != null)
             {
-                animator.SetHealingAnim(true);
+                animator.StartHealAnim();
             }
-
-            healTimer = 0f;
-            nextHealTime = 1f;
-            isHealingComplete = false;
-            context.elapsedTime = 0f;
-            context.healedAmount = 0;
         }
 
         public override void Execute(PlayerController player)
+        {
+            switch (currentPhase)
+            {
+                case HealPhase.Connecting:
+                    HandleConnectingPhase(player);
+                    break;
+                
+                case HealPhase.Healing:
+                    HandleHealingPhase(player);
+                    break;
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            if (animator != null)
+            {
+                animator.SetHealingAnim(false);
+            }
+        }
+
+        private void HandleConnectingPhase(PlayerController player)
+        {
+            if (isConnectAnimationComplete)
+            {
+                TransitionToHealingPhase();
+            }
+        }
+
+        private void HandleHealingPhase(PlayerController player)
         {
             healTimer += Time.deltaTime;
             context.elapsedTime += Time.deltaTime;
@@ -936,14 +1078,22 @@ namespace PlayerStates
             }
         }
 
-        public override void Exit(PlayerController player)
+        private void TransitionToHealingPhase()
         {
+            currentPhase = HealPhase.Healing;
+
             if (animator != null)
             {
-                animator.SetHealingAnim(false);
+                animator.SetHealingAnim(true);
             }
+            
+            // 회복 타이머 초기화
+            healTimer = 0f;
+            nextHealTime = 1f; // 1초마다 회복
+            context.elapsedTime = 0f;
+            context.healedAmount = 0;
         }
-
+        
         private void PerformHeal()
         {
             if (playerHp == null) return;
@@ -981,6 +1131,11 @@ namespace PlayerStates
             isHealingComplete = true;
             
             player.ChangeState(new Idle());
+        }
+
+        public void OnConnectAnimationFinished()
+        {
+            isConnectAnimationComplete = true;
         }
     }
 

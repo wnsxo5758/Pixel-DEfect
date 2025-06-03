@@ -90,15 +90,19 @@ public class VendingMachine : MonoBehaviour
         PlayerController controller = player.GetComponent<PlayerController>();
         if (controller != null)
         {
-            VendingMachineHealContext context = new VendingMachineHealContext
-            {
-                healAmount = healAmount,
-                healRate = healRate,
-                vendingMachine = this
-            };
+            Vector3 targetPos = playerPosition != null ? playerPosition.position : transform.position;
+
+            VendingMachineHealContext context = new VendingMachineHealContext(
+                this,
+                targetPos,
+                moveSpeed,
+                positionTolerance,
+                healAmount,
+                healRate);
             
             Debug.Log("회복 자판기 상호작용 시작");
-            controller.ChangeState(new PlayerStates.VendingMachineHeal(context));
+            
+            controller.ChangeState(new PlayerStates.VendingMachineMove(context));
         }
     }
 

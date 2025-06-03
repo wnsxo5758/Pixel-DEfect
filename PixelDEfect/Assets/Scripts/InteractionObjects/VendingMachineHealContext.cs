@@ -18,15 +18,22 @@ public class VendingMachineHealContext
     public float totalHealTime;
     public float elapsedTime;
     public int healedAmount;
-    
-    public VendingMachineHealContext()
+
+    public VendingMachineHealContext(VendingMachine machine, Vector3 target, float speed, float tolerance, int heal,
+        float rate)
     {
+        vendingMachine = machine;
+        targetPosition = target;
+
+        moveSpeed = speed;
+        positionTolerance = tolerance;
+        healAmount = heal;
+        healRate = rate;
+        
         hasReachedPosition = false;
-        totalHealTime = 0f;
-        elapsedTime = 0f;
+        totalHealTime = 0;
+        elapsedTime = 0;
         healedAmount = 0;
-        positionTolerance = 0.1f;
-        moveSpeed = 3f;
     }
     
     /// <summary>
@@ -42,7 +49,8 @@ public class VendingMachineHealContext
     /// </summary>
     public bool IsAtTargetPosition(Vector3 currentPosition)
     {
-        return Vector3.Distance(currentPosition, targetPosition) <= positionTolerance;
+        float xDistance = Mathf.Abs(currentPosition.x - targetPosition.x);
+        return xDistance <= positionTolerance;
     }
     
     /// <summary>
