@@ -429,7 +429,7 @@ public class PlayerAnimator : MonoBehaviour
         animator.ResetTrigger(attack);
         animator.ResetTrigger(throwWeapon);
         animator.ResetTrigger(hit);
-        animator.SetTrigger(startHeal);
+        animator.ResetTrigger(startHeal);
         
         ResetPullAnimationTriggers();
         ResetTeleportAnimationTriggers();

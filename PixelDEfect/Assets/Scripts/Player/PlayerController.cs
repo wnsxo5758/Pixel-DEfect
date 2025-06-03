@@ -10,7 +10,6 @@ public class PlayerController : MonoBehaviour
     [Header("디버그 설정")] 
     [SerializeField] private bool enableDeveloperDebug = false;
     
-
     [Header("웅크리기")] 
     [SerializeField] private float crouchCheckDistance = 0.5f;
     [SerializeField] private LayerMask aboveLayer;
@@ -289,7 +288,7 @@ public class PlayerController : MonoBehaviour
     // 위에 공간이 있는지 확인 (웅크리기 해제 가능 여부)
     public bool HasSpaceAbove() 
     {
-        Vector3 rayOrigin = transform.position + new Vector3(0, 1f, 0);
+        Vector3 rayOrigin = transform.position + new Vector3(0, 0.7f, 0);
         
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up, 
                             crouchCheckDistance, aboveLayer);
