@@ -58,10 +58,10 @@ public class GameManager : MonoBehaviour
             playerHp.OnInvincibility(respawnInvulnerabilityTime);
         }
 
-        // 즉시 체크포인트로 이동
+        // 낙사 체크포인트로 이동
         if (CheckpointManager.Instance != null)
         {
-            CheckpointManager.Instance.TeleportToCheckpoint(player);
+            CheckpointManager.Instance.MoveToFallbackCheckpoint(player);
         }
     }
     
@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviour
                 controller.ResetOnRespawn();
             }
             
-            CheckpointManager.Instance.RespawnCheckpoint(player);
+            CheckpointManager.Instance.RespawnAtCheckpoint(player);
             
             isPlayerDead = false;
         }

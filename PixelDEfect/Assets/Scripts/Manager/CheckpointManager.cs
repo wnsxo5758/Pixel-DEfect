@@ -12,13 +12,16 @@ public class CheckpointManager : MonoBehaviour
         public int id;
         public Vector3 position;
         public bool isActivated;
+        public bool isRespawnPoint;
     }
+
+    // 리스폰 체크포인트
+    private int currentRespawnCheckpointID = -1;
+    private Vector3 respawnPosition;
     
     // 현재 활성화된 체크포인트 ID
-    private int currentCheckpointID = -1;
-    
-    // 체크포인트 위치 저장
-    private Vector3 respawnPosition;
+    private int currentFallbackCheckpointID = -1;
+    private Vector3 fallbackPosition;
     
     // 모든 체크포인트 상태 관리
     private Dictionary<int, CheckpointData> checkpoints = new Dictionary<int, CheckpointData>();
@@ -34,6 +37,7 @@ public class CheckpointManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
 
             respawnPosition = Vector3.zero;
+            fallbackPosition = Vector3.zero;
         }
         else
         {
@@ -42,9 +46,9 @@ public class CheckpointManager : MonoBehaviour
     }
     
     // 체크포인트 활성화 및 플레이어 상태 저장
-    public void SetActiveCheckpoint(int id, Vector3 position)
+    public void SetRespawnCheckpoint(int id, Vector3 position)
     {
-        currentCheckpointID = id;
+        currentRespawnCheckpointID = id;
         respawnPosition = position;
         
         // 체크포인트 상태 저장
@@ -52,7 +56,8 @@ public class CheckpointManager : MonoBehaviour
         {
             id = id,
             position = position,
-            isActivated = true
+            isActivated = true,
+            isRespawnPoint = true
         };
 
         checkpoints[id] = data;
@@ -60,11 +65,28 @@ public class CheckpointManager : MonoBehaviour
         // 플레이어 상태 저장
         SavePlayerState();
     }
+
+    public void SetFallbackCheckpoint(int id, Vector3 position)
+    {
+        currentFallbackCheckpointID = id;
+        fallbackPosition = position;
+        
+        // 체크포인트 상태 저장
+        CheckpointData data = new CheckpointData
+        {
+            id = id,
+            position = position,
+            isActivated = true,
+            isRespawnPoint = false
+        };
+
+        checkpoints[id] = data;
+    }
     
     // 현재 활성화된 체크포인트에서 플레이어 상태 복원
-    public void RespawnCheckpoint(GameObject player)
+    public void RespawnAtCheckpoint(GameObject player)
     {
-        if (currentCheckpointID != -1)
+        if (currentRespawnCheckpointID != -1)
         {
             // 플레이어 위치 복원
             player.transform.position = respawnPosition;
@@ -72,6 +94,29 @@ public class CheckpointManager : MonoBehaviour
             // 플레이어 상태 복원
             RestorePlayerState(player);
         }
+    }
+
+    // 낙사 체크포인트로 플레이어 이동
+    public void MoveToFallbackCheckpoint(GameObject player)
+    {
+        Vector3 targetPosition;
+        
+        if (currentFallbackCheckpointID != -1)
+        {
+            targetPosition = fallbackPosition;
+        }
+        else if (currentRespawnCheckpointID != -1)
+        {
+            // 낙사 체크포인트가 없으면 리스폰 체크포인트 사용
+            targetPosition = respawnPosition;
+        }
+        else
+        {
+            return;
+        }
+        
+        // 플레이어 위치만 이동 (상태는 복원하지 않음)
+        player.transform.position = targetPosition;
     }
     
     // 플레이어 상태 저장
@@ -105,13 +150,23 @@ public class CheckpointManager : MonoBehaviour
 
     public void TeleportToCheckpoint(GameObject player)
     {
-        if (currentCheckpointID == -1 || player == null)
+        if (currentFallbackCheckpointID != -1)
         {
-            GameManager.Instance.RestartGame();
-            return;
+            // 낙사 체크포인트 우선 사용
+            player.transform.position = fallbackPosition;
+            Debug.Log("낙사 체크포인트로 즉시 이동");
         }
-        
-        player.transform.position = respawnPosition;
+        else if (currentRespawnCheckpointID != -1)
+        {
+            // 낙사 체크포인트가 없으면 리스폰 체크포인트 사용
+            player.transform.position = respawnPosition;
+            Debug.Log("리스폰 체크포인트로 즉시 이동");
+        }
+        else
+        {
+            // 체크포인트가 없으면 게임 재시작
+            GameManager.Instance.RestartGame();
+        }
     }
     
     // 체크포인트 상태 확인
@@ -124,7 +179,9 @@ public class CheckpointManager : MonoBehaviour
     public void ResetCheckpoints()
     {
         checkpoints.Clear();
-        currentCheckpointID = -1;
+        currentRespawnCheckpointID = -1;
+        currentFallbackCheckpointID = -1;
         respawnPosition = Vector3.zero;
+        fallbackPosition = Vector3.zero;
     }
 }
