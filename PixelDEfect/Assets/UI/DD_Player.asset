@@ -61,3 +61,7 @@ MonoBehaviour:
     waitAfterLine: 1.5
   - line: "\uC544... \uC81C\uBC1C..."
     waitAfterLine: 1.5
+  - line: "\uC5B4\uB514\uC11C \uB9CE\uC774 \uBCF8 \uC7A5\uBA74\uC778\uB370"
+    waitAfterLine: 1.5
+  - line: "\uC774\uAC78\uB85C \uBB50 \uC5B4\uB5A1\uD558\uB77C\uACE0"
+    waitAfterLine: 1.5

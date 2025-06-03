@@ -354,7 +354,7 @@ Transform:
   m_GameObject: {fileID: 14909939}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2, y: 8, z: -20}
+  m_LocalPosition: {x: 0, y: 8, z: -0.3523448}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13107,7 +13107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogueData: {fileID: 11400000, guid: 1d07038f501e85d4ba70ff7e3483a041, type: 2}
-  chatBoxPrefab: {fileID: 6296424888039983329, guid: 99ccff7dc906a7b469595b4bcd19decd, type: 3}
+  chatBoxPrefab: {fileID: 6296424888039983329, guid: e5bda216c90e9924a8f1a8c3f6583791, type: 3}
   chatTarget: {fileID: 1412835356}
 --- !u!114 &605426705
 MonoBehaviour:
@@ -231626,6 +231626,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee6acb31f9db54c41936bf2ebc7e1ad5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skillCoolUI: {fileID: 0}
   timeFreezeRadius: 20
   timeFreezeDuration: 5
   timeFreezeCooldown: 15
@@ -405512,6 +405513,12 @@ PlayableDirector:
     value: {fileID: 500275939}
   - key: {fileID: -462254733695570120, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
     value: {fileID: 14909950}
+  - key: {fileID: -7380459318076779351, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
+    value: {fileID: 1952050361}
+  - key: {fileID: -3239543692654694451, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
+    value: {fileID: 1952050363}
+  - key: {fileID: -2587084390274762760, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
+    value: {fileID: 1952050366}
   m_ExposedReferences:
     m_References:
     - 7896d8a3c4a46b64a96c1bb2251e5a2f: {fileID: 936962298}
@@ -493006,6 +493013,7 @@ GameObject:
   - component: {fileID: 1952050364}
   - component: {fileID: 1952050363}
   - component: {fileID: 1952050362}
+  - component: {fileID: 1952050366}
   m_Layer: 0
   m_Name: Assistant (1)
   m_TagString: Untagged
@@ -493117,6 +493125,51 @@ Transform:
   - {fileID: 708186760}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1952050366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952050361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: 4f5917d2c992e5d448e8b2899a546268, type: 2}
+    - {fileID: 11400000, guid: af468cdbc33958e4c8d7b143fc7d525d, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1952050362}
+          m_TargetAssemblyTypeName: DialogueTrigger, Assembly-CSharp
+          m_MethodName: ShowTimelineLine
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 4
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1952050362}
+          m_TargetAssemblyTypeName: DialogueTrigger, Assembly-CSharp
+          m_MethodName: ShowTimelineLine
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 5
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1953696235
 GameObject:
   m_ObjectHideFlags: 0
