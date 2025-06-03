@@ -80,12 +80,12 @@ public class VendingMachine : MonoBehaviour
             StartCooldown();
         }
 
-        StartHealing(player);
+        StartVendingMachineSequence(player);
 
         return true;
     }
 
-    private void StartHealing(GameObject player)
+    private void StartVendingMachineSequence(GameObject player)
     {
         PlayerController controller = player.GetComponent<PlayerController>();
         if (controller != null)

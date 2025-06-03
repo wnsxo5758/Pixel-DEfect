@@ -22,11 +22,11 @@ public class VendingMachineHealContext
     public VendingMachineHealContext()
     {
         hasReachedPosition = false;
-        healAmount = 0;
-        healRate = 0f;
         totalHealTime = 0f;
         elapsedTime = 0f;
         healedAmount = 0;
+        positionTolerance = 0.1f;
+        moveSpeed = 3f;
     }
     
     /// <summary>
@@ -35,6 +35,14 @@ public class VendingMachineHealContext
     public void CalculateHealTime()
     {
         totalHealTime = healAmount / healRate;
+    }
+    
+    /// <summary>
+    /// 목표 위치에 도달했는지 확인
+    /// </summary>
+    public bool IsAtTargetPosition(Vector3 currentPosition)
+    {
+        return Vector3.Distance(currentPosition, targetPosition) <= positionTolerance;
     }
     
     /// <summary>
