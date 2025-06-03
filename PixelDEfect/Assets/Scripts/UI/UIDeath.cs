@@ -113,7 +113,7 @@ public class UIDeath : MonoBehaviour
         if (button == null) yield break;
         
         yield return new WaitForSeconds(delay);
-        
+        respawnButton.interactable = true;
         CanvasGroup canvasGroup = button.GetComponent<CanvasGroup>();
         if (canvasGroup == null)
         {
