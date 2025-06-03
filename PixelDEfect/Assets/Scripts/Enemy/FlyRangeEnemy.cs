@@ -424,10 +424,15 @@ public class FlyRangeEnemy : EnemyBT
     {
         var state = base.HandleDeath();
 
+        if (enemyCollider != null)
+        {
+            enemyCollider.enabled = true; // 다시 켬
+        }
+
         if (rb != null)
         {
             rb.bodyType = RigidbodyType2D.Dynamic;
-            rb.gravityScale = 25f;
+            rb.gravityScale = 1f;
             rb.freezeRotation = false;
             rb.constraints = RigidbodyConstraints2D.None;
             rb.angularDrag = 1f;

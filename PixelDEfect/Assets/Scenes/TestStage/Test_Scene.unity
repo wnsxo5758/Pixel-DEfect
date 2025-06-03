@@ -52735,6 +52735,9 @@ MonoBehaviour:
   healRate: 2
   cooldownTime: 5
   isUnlimited: 0
+  playerPosition: {fileID: 0}
+  moveSpeed: 3
+  positionTolerance: 0.1
   usagePrompt: {fileID: 0}
   cooldownPrompt: {fileID: 0}
 --- !u!1 &1721143898
@@ -55819,11 +55822,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6533728795182351216, guid: 8ec2c8a821ca9ff4f89777c263cf3524, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 25.91
+      value: 18.34
       objectReference: {fileID: 0}
     - target: {fileID: 6533728795182351216, guid: 8ec2c8a821ca9ff4f89777c263cf3524, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.35
+      value: -0.26
       objectReference: {fileID: 0}
     - target: {fileID: 6533728795182351216, guid: 8ec2c8a821ca9ff4f89777c263cf3524, type: 3}
       propertyPath: m_LocalPosition.z
