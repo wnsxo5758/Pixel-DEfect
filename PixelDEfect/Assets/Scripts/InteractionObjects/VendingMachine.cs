@@ -5,11 +5,16 @@ using UnityEngine;
 public class VendingMachine : MonoBehaviour
 {
     [Header("자판기 설정")] 
-    [SerializeField] private int healAmount = 8;    // 총 회복량
-    [SerializeField] private float healRate = 2f;      // 초당 회복량
+    [SerializeField] private int healAmount = 8;        // 총 회복량
+    [SerializeField] private float healRate = 2f;       // 초당 회복량
     [SerializeField] private float cooldownTime = 5f;
-    [SerializeField] private bool isUnlimited = false; // 무제한 사용 가능 여부
+    [SerializeField] private bool isUnlimited = false;  // 무제한 사용 가능 여부
 
+    [Header("플레이어 이동 설정")] 
+    [SerializeField] private Transform playerPosition;  // 플레이어가 이동할 위치
+    [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private float positionTolerance = 0.1f;
+    
     [Header("UI 표시")] 
     [SerializeField] private GameObject usagePrompt;    // 사용 안내 UI
     [SerializeField] private GameObject cooldownPrompt; // 쿨다운 안내 UI
@@ -19,7 +24,14 @@ public class VendingMachine : MonoBehaviour
     
     private void Awake()
     {
-        
+        // 플레이어 위치가 설정되지 않았으면 자판기 앞쪽으로 설정
+        if (playerPosition == null)
+        {
+            GameObject positionObj = new GameObject("PlayerPosition");
+            positionObj.transform.SetParent(transform);
+            positionObj.transform.localPosition = Vector3.zero; // 자판기 중앙
+            playerPosition = positionObj.transform;
+        }
     }
 
     private void Update()

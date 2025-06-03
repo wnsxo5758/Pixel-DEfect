@@ -5,18 +5,25 @@ public class VendingMachineHealContext
 {
     [Header("회복 설정")] 
     public int healAmount;      // 총 회복량
-    public float healRate;        // 초당 회복량
+    public float healRate;      // 초당 회복량
     public VendingMachine vendingMachine;
 
+    [Header("이동 설정")] 
+    public Vector3 targetPosition;
+    public float moveSpeed;
+    public float positionTolerance;
+
     [Header("상태 정보")] 
+    public bool hasReachedPosition;
     public float totalHealTime;
     public float elapsedTime;
     public int healedAmount;
     
     public VendingMachineHealContext()
     {
-        healAmount = 8;
-        healRate = 2f;
+        hasReachedPosition = false;
+        healAmount = 0;
+        healRate = 0f;
         totalHealTime = 0f;
         elapsedTime = 0f;
         healedAmount = 0;

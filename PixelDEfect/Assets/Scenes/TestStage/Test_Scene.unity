@@ -50458,6 +50458,14 @@ PrefabInstance:
       propertyPath: hitClip
       value: 
       objectReference: {fileID: 8300000, guid: 975d1302dad558f4c90fe12af521aae5, type: 3}
+    - target: {fileID: 4184501413353370576, guid: daa93609b330577489e689b906114e0f, type: 3}
+      propertyPath: attackBoxSize.x
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4184501413353370576, guid: daa93609b330577489e689b906114e0f, type: 3}
+      propertyPath: attackBoxOffset.x
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 6289588865983769723, guid: daa93609b330577489e689b906114e0f, type: 3}
       propertyPath: m_Name
       value: Melee (1)
