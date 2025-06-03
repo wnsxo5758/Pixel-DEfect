@@ -41,11 +41,11 @@ MonoBehaviour:
     waitAfterLine: 1
   - line: ????????
     waitAfterLine: 1
-  - line: "\uB0B4\uAC00 \uAFC8\uC744 \uAFB8\uB294\uAC74\uAC00...."
+  - line: "\uBBF8\uCE5C\uB188... \uBBF8\uCE5C\uB188..."
     waitAfterLine: 1
-  - line: "\uADF8\uB798\uB3C4 \uB355\uBD84\uC5D0"
+  - line: "\uADF8\uB798\uB3C4 \u3131\u3145"
     waitAfterLine: 1
-  - line: "\uD574\uBCF4\uC790!"
+  - line: "\uB2E4 \uC8FD\uC5C8\uC5B4!"
     waitAfterLine: 1
   - line: "\uBB50\uC57C"
     waitAfterLine: 1
@@ -61,7 +61,13 @@ MonoBehaviour:
     waitAfterLine: 1.5
   - line: "\uC544... \uC81C\uBC1C..."
     waitAfterLine: 1.5
+  - line: '?'
+    waitAfterLine: 1
+  - line: "\uC65C \uBA48\uCDC4\uC9C0"
+    waitAfterLine: 1
   - line: "\uC5B4\uB514\uC11C \uB9CE\uC774 \uBCF8 \uC7A5\uBA74\uC778\uB370"
     waitAfterLine: 1.5
-  - line: "\uC774\uAC78\uB85C \uBB50 \uC5B4\uB5A1\uD558\uB77C\uACE0"
-    waitAfterLine: 1.5
+  - line: "\uADF8\uB798\uC11C \uC774\uAC8C \uB3C4\uB300\uCCB4 \uBB54\uB370\uC694"
+    waitAfterLine: 2
+  - line: "\uB2F9\uC2E0\uBBFF\uACE0 "
+    waitAfterLine: 2

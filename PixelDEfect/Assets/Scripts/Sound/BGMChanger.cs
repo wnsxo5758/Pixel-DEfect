@@ -20,4 +20,13 @@ public class BGMChanger : MonoBehaviour
             AudioManager.instance.ChangeBGM(newBgm, newVolume);
         }
     }
+
+    public void ChangeBGMBySignal()
+    {
+        if (triggered) return;
+
+        triggered = true;
+
+        AudioManager.instance.ChangeBGM(newBgm, newVolume);
+    }
 }
