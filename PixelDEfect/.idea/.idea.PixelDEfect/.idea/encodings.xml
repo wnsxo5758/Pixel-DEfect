@@ -22,6 +22,7 @@
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Player/PlayerController.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Player/PlayerHp.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Player/PlayerInteraction.cs" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Assets/Scripts/Stage/SceneChanger.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/UI/UIPlayerData.cs" charset="EUC-KR" />
   </component>
 </project>

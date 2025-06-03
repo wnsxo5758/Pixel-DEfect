@@ -88,6 +88,7 @@ public class MeleeEnemy : EnemyBT
         Sequence attackSequence = new Sequence();
 
         // 조건 노드들
+        ConditionNode isNotDead = new ConditionNode(() => !blackboard.GetValue<bool>("IsDead"));
         ConditionNode isNotHit = new ConditionNode(() => !blackboard.GetValue<bool>("IsHit"));
         ConditionNode isPlayerDetected = new ConditionNode(() => blackboard.GetValue<bool>("PlayerDetected"));
         ConditionNode isInAttackRange = new ConditionNode(IsInAttackRange);
@@ -98,6 +99,7 @@ public class MeleeEnemy : EnemyBT
         ActionNode performAttack = new ActionNode(PerformAttack);
 
         // 공격 시퀀스 구성
+        attackSequence.AddChild(isNotDead);
         attackSequence.AddChild(isNotHit); // 피격 상태가 아닌지
         attackSequence.AddChild(isPlayerDetected); // 플레이어가 감지되었는지
         attackSequence.AddChild(isInAttackRange); // 공격 범위 내에 있는지
@@ -189,7 +191,7 @@ public class MeleeEnemy : EnemyBT
     public override void OnAttackAnimationEvent()
     {
         // 피격 중이면 공격 판정 취소
-        if (isHit) return;
+        if (isHit || isDead) return;
 
         DealDamage();
     }

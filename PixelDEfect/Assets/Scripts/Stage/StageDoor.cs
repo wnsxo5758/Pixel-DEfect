@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class StageDoor : InteractableObject
 {
-    public GameObject[] targets;               // ºñÈ°¼ºÈ­ ¿©ºÎ¸¦ È®ÀÎÇÒ ´ë»óµé
-    public GameObject infoUIPrefab;            // UI ÇÁ¸®ÆÕ (¿ìÃø »ó´Ü¿¡ ¶ç¿ï °Í)
-    public Transform uiParent;                 // UI¸¦ ³ÖÀ» ºÎ¸ğ (¿¹: Canvas)
-
+    [Header("ê¸°ë³¸ ì„¤ì •")]
+    public GameObject[] targets;               // í™•ì¸í•  ì˜¤ë¸Œì íŠ¸ë“¤
+    public GameObject infoUIPrefab;            // UI í”„ë¦¬íŒ¹ (ì˜µì…˜ ìƒí™©ì— ëœ¨ëŠ” ê²ƒ)
+    public Transform uiParent;                 // UIë¥¼ ë„£ì„ ë¶€ëª¨ (ì˜ˆ: Canvas)
+    
+    private bool hasBossTarget = false;  // ë³´ìŠ¤ ì²˜ì¹˜ í™•ì¸ ì—¬ë¶€
+    private ManagerRobotBoss targetBoss = null;   // ì—°ê²°ëœ ë³´ìŠ¤
+    
     private Animator animator;
     private BoxCollider2D boxCollider;
     private bool doorOpened = false;
@@ -17,25 +21,57 @@ public class StageDoor : InteractableObject
     {
         animator = GetComponentInChildren<Animator>();
         boxCollider = GetComponent<BoxCollider2D>();
+
+        FindBossInTarget();
     }
 
-    private void Update()
+    private void Start()
     {
-        // ¸ğµç ´ë»óÀÌ ²¨Á³À» ¶§ ¹® ¿­±â
-        if (!doorOpened && CheckAllTargetsInactive())
+        // ë³´ìŠ¤ê°€ targetsì— ìˆìœ¼ë©´ ë³´ìŠ¤ ì´ë²¤íŠ¸ êµ¬ë…
+        if (hasBossTarget)
         {
-            isActive = true;
-            Active();
-            doorOpened = true;
+            BossEvents.OnBossTransformedToRemains += OnBossTransformedToRemains;
         }
-
-        // isActive »óÅÂ¿¡ µû¶ó BoxCollider2D È°¼º/ºñÈ°¼º
+        
+        // isActive ï¿½ï¿½ï¿½Â¿ï¿½ ï¿½ï¿½ï¿½ï¿½ BoxCollider2D È°ï¿½ï¿½/ï¿½ï¿½È°ï¿½ï¿½
         if (boxCollider != null)
         {
-            boxCollider.enabled = !isActive;
+            boxCollider.enabled = true;
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        // ì´ë²¤íŠ¸ êµ¬ë… í•´ì œ (ë©”ëª¨ë¦¬ ëˆ„ìˆ˜ ë°©ì§€)
+        if (hasBossTarget)
+        {
+            BossEvents.OnBossTransformedToRemains -= OnBossTransformedToRemains;
+        }
+    }
+    
+    private void Update()
+    {
+        if (doorOpened) return;
+
+        if (!hasBossTarget && CheckAllTargetsInactive() && !doorOpened)
+        {
+            OpenDoor();
+            Debug.Log("StageDoor: ëª¨ë“  íƒ€ê²Ÿì´ ë¹„í™œì„±í™”ë¨, ë¬¸ì„ ì—½ë‹ˆë‹¤.");
         }
     }
 
+    private void OpenDoor()
+    {
+        doorOpened = true;
+        isActive = true;
+        Active();
+        
+        // if (boxCollider != null)
+        // {
+        //     boxCollider.enabled = !isActive;
+        // }
+    }
+    
     private bool CheckAllTargetsInactive()
     {
         foreach (GameObject obj in targets)
@@ -56,12 +92,12 @@ public class StageDoor : InteractableObject
     {
         animator.SetBool("isActive", isActive);
     }
-
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!isActive && other.CompareTag("Player"))
         {
-            // UI°¡ ÀÌ¹Ì ¶° ÀÖ´Ù¸é Áßº¹ »ı¼º ¹æÁö
+            // UIï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½ ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             if (uiInstance == null && infoUIPrefab != null)
             {
                 uiInstance = Instantiate(infoUIPrefab, uiParent);
@@ -74,6 +110,42 @@ public class StageDoor : InteractableObject
         if (uiInstance != null && other.CompareTag("Player"))
         {
             Destroy(uiInstance);
+        }
+    }
+
+    private void FindBossInTarget()
+    {
+        targetBoss = null;
+
+        if (targets == null || targets.Length == 0) return;
+
+        foreach (GameObject target in targets)
+        {
+            if (target != null)
+            {
+                ManagerRobotBoss boss = target.GetComponent<ManagerRobotBoss>();
+                if (boss != null)
+                {
+                    targetBoss = boss;
+                    Debug.Log($"StageDoor: ë³´ìŠ¤ ë°œê²¬ - {boss.name}");
+                    break; // ì²« ë²ˆì§¸ ë³´ìŠ¤ë§Œ ì°¾ìœ¼ë©´ ì¢…ë£Œ
+                }
+            }
+        }
+        
+        hasBossTarget = targetBoss != null;
+    }
+    
+    // ë³´ìŠ¤ê°€ ì”í•´ ìƒíƒœë¡œ ë³€í™˜ë˜ì—ˆì„ ë•Œ í˜¸ì¶œë˜ëŠ” ë©”ì„œë“œ
+    private void OnBossTransformedToRemains(ManagerRobotBoss defeatedBoss)
+    {
+        if (!hasBossTarget) return;  // âœ… ìˆ˜ì •ë¨
+    
+        // targetsì— ìˆëŠ” ë³´ìŠ¤ê°€ ì²˜ì¹˜ë˜ë©´ ë¬¸ ì—´ê¸°
+        if (targetBoss == defeatedBoss)  // âœ… ìˆ˜ì •ë¨
+        {
+            Debug.Log($"StageDoor: ì—°ë™ëœ ë³´ìŠ¤ {defeatedBoss.name} ì²˜ì¹˜ í™•ì¸, ë¬¸ì„ ì—½ë‹ˆë‹¤!");
+            OpenDoor();
         }
     }
 }

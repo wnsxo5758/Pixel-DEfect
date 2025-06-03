@@ -90,7 +90,7 @@ public class PlayerHp : MonoBehaviour
     }
 
     // 넉백이 포함된 데미지 처리
-    public void DecreaseHp(int damage, Vector2 knockBack, DeathData deathData, bool canDodge = false)
+    public void DecreaseHp(int damage, Vector2 knockBack, DeathData deathData, bool canDodge = false, bool freeze = false)
     {
         if (isDead) return;
         
@@ -98,7 +98,7 @@ public class PlayerHp : MonoBehaviour
 
         if (canDodge && player != null)
         {
-            dodged = player.OnAttackReceived(false);
+            dodged = player.OnAttackReceived(freeze);
         }
         
         if (isInvincible || dodged) return;
