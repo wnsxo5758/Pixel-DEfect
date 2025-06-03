@@ -395,12 +395,13 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 4680
-  hitClip: {fileID: 0}
-  attackClip: {fileID: 0}
-  deadClip: {fileID: 0}
+  hitClip: {fileID: 8300000, guid: 75f734f6ec584e243bb6aa52a34e0dcb, type: 3}
+  attackClip: {fileID: 8300000, guid: 31b6f7f79ddf96d4b9344c753dd11fea, type: 3}
+  deadClip: {fileID: 8300000, guid: 2ea4fb9f67181cf499cad61b7d7791f3, type: 3}
   isPatrol: 0
   skillRange: 6
   skillCooldown: 5
+  skillClip: {fileID: 0}
   jumpHeight: 3
   jumpForwardOffset: 0.3
   canJumpLayer:

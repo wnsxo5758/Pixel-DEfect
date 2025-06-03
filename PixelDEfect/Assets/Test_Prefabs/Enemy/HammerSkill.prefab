@@ -180,6 +180,8 @@ MonoBehaviour:
   targetLayer:
     serializedVersion: 2
     m_Bits: 128
+  attackBoxOffset: {x: 0, y: 4}
+  attackBoxSize: {x: 1.8, y: 8}
   lightingClip: {fileID: 8300000, guid: 6a422d61e998b8f41b02ac3c720e3bbd, type: 3}
   attackClip: {fileID: 8300000, guid: 8738fc40d94464341b70732f7b17c512, type: 3}
 --- !u!61 &6513730565803758014
