@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c57411601dc3d2438c8ea195c9928d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 1
+  damage: 50
   beamTransform: {fileID: 951160498801732487}
   groundLayer:
     serializedVersion: 2
