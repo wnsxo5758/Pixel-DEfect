@@ -95,6 +95,12 @@ public class WrenchBT : ManaBT
         isAttacking = true;
         blackboard.SetValue("IsAttacking", true);
 
+        //공격 상태 설정 (스킬 사용시 공격도 초기화)
+        canAttack = false;
+        attackTimer = 0f;
+        blackboard.SetValue("CanAttack", false);
+
+
         return NodeState.Running;
     }
 
