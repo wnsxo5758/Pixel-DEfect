@@ -22,6 +22,7 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int isHealing = Animator.StringToHash("isHealing");
     private readonly int manaDrain = Animator.StringToHash("ManaDrain");
     private readonly int hit = Animator.StringToHash("Hit");
+    private readonly int skillAcquisition = Animator.StringToHash("SkillAcquisition");
     
     // 무기 뽑기 애니메이션
     private readonly int pullGround = Animator.StringToHash("PullGround");
@@ -40,6 +41,8 @@ public class PlayerAnimator : MonoBehaviour
     private readonly int deathPress = Animator.StringToHash("DeathPress");
     private readonly int deathLaser = Animator.StringToHash("DeathLaser");
     private readonly int deathDrown = Animator.StringToHash("DeathDrown");
+    private readonly int deathHammer = Animator.StringToHash("DeathHammer");
+    private readonly int deathHammerSkill = Animator.StringToHash("DeathHammerSkill");
 
     private Animator animator; // 애니메이션 
     private PlayerController controller;
@@ -52,7 +55,6 @@ public class PlayerAnimator : MonoBehaviour
     
     // 상태 추적
     private bool isPlayingClimbingAnimation = false;
-    private bool isPlayingPullAnimation = false;
     private bool isPlayingTeleportAnimation = false;
 
     private DeathData currentDeathData;
@@ -170,6 +172,14 @@ public class PlayerAnimator : MonoBehaviour
         }
     }
 
+    public void SetSkillAcquisitionAnim(bool isSkillAcquisition)
+    {
+        if (animator != null)
+        {
+            animator.SetBool(skillAcquisition, isSkillAcquisition);
+        }
+    }
+    
     public void SetHasWeapon(bool weapon)
     {
         animator.SetBool(hasWeapon, weapon);
@@ -351,6 +361,14 @@ public class PlayerAnimator : MonoBehaviour
                 animator.SetTrigger(deathDrown);
                 break;
             
+            case DeathCause.Hammer:
+                animator.SetTrigger(deathHammer);
+                break;
+            
+            case DeathCause.HammerSkill:
+                animator.SetTrigger(deathHammerSkill);
+                break;
+            
             case DeathCause.Fall:
             case DeathCause.Environmental:
             default:
@@ -385,6 +403,8 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool(turnValve, false);
         animator.SetBool(afterPull, false);
         animator.SetBool(isHealing, false);
+        animator.SetBool(manaDrain, false);
+        animator.SetBool(skillAcquisition, false);
         
         animator.ResetTrigger(jump);
         animator.ResetTrigger(roll);
@@ -392,14 +412,12 @@ public class PlayerAnimator : MonoBehaviour
         animator.ResetTrigger(attack);
         animator.ResetTrigger(throwWeapon);
         animator.ResetTrigger(hit);
-        animator.ResetTrigger(death);
         
         ResetPullAnimationTriggers();
         ResetTeleportAnimationTriggers();
         ResetAllDeathTrigger();
         
         isPlayingClimbingAnimation = false;
-        isPlayingPullAnimation = false;
         isPlayingTeleportAnimation = false;
         
         animator.SetTrigger(revive);

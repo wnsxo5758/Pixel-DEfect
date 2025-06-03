@@ -217,7 +217,7 @@ public class HammerBT : ManaBT
             PlayerHp hp = hitPlayer.GetComponent<PlayerHp>();
             if (hp != null)
             {
-                DeathData deathData = new DeathData(DeathCause.MeleeAttack, dir);
+                DeathData deathData = new DeathData(DeathCause.Hammer, dir);
                 hp.DecreaseHp(attackDamage, deathData,true, true);
             }
         }

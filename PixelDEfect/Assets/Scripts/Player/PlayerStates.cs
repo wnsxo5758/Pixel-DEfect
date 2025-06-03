@@ -983,6 +983,52 @@ namespace PlayerStates
             player.ChangeState(new Idle());
         }
     }
+
+    public class SkillAcquisition : State<PlayerController>
+    {
+        private PlayerAnimator animator;
+        private MovementRigidbody2D movement;
+        private float acquisitionDuration;
+        private float timer;
+
+        private bool animationStarted;
+        
+        public override void Enter(PlayerController player)
+        {
+            animator = player.GetComponentInChildren<PlayerAnimator>();
+            movement = player.GetComponent<MovementRigidbody2D>();
+
+            timer = 0f;
+            acquisitionDuration = 2f;
+            
+            player.UpdateMove(0);
+
+            if (animator != null)
+            {
+                animator.SetSkillAcquisitionAnim(true);
+                animationStarted = true;
+            }
+        }
+
+        public override void Execute(PlayerController player)
+        {
+            timer += Time.deltaTime;
+
+            if (timer >= acquisitionDuration)
+            {
+                player.ChangeState(new Idle());
+            }
+        }
+
+        public override void Exit(PlayerController player)
+        {
+            if (animator != null && animationStarted)
+            {
+                animator.SetSkillAcquisitionAnim(false);
+                animationStarted = false;
+            }
+        }
+    }
     
     public class Hit : State<PlayerController>
     {

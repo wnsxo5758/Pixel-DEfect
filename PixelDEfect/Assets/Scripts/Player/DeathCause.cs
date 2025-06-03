@@ -9,5 +9,7 @@ public enum DeathCause
     Laser = 4,
     Drowning = 5,
     Fall = 6,
-    Environmental = 7
+    Environmental = 7,
+    Hammer = 8,
+    HammerSkill = 9
 }

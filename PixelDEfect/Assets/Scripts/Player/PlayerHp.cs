@@ -128,10 +128,8 @@ public class PlayerHp : MonoBehaviour
     private void HandleHit(Vector2 knockBack)
     {
         var currentState = player.GetCurrentState();
-        bool isSpecialState = currentState is PlayerStates.Climb or PlayerStates.Hold or
-            PlayerStates.Valve or PlayerStates.VendingMachineHeal or PlayerStates.Attack or 
-            PlayerStates.PullWeaponGround or PlayerStates.PullWeaponAir or 
-            PlayerStates.TeleportStart or PlayerStates.TeleportEnd;
+        bool isSpecialState = currentState is not PlayerStates.Idle and not PlayerStates.Run 
+            and not PlayerStates.Jump and not PlayerStates.Crawl;
         
         // 경직 시간 설정
         currentHitStunDuration = isSpecialState ? specialStunDuration : hitStunDuration;
@@ -145,7 +143,7 @@ public class PlayerHp : MonoBehaviour
         }
         
         // 피격 효과
-        OnInvincibility(1.5f);
+        OnInvincibility(2f);
         
         // 상태 전환 또는 경직 처리
         if (isSpecialState)
@@ -225,14 +223,6 @@ public class PlayerHp : MonoBehaviour
     {
         switch (currentDeathData.cause)
         {
-            case DeathCause.MeleeAttack:
-            case DeathCause.RangedAttack:
-            case DeathCause.Laser:
-                rb.velocity = Vector2.zero;
-                rb.angularVelocity = 0f;
-                rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
-                break;
-            
             case DeathCause.Press:
                 rb.velocity = Vector2.zero;
                 rb.angularVelocity = 0f;
@@ -244,6 +234,7 @@ public class PlayerHp : MonoBehaviour
                 break;
             
             default:
+                rb.velocity = Vector2.zero;
                 rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
                 break;
         }

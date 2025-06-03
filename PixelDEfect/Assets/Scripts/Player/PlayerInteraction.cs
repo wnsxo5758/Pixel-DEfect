@@ -591,6 +591,12 @@ public class PlayerInteraction : MonoBehaviour
             // 토큰 획득 처리
             currentSkillToken.OnTokenAcquired();
             
+            PlayerController controller = GetComponent<PlayerController>();
+            if (controller != null)
+            {
+                controller.ChangeState(new PlayerStates.SkillAcquisition());
+            }
+            
             // 현재 토큰 참조 제거
             currentSkillToken = null;
         }
