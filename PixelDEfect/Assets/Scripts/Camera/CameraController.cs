@@ -51,17 +51,24 @@ public class CameraController : MonoBehaviour
             return;
         }
 
+        if (target == null)
+        {
+            target = GameObject.FindGameObjectWithTag("Player").transform;
+        }
+    }
+
+    private void Start()
+    {
         initialZ = transform.position.z;
-        
         targetPosition = transform.position;
         shakeOffset = Vector3.zero;
-
+        
         if (target != null)
         {
             offsetY = Mathf.Abs(transform.position.y - target.position.y);
         }
+        Debug.Log("Camera Controller Begin");
     }
-
     private void LateUpdate()
     {
         // 추적 계산

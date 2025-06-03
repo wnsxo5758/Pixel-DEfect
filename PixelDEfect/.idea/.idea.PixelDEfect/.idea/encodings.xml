@@ -3,6 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Bullet/BulletBase.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Camera/CameraFollowTarget.cs" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Assets/Scripts/CutScene/CinemachinShake.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Enemy/EnemyAnimator.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Enemy/EnemyFSM.cs" charset="EUC-KR" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/Enemy/EnemyMemoryPool.cs" charset="EUC-KR" />

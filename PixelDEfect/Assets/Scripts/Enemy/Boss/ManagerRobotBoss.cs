@@ -53,8 +53,12 @@ public class ManagerRobotBoss : BossBT
     [SerializeField] private float remainsColliderHeight = 2.5f;  // 잔해 콜라이더 높이
     [SerializeField] private Vector2 remainsColliderOffset = new Vector2(0.5f, -1.75f);
     
+    [Header("카메라 설정")]
+    [SerializeField] private CinemachinShake cineachinShake;
+    
     // 사망 잔해 관련 변수
     private bool hasTransformedToRemains = false;
+    private bool deathEventSent = false;
     
     // 마나 드레인 관련 변수
     private GameObject activeManaCollider;
@@ -762,12 +766,17 @@ public class ManagerRobotBoss : BossBT
             {
                 Vector2 knockBackDirection = new Vector2(direction * knockBackForce, 4 * knockBackForce);
                 DeathData deathData = new DeathData(DeathCause.MeleeAttack, GetDirection());
-                playerHp.DecreaseHp(basicAttackDamage, knockBackDirection, deathData,true);
+                playerHp.DecreaseHp(basicAttackDamage, knockBackDirection, deathData,true, true);
                 
                 // 카메라 효과
                 if (CameraController.Instance != null)
                 {
                     CameraController.Instance.ShakeScreen(0.3f, 0.2f, 0.1f);
+                }
+
+                if (cineachinShake != null)
+                {
+                    cineachinShake.ShakeScreen(0.3f, 0.2f, 0.1f);
                 }
             }
         }
@@ -840,6 +849,11 @@ public class ManagerRobotBoss : BossBT
             {
                 CameraController.Instance.ShakeScreen(0.2f, 0.15f, 0.1f);
             }
+            
+            if (cineachinShake != null)
+            {
+                cineachinShake.ShakeScreen(0.3f, 0.2f, 0.1f);
+            }
         }
     }
     
@@ -879,13 +893,18 @@ public class ManagerRobotBoss : BossBT
 
             DeathData deathData = new DeathData(DeathCause.MeleeAttack, GetDirection());
             // 데미지 적용
-            playerHp.DecreaseHp(headbuttDamage, knockBackDirection, deathData,true);
+            playerHp.DecreaseHp(headbuttDamage, knockBackDirection, deathData,true, true);
         }
         
         // 카메라 효과
         if (CameraController.Instance != null)
         {
             CameraController.Instance.ShakeScreen(0.3f, 0.2f, 0.1f);
+        }
+        
+        if (cineachinShake != null)
+        {
+            cineachinShake.ShakeScreen(0.3f, 0.2f, 0.1f);
         }
     }
     
@@ -1377,6 +1396,13 @@ public class ManagerRobotBoss : BossBT
         
         isDeathProcessed = true;
         
+        // 사망 이벤트 발생
+        if (!deathEventSent)
+        {
+            BossEvents.BossDefeated(this);
+            deathEventSent = true;
+        }
+        
         // 움직임 멈춤
         if (movement != null)
         {
@@ -1444,6 +1470,8 @@ public class ManagerRobotBoss : BossBT
             remainsCollider.gameObject.layer = LayerMask.NameToLayer("Ground");
         }
         
+        BossEvents.BossTransformedToRemains(this);
+        
         // 스킬 토큰 생성
         SpawnSkillToken();
 
@@ -1482,6 +1510,14 @@ public class ManagerRobotBoss : BossBT
             Vector2 attackPos = (Vector2)attackPoint.position +
                                 new Vector2(attackHitBoxOffset.x * direction, attackHitBoxOffset.y);
             Gizmos.DrawWireCube(attackPos, attackHitBoxSize);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (this != null)
+        {
+            BossEvents.ClearAllEvents();
         }
     }
 }
