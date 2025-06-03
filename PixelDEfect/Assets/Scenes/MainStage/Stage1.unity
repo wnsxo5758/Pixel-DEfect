@@ -13280,7 +13280,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: ceilingHeight
-      value: 17
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: ascentDuration
