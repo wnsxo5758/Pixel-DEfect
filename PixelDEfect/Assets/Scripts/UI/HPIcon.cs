@@ -21,12 +21,6 @@ public class HPIcon : MonoBehaviour
         currentHP = _currentHP;
         SetHPAnim();
     }
-    public void SetState(int damage) 
-    {
-        currentHP -= damage;
-        SetHPAnim();
-    }
-
     private void SetHPAnim()
     {
         animator.SetInteger("currentHP", currentHP);

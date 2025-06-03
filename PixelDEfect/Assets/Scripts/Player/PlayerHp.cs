@@ -252,6 +252,7 @@ public class PlayerHp : MonoBehaviour
         
         // 무적 상태 설정
         uiPlayer.ResetDeathUI();
+        uiPlayer.SetHpAll(currentHp);
     }
 
     public void TakeFallDamage(int damage)
@@ -297,7 +298,7 @@ public class PlayerHp : MonoBehaviour
         OnHpChanged?.Invoke(currentHp, maxHp);
         
         Debug.Log($"체력 회복: {actualHealed} (현재: {currentHp}/{maxHp})");
-        
+        uiPlayer.SetHpAll(currentHp);
         return actualHealed;
     }
 
