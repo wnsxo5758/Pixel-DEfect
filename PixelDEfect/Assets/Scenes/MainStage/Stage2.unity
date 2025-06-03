@@ -85106,7 +85106,7 @@ PlayableDirector:
   - key: {fileID: -8657270286649102022, guid: 28c25c40c20846b409675ea19b9f82c9, type: 2}
     value: {fileID: 1460099185}
   - key: {fileID: 8721164063687753795, guid: 28c25c40c20846b409675ea19b9f82c9, type: 2}
-    value: {fileID: 0}
+    value: {fileID: 1303569821}
   - key: {fileID: -6027985459082983918, guid: 28c25c40c20846b409675ea19b9f82c9, type: 2}
     value: {fileID: 1460099186}
   - key: {fileID: -699856622490351228, guid: 28c25c40c20846b409675ea19b9f82c9, type: 2}
@@ -90703,7 +90703,8 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4407298093497388515, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 5592127285762298269, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
@@ -90713,6 +90714,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8759166575710960654, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1303569820}
+    - targetCorrespondingSourceObject: {fileID: 8759166575710960654, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1303569821}
   m_SourcePrefab: {fileID: 100100000, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
 --- !u!1 &1303569816 stripped
 GameObject:
@@ -90724,6 +90728,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5592127285762298269, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
   m_PrefabInstance: {fileID: 1303569815}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1303569818 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1164060511515411491, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
+  m_PrefabInstance: {fileID: 1303569815}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303569816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffa031d7cf683ea4b9243375eaa48371, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &1303569820
 Animator:
   serializedVersion: 5
@@ -90745,6 +90760,126 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1303569821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303569816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: 299cd44e5ddaa2740a1c6ff9836502e6, type: 2}
+    - {fileID: 11400000, guid: 2c782c0d50bd4294db71ead0f22a96fb, type: 2}
+    - {fileID: 11400000, guid: 81cdc830843742f478ae104f28dead55, type: 2}
+    - {fileID: 11400000, guid: 6246dc3de2138c148b68f2babee752cd, type: 2}
+    - {fileID: 11400000, guid: 1e7b8049de0ae6d4faa384fabf37b17f, type: 2}
+    - {fileID: 11400000, guid: 24e6ed2092a013140b8195ea3f2d6237, type: 2}
+    - {fileID: 11400000, guid: 42db24dc19b597d41a3ce7ac17d59bf4, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1303569818}
+          m_TargetAssemblyTypeName: DialogueTrigger, Assembly-CSharp
+          m_MethodName: ShowTimelineLine
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1303569818}
+          m_TargetAssemblyTypeName: DialogueTrigger, Assembly-CSharp
+          m_MethodName: ShowTimelineLine
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 1
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1303569818}
+          m_TargetAssemblyTypeName: DialogueTrigger, Assembly-CSharp
+          m_MethodName: ShowTimelineLine
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 2
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1303569818}
+          m_TargetAssemblyTypeName: DialogueTrigger, Assembly-CSharp
+          m_MethodName: ShowTimelineLine
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 3
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1303569818}
+          m_TargetAssemblyTypeName: DialogueTrigger, Assembly-CSharp
+          m_MethodName: ShowTimelineLine
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 4
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1303569818}
+          m_TargetAssemblyTypeName: DialogueTrigger, Assembly-CSharp
+          m_MethodName: ShowTimelineLine
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 5
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1303569818}
+          m_TargetAssemblyTypeName: DialogueTrigger, Assembly-CSharp
+          m_MethodName: ShowTimelineLine
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 6
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1308061463
 GameObject:
   m_ObjectHideFlags: 0
@@ -273345,7 +273480,7 @@ Camera:
   far clip plane: 1000
   field of view: 40
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 3.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -273370,7 +273505,7 @@ Transform:
   m_GameObject: {fileID: 1887191830}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7, z: -12}
+  m_LocalPosition: {x: 195, y: 38, z: -11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
