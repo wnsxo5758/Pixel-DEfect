@@ -24,11 +24,14 @@ public class FadeUIController : MonoBehaviour
     private AudioClip uiAppearSound;
     [SerializeField]
     private AudioClip ev2Sound;
+    [SerializeField]
+    private AudioClip ev2ArriveClip;
 
     AudioSource audioSource;
 
     private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
         // 초기 상태 설정
         if (blackScreen != null)
         {
@@ -47,6 +50,7 @@ public class FadeUIController : MonoBehaviour
     private void Start()
     {
         StartCoroutine(FadeSequence());
+        PlaySound(ev2Sound);
     }
 
     private IEnumerator FadeSequence()
@@ -57,6 +61,7 @@ public class FadeUIController : MonoBehaviour
         // 2. 대기
         yield return new WaitForSeconds(holdDuration);
 
+        PlaySound(ev2ArriveClip);
         // 3. 페이드 아웃: 다시 어두워짐
         yield return StartCoroutine(Fade(0f, 1f, fadeOutDuration));
 
@@ -69,7 +74,7 @@ public class FadeUIController : MonoBehaviour
         // 5. 효과음 재생
         if (audioSource != null && uiAppearSound != null)
         {
-            audioSource.PlayOneShot(uiAppearSound);
+            PlaySound(uiAppearSound);
         }
     }
 
@@ -89,5 +94,16 @@ public class FadeUIController : MonoBehaviour
 
         c.a = toAlpha;
         blackScreen.color = c;
+    }
+
+    public void LoopSound(AudioClip _clip)
+    {
+
+    }
+    public void PlaySound(AudioClip _clip)
+    {
+        audioSource.Stop();
+        audioSource.clip = _clip;
+        audioSource.Play();
     }
 }

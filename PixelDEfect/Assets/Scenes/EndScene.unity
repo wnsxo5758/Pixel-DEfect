@@ -617,8 +617,9 @@ MonoBehaviour:
   fadeInDuration: 1
   holdDuration: 1
   fadeOutDuration: 1
-  uiAppearSound: {fileID: 0}
-  ev2Sound: {fileID: 0}
+  uiAppearSound: {fileID: 8300000, guid: 4edca5001ba4d594fb626d57f0fa2b0c, type: 3}
+  ev2Sound: {fileID: 8300000, guid: 9a84a691dac931e45a24873e1ec0c7b6, type: 3}
+  ev2ArriveClip: {fileID: 8300000, guid: 75c33730504c34148b766ffa66a1916f, type: 3}
 --- !u!82 &1188211915
 AudioSource:
   m_ObjectHideFlags: 0
