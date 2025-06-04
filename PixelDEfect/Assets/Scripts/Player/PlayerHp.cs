@@ -230,7 +230,9 @@ public class PlayerHp : MonoBehaviour
                 break;
             
             case DeathCause.Drowning:
-                rb.gravityScale = 0.2f;
+            case DeathCause.Fall:
+                rb.velocity = Vector2.zero;
+                rb.isKinematic = true;
                 break;
             
             default:
@@ -255,10 +257,10 @@ public class PlayerHp : MonoBehaviour
         uiPlayer.SetHpAll(currentHp);
     }
 
-    public void TakeFallDamage(int damage)
+    public void TakeFallDamage(int damage, bool water)
     {
-        currentHp -= damage;
-        currentHp = Mathf.Max(0, currentHp);
+        DeathData deathData = water ? new DeathData(DeathCause.Drowning) : new DeathData(DeathCause.Fall);
+        DecreaseHp(damage, deathData);
         
         if (uiPlayer != null)
         {

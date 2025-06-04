@@ -7,6 +7,7 @@ public class FallZone : MonoBehaviour
     [Header("낙사 설정")] 
     [SerializeField] private int fallDamage = 1;
     [SerializeField] private float teleportDelay = 0.5f;
+    [SerializeField] private bool water = false;
 
     private bool isProcessingFall = false;
 
@@ -34,7 +35,7 @@ public class FallZone : MonoBehaviour
 
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.ProcessPlayerFall(fallDamage);
+            GameManager.Instance.ProcessPlayerFall(fallDamage, water);
         }
 
         isProcessingFall = false;

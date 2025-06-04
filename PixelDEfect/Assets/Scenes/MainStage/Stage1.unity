@@ -329,7 +329,7 @@ Camera:
   far clip plane: 1000
   field of view: 40
   orthographic: 1
-  orthographic size: 11
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -717,9 +717,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1396420266}
-    - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1396420264}
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1396420265}
@@ -6187,6 +6184,10 @@ PrefabInstance:
       propertyPath: m_Offset.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6442523102907526128, guid: 5b8a5c8569f22a540b6bdfa8330fc5e9, type: 3}
+      propertyPath: water
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7075142655485641614, guid: 5b8a5c8569f22a540b6bdfa8330fc5e9, type: 3}
       propertyPath: m_Name
       value: Fall_Zone (1)
@@ -9387,9 +9388,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1773300595}
-    - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1773300593}
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1773300594}
@@ -230549,9 +230547,6 @@ PrefabInstance:
       addedObject: {fileID: 1487644657}
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1487644655}
-    - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1487644656}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
 --- !u!1 &858010449 stripped
@@ -395038,22 +395033,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -2253911629886400664, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
   m_PrefabInstance: {fileID: 15331724}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1396420264
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1396420263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4b361046c284a1409adafa61eda3201, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isInstantDeath: 1
-  continuousDamage: 0
-  damage: 1
-  canDestory: 0
 --- !u!253 &1396420265
 BuoyancyEffector2D:
   m_ObjectHideFlags: 0
@@ -397512,22 +397491,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7878350319992209165, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
   m_PrefabInstance: {fileID: 834338093}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1487644655
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 650890494}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4b361046c284a1409adafa61eda3201, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isInstantDeath: 1
-  continuousDamage: 0
-  damage: 1
-  canDestory: 0
 --- !u!253 &1487644656
 BuoyancyEffector2D:
   m_ObjectHideFlags: 0
@@ -404305,22 +404268,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7878350319992209165, guid: b2981919eb6650a43a4bbe4dfd501650, type: 3}
   m_PrefabInstance: {fileID: 407194751}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1773300593
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2976655}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4b361046c284a1409adafa61eda3201, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isInstantDeath: 1
-  continuousDamage: 0
-  damage: 1
-  canDestory: 0
 --- !u!253 &1773300594
 BuoyancyEffector2D:
   m_ObjectHideFlags: 0
