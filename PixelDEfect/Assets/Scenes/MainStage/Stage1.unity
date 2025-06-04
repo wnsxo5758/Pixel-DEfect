@@ -279,6 +279,7 @@ GameObject:
   - component: {fileID: 14909949}
   - component: {fileID: 14909951}
   - component: {fileID: 14909950}
+  - component: {fileID: 14909952}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -622,6 +623,27 @@ MonoBehaviour:
   defaultShakeDuration: 0.35
   defaultShakeMagnitude: 1
   defaultShakeFadeTime: 0.2
+--- !u!95 &14909952
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14909939}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &15331724
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -392023,7 +392045,7 @@ MonoBehaviour:
   m_Follow: {fileID: 1305578309}
   m_Lens:
     FieldOfView: 40
-    OrthographicSize: 11
+    OrthographicSize: 10.6
     NearClipPlane: 0.1
     FarClipPlane: 5000
     Dutch: 0
@@ -406673,12 +406695,8 @@ PlayableDirector:
     value: {fileID: 1583508670}
   - key: {fileID: -1729954307454254343, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
     value: {fileID: 1583508682}
-  - key: {fileID: -3810737857458836406, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
-    value: {fileID: 14909944}
   - key: {fileID: 8580010267725441853, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
     value: {fileID: 147196047}
-  - key: {fileID: 3773588431841370794, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
-    value: {fileID: 500275936}
   - key: {fileID: -3565179924919691761, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
     value: {fileID: 605426695}
   - key: {fileID: -3416904219382047390, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
@@ -406695,10 +406713,6 @@ PlayableDirector:
     value: {fileID: 605426705}
   - key: {fileID: -6660199574886380738, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
     value: {fileID: 696446016}
-  - key: {fileID: 3161658714620053432, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
-    value: {fileID: 936962300}
-  - key: {fileID: 2583922385003751503, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
-    value: {fileID: 500275939}
   - key: {fileID: -462254733695570120, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
     value: {fileID: 14909950}
   - key: {fileID: -7380459318076779351, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
@@ -406717,13 +406731,25 @@ PlayableDirector:
     value: {fileID: 810942409}
   - key: {fileID: -2985950578129146105, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
     value: {fileID: 32794348}
+  - key: {fileID: 4898071068959707731, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
+    value: {fileID: 14909944}
+  - key: {fileID: -5962132531430306644, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
+    value: {fileID: 14909952}
+  - key: {fileID: 3398675442913567354, guid: 6a914a36a8af48a45a9037b64f6a55b4, type: 2}
+    value: {fileID: 14909952}
   m_ExposedReferences:
     m_References:
+    - c10b24565b7986a48a1826e3df3289fe: {fileID: 1224895801}
     - 7896d8a3c4a46b64a96c1bb2251e5a2f: {fileID: 936962298}
     - 4441b672aa3b70f4f8d59a53e4212d41: {fileID: 500275937}
     - bf4f000bd5d44684abb6f2c585f8220b: {fileID: 936962298}
     - 47cf8e5ff615e30428f0787b4d7d099a: {fileID: 1224895801}
     - 16c873e1a886cfe4389917e577de9f91: {fileID: 14909945}
+    - 627e4b4855966eb4798f9b7cbac0bd2b: {fileID: 500275937}
+    - 7c7bbb1c88947fb449733955ec37714b: {fileID: 14909945}
+    - b704fc482a0b420489e1ad201ff73ee6: {fileID: 14909945}
+    - 7ba38eeb31571d042a542f74c6a8f3ca: {fileID: 936962298}
+    - 092efa3db06dd7a4b83c1f27ad21b2c1: {fileID: 936962298}
 --- !u!4 &1866122773
 Transform:
   m_ObjectHideFlags: 0
