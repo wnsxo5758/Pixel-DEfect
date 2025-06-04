@@ -69,6 +69,8 @@ MonoBehaviour:
     waitAfterLine: 2
   - line: "\uADF8\uB798\uC11C \uC774\uAC8C \uB3C4\uB300\uCCB4 \uBB54\uB370"
     waitAfterLine: 2
+  - line: "\uC544\uB2C8 \uBA39\uC744 \uC2DC\uAC04\uC740 \uC918\uC57C\uC9C0"
+    waitAfterLine: 1.5
   - line: "\uC9C4\uC9DC \uBD88\uCE5C\uC808\uD558\uB124"
     waitAfterLine: 1.5
   - line: "\uB10C \uAE30\uB7EC\uAE30 \uC544\uBE60\uB294 \uBABB \uB418\uACA0\uB2E4"
