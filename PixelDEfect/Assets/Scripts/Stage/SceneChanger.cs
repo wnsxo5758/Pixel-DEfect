@@ -11,7 +11,9 @@ public class SceneChanger : MonoBehaviour
     [SerializeField] private bool savePlayerState = true;   // 플레이어 상태 저장 여부
 
     private bool isTransitioning = false;
-    
+
+    [SerializeField] private GameObject loadingPanel;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag(targetTag) && !isTransitioning)
@@ -35,7 +37,8 @@ public class SceneChanger : MonoBehaviour
         {
             TimeManager.Instance.ResumeTime();
         }
-        
+        if (loadingPanel != null)
+            loadingPanel.SetActive(true);
         yield return new WaitForSeconds(transitionDelay);
         
         // 씬 로드
