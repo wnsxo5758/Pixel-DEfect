@@ -2446,6 +2446,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6707067970547556332, guid: 347d57023cfebeb4189e5b6018933e53, type: 3}
+      propertyPath: timeManager
+      value: 
+      objectReference: {fileID: 663328291}
     - target: {fileID: 8790695981574342116, guid: 347d57023cfebeb4189e5b6018933e53, type: 3}
       propertyPath: m_Name
       value: PlayerData
@@ -12424,6 +12428,17 @@ Transform:
   - {fileID: 1780388677}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &663328291 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2029315015898106650, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+  m_PrefabInstance: {fileID: 2131942394}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee6acb31f9db54c41936bf2ebc7e1ad5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &667597945
 GameObject:
   m_ObjectHideFlags: 0
@@ -91628,6 +91643,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5592127285762298269, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5783198869496049011, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
+      propertyPath: enableDeveloperDebug
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8312166533425255970, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
@@ -277204,8 +277223,36 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 295999795}
     - target: {fileID: 6313230333829793806, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: debug
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6313230333829793806, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
       propertyPath: allSkills.Array.size
-      value: 0
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6313230333829793806, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: allSkills.Array.data[0].skillName
+      value: "\uC21C\uAC04\uC774\uB3D9"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6313230333829793806, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: allSkills.Array.data[0].skillType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6313230333829793806, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: allSkills.Array.data[1].skillName
+      value: "\uC2DC\uAC04\uC815\uC9C0"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6313230333829793806, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: allSkills.Array.data[1].skillType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6313230333829793806, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: allSkills.Array.data[0].isUnlocked
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6313230333829793806, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: allSkills.Array.data[1].isUnlocked
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8051266533097063498, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
       propertyPath: m_LocalPosition.x

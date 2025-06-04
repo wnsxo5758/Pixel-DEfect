@@ -7,6 +7,7 @@ public class SkillManager : MonoBehaviour
 
     [Header("스킬 설정")] 
     [SerializeField] private SkillData[] allSkills;
+    [SerializeField] private bool debug = false;
 
     [Header("스킬 획득 UI")] 
     [SerializeField] private GameObject skillAcquiredUI;
@@ -22,7 +23,7 @@ public class SkillManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
             InitializeSkills();
         }
         else
@@ -36,11 +37,16 @@ public class SkillManager : MonoBehaviour
         // 기본 스킬 데이터 초기화
         if (allSkills == null || allSkills.Length == 0)
         {
-            allSkills = new SkillData[]
+            allSkills = new[]
             {
                 new SkillData(SkillType.Teleport, "순간이동", "던진 무기의 위치로 순간이동할 수 있습니다."),
                 new SkillData(SkillType.TimeStop, "시간 정지", "짧은 시간 동안 시간을 정지시킬 수 있습니다.")
             };
+        }
+        else if (debug)
+        {
+            UnlockSkill(SkillType.Teleport);
+            UnlockSkill(SkillType.TimeStop);
         }
     }
     

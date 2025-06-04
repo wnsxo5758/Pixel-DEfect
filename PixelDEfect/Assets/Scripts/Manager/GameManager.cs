@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                DontDestroyOnLoad(gameObject);
+                // DontDestroyOnLoad(gameObject);
                 if (debugMode)
                     Debug.Log("GameManager: DontDestroyOnLoad 적용");
             }

@@ -6,7 +6,6 @@ public class BossHealthUI : MonoBehaviour
 {
     [Header("UI 컴포넌트")]
     [SerializeField] private Slider hpSlider;
-
     [SerializeField] private TextMeshProUGUI bossText;
     [SerializeField] private TextMeshProUGUI hpText;
     [SerializeField] private GameObject stunCountIndicator;
@@ -72,7 +71,6 @@ public class BossHealthUI : MonoBehaviour
     {
         currentBoss = boss;
         gameObject.SetActive(true);
-        
         // 보스 이름 설정
         if (bossText != null)
         {

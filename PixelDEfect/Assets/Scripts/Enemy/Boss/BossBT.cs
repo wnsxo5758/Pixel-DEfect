@@ -601,11 +601,41 @@ public class BossBT : EnemyBT
 
     public override void FreezeTime()
     {
+        isTimeFrozen = true;
         
+        // 물리 객체 정지 
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.Sleep();
+        }
+        
+        // 이동 관련 동작 중지
+        if (movement != null)
+        {
+            movement.MoveTo(0f);
+        }
+
+        if (behaviorTree != null)
+        {
+            behaviorTree.Pause();
+        }
     }
 
     public override void UnfreezeTime()
     {
+        isTimeFrozen = false;
         
+        // 물리 객체 깨우기
+        if (rb != null)
+        {
+            rb.WakeUp();
+        }
+
+        if (behaviorTree != null)
+        {
+            behaviorTree.Resume();
+        }
     }
 }

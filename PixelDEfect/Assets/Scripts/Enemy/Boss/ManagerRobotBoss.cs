@@ -53,6 +53,9 @@ public class ManagerRobotBoss : BossBT
     [SerializeField] private float remainsColliderHeight = 2.5f;  // 잔해 콜라이더 높이
     [SerializeField] private Vector2 remainsColliderOffset = new Vector2(0.5f, -1.75f);
     
+    [Header("UI")]
+    [SerializeField] private GameObject bossUI;
+    
     [Header("카메라 설정")]
     [SerializeField] private CinemachinShake cineachinShake;
     
@@ -174,7 +177,7 @@ public class ManagerRobotBoss : BossBT
 
     protected override void Update()
     {
-        if (hasTransformedToRemains) return;
+        if (hasTransformedToRemains || isTimeFrozen) return;
         
         base.Update();
         

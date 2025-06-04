@@ -49,7 +49,7 @@ public class TimeManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(this);
+            // DontDestroyOnLoad(this);
             
             // 플레이어 찾기 및 이펙트 오브젝트 참조
             FindPlayerAndEffects();

@@ -10,6 +10,7 @@ public class CheckPoint : MonoBehaviour
 
     public bool IsRespawnPoint => respawn;
     public int CheckpointID => checkpointID;
+    public bool IsActivated => isActivated;
     
     private void Start()
     {

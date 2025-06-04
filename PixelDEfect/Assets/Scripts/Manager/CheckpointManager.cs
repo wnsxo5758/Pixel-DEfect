@@ -34,7 +34,7 @@ public class CheckpointManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
 
             respawnPosition = Vector3.zero;
             fallbackPosition = Vector3.zero;
