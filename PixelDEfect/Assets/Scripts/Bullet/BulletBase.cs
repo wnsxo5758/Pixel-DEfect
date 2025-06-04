@@ -68,11 +68,13 @@ public class BulletBase : MonoBehaviour
                 playerHp.DecreaseHp(damage, deathData,true, true);
             }
         }
+        Destroy(this.gameObject);
+        //StartCoroutine(nameof(DestroyBullet));
 
-        if ((hitLayer.value & (1 << collision.gameObject.layer)) > 0)
-        {
-            StartCoroutine(nameof(DestroyBullet));
-        }
+        //if ((hitLayer.value & (1 << collision.gameObject.layer)) > 0)
+        //{
+        //    StartCoroutine(nameof(DestroyBullet));
+        //}
     }
 
     //ÃÑ¾Ë ºñÈ°¼ºÈ­(Destroy ¾Æ´Ô)
@@ -81,7 +83,8 @@ public class BulletBase : MonoBehaviour
         GetComponent<Collider2D>().enabled = false;
 
         PlaySound(hitSound);
-        memoryPool.DeactivatePoolItems(gameObject);
+        Destroy(gameObject);
+        //memoryPool.DeactivatePoolItems(gameObject);
         yield return null;
     }
 
