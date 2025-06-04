@@ -3263,6 +3263,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BossUI
       objectReference: {fileID: 0}
+    - target: {fileID: 2546148282209289948, guid: 60d302fcd6e17694999e37a5123f3ab3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2683095863885332197, guid: 60d302fcd6e17694999e37a5123f3ab3, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -3345,7 +3349,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6782258745832110704, guid: 60d302fcd6e17694999e37a5123f3ab3, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -412198,6 +412202,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5783198869496049011, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
+      propertyPath: enableDeveloperDebug
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8312166533425255970, guid: 6313fbf68f9067b47ac03a74faf7acd4, type: 3}
       propertyPath: uiPlayer
       value: 
@@ -415244,7 +415252,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1692155088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -512549,6 +512557,14 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1305578309}
+    - target: {fileID: 1447637741753454058, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: positions.Array.data[1].x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 1447637741753454058, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: positions.Array.data[1].y
+      value: -25
+      objectReference: {fileID: 0}
     - target: {fileID: 2029315015898106650, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
       propertyPath: skillCoolUI
       value: 
