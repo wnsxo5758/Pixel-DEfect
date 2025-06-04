@@ -13,7 +13,7 @@ public class EnemyTimeAffected : TimeAffectedEntity
     private Vector2 originalVelocity;
     private float originalAngularVelocity;
     private float originalAnimatorSpeed;
-
+    
     private void Awake()
     {
         enemyBehavior = GetComponent<EnemyBT>();
@@ -34,6 +34,7 @@ public class EnemyTimeAffected : TimeAffectedEntity
             rb.angularVelocity = 0f;
             rb.isKinematic = true;
         }
+        
         
         // 애니메이션 정지
         if (animator != null)

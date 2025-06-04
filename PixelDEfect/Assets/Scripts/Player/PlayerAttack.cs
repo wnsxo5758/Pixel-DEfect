@@ -369,7 +369,7 @@ public class PlayerAttack : MonoBehaviour
                 // 공격 방향 계산
                 Vector2 attackDirection = (enemyCollider.transform.position - transform.position).normalized;
                 int damage = currentWeapon.Damage;
-                
+                Debug.Log(TimeManager.Instance.IsTimeFrozen() && timeAffected != null);
                 // 시간이 정지된 상태인지 확인
                 if (TimeManager.Instance.IsTimeFrozen() && timeAffected != null)
                 {

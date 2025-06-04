@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2217178688571010545}
   - component: {fileID: 101884625652215795}
   - component: {fileID: 4704805162367914870}
+  - component: {fileID: 5857022358211321977}
   m_Layer: 8
   m_Name: HammerBot
   m_TagString: Enemy
@@ -204,6 +205,18 @@ MonoBehaviour:
   player: {fileID: 0}
   distanceThreshold: 4
   sentenceDelay: 2
+--- !u!114 &5857022358211321977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094357048903286401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6efeca90de21d498e82715c72f71d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5620285642868650240
 GameObject:
   m_ObjectHideFlags: 0

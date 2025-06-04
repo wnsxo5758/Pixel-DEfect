@@ -42,6 +42,8 @@ public class ScenePortal : MonoBehaviour
         {
             interactionPrompt.SetActive(false);
         }
+
+        targetSceneName = "Stage2";
     }
     
     private void Update()

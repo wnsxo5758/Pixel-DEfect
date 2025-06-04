@@ -336,6 +336,7 @@ GameObject:
   - component: {fileID: 4589220259395401741}
   - component: {fileID: 792792595822403050}
   - component: {fileID: 522185211971339721}
+  - component: {fileID: 263875411847288293}
   m_Layer: 8
   m_Name: WrenchBot
   m_TagString: Enemy
@@ -526,3 +527,15 @@ MonoBehaviour:
   player: {fileID: 0}
   distanceThreshold: 4
   sentenceDelay: 2
+--- !u!114 &263875411847288293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8700790810545068082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6efeca90de21d498e82715c72f71d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
