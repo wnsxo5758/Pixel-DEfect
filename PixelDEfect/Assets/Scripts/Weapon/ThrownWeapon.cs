@@ -26,6 +26,10 @@ public class ThrownWeapon : MonoBehaviour
     private Vector2 playerPositionOnThrow; // 던진 시점의 플레이어 위치
     public LayerMask StickLayers => stickLayers;
 
+    [SerializeField]
+    private AudioClip throwClip;
+    AudioSource audioSource;
+
     private static readonly Vector2[] possibleNormals =
     {
         Vector2.right,
@@ -36,6 +40,7 @@ public class ThrownWeapon : MonoBehaviour
     
     private void Awake()
     {
+        audioSource = GetComponentInChildren<AudioSource>();
         rb = GetComponent<Rigidbody2D>();
         circleCollider = GetComponent<CircleCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -59,7 +64,7 @@ public class ThrownWeapon : MonoBehaviour
         {
             spriteRenderer.sprite = weaponData.GetComponent<SpriteRenderer>().sprite;
             spriteRenderer.flipX = direction.x < 0;
-            
+            PlaySound(throwClip);
             // 콜라이더 크기 설정
             float radius = Mathf.Max(spriteRenderer.bounds.size.x, spriteRenderer.bounds.size.y) * 0.4f;
             circleCollider.radius = radius;
@@ -128,7 +133,7 @@ public class ThrownWeapon : MonoBehaviour
         ContactPoint2D contact = collision.GetContact(0);
         Vector2 impactPoint = contact.point;
         Vector2 impactNormal = contact.normal;
-
+        StopSound();
         // 법선 벡터 저장
         contactNormal = impactNormal;
         
@@ -355,5 +360,16 @@ public class ThrownWeapon : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, 0.1f);
         }
+    }
+
+    public void PlaySound(AudioClip _clip)
+    {
+        audioSource.Stop();
+        audioSource.clip = _clip;
+        audioSource.Play();
+    }
+    public void StopSound()
+    {
+        audioSource.Stop();
     }
 }

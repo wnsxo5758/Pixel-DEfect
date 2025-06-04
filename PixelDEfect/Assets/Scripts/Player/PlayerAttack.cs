@@ -280,7 +280,6 @@ public class PlayerAttack : MonoBehaviour
         // 던지기 애니메이션 재생
         if (playerAnimator != null)
         {
-            playerSound.ThrowAttackSound();
             playerAnimator.TriggerThrowAnim();
         }
         
