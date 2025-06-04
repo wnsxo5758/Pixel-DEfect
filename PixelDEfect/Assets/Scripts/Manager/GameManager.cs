@@ -67,27 +67,24 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ProcessPlayerFall(int fallDamage)
+    public void ProcessPlayerFall(int fallDamage, bool water)
     {
         if (player == null) return;
         
-        StartCoroutine(FallRespawnProcess(fallDamage));
+        StartCoroutine(FallRespawnProcess(fallDamage, water));
     }
 
-    private IEnumerator FallRespawnProcess(int fallDamage)
+    private IEnumerator FallRespawnProcess(int fallDamage, bool water)
     {
         PlayerHp playerHp = player.GetComponent<PlayerHp>();
         if (playerHp != null)
         {
-            playerHp.TakeFallDamage(fallDamage);
+            playerHp.TakeFallDamage(fallDamage, water);
 
             if (playerHp.GetCurrentHp() <= 0)
             {
-                PlayerDied();
                 yield break;
             }
-            
-            playerHp.OnInvincibility(respawnInvulnerabilityTime);
         }
 
         // 낙사 체크포인트로 이동

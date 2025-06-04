@@ -277203,6 +277203,10 @@ PrefabInstance:
       propertyPath: skillCoolUI
       value: 
       objectReference: {fileID: 295999795}
+    - target: {fileID: 6313230333829793806, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
+      propertyPath: allSkills.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8051266533097063498, guid: f9b134f0619588c47b454985afcd7ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.5114064
