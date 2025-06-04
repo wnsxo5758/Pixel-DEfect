@@ -595,8 +595,8 @@ MonoBehaviour:
     m_Events:
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 14909951}
-          m_TargetAssemblyTypeName: CinemachinShake, Assembly-CSharp
+        - m_Target: {fileID: 14909946}
+          m_TargetAssemblyTypeName: CameraController, Assembly-CSharp
           m_MethodName: ShakeScreen
           m_Mode: 1
           m_Arguments:
@@ -13621,7 +13621,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7370528742305282222, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13636,6 +13636,9 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1434134856}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7370528742305282222, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 605426707}
     - targetCorrespondingSourceObject: {fileID: 7370528742305282222, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 605426696}
@@ -13844,6 +13847,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &605426707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 605426695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6efeca90de21d498e82715c72f71d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &609055655
@@ -233765,7 +233780,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6782258745832110704, guid: 60d302fcd6e17694999e37a5123f3ab3, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -406708,6 +406723,7 @@ PlayableDirector:
     - 4441b672aa3b70f4f8d59a53e4212d41: {fileID: 500275937}
     - bf4f000bd5d44684abb6f2c585f8220b: {fileID: 936962298}
     - 47cf8e5ff615e30428f0787b4d7d099a: {fileID: 1224895801}
+    - 16c873e1a886cfe4389917e577de9f91: {fileID: 14909945}
 --- !u!4 &1866122773
 Transform:
   m_ObjectHideFlags: 0
