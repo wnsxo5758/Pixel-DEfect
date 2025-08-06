@@ -16,7 +16,11 @@ public class PlayerHp : MonoBehaviour
     
     [Header("UI")]
     [SerializeField] private UIPlayerData uiPlayer;
-    
+
+    [Header("피 효과")]
+    [SerializeField]
+    private ParticleSystem bloodParticle;
+
     private PlayerController player;
     private PlayerAnimator playerAnimator;
     private SpriteRenderer spriteRenderer; // 피격시 색상 변경을 위한 스프라이트 렌더러
@@ -70,7 +74,7 @@ public class PlayerHp : MonoBehaviour
         if (isInvincible || dodged) return;
         
         currentHp -= damage;
-
+        ShowBoodEffect();
         if (currentHp <= 0)
         {
             Debug.Log("플레이어 사망");
@@ -104,7 +108,7 @@ public class PlayerHp : MonoBehaviour
         if (isInvincible || dodged) return;
         
         currentHp -= damage;
-
+        ShowBoodEffect();
         if (currentHp <= 0)
         {
             Debug.Log("플레이어 사망");
@@ -312,5 +316,13 @@ public class PlayerHp : MonoBehaviour
         currentDeathData = deathData;
         lastDeathCause = deathData.cause;
         Die();
+    }
+
+    private void ShowBoodEffect()
+    {
+        Debug.Log("파티클 실행");
+        bloodParticle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        bloodParticle.Play();
+        bloodParticle.Emit(1);
     }
 }
