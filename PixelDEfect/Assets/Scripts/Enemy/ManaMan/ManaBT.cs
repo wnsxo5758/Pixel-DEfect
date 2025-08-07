@@ -302,6 +302,52 @@ public class ManaBT : EnemyBT
 
         return hit;
     }
+
+
+    protected override void Hit()
+    {
+        // 피격 상태 처리
+        if (isHit)
+        {
+            if(!isPatrol)
+            {
+                isPatrol = true;
+                blackboard.SetValue("IsPatrol", isPatrol);
+            }
+            stunTimer -= Time.deltaTime;
+            blackboard.SetValue("StunTimer", stunTimer);
+
+            if (stunTimer <= 0)
+            {
+                isHit = false;
+                blackboard.SetValue("IsHit", false);
+
+                if (flashCoroutine != null)
+                {
+                    StopCoroutine(flashCoroutine);
+                    flashCoroutine = null;
+                }
+
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = originalColor;
+                }
+            }
+        }
+
+        // 타깃 감지
+        if (!isHit && !isDead)
+        {
+            DetectTarget();
+        }
+
+        // Behavior Tree 평가
+        if (behaviorTree != null)
+        {
+            behaviorTree.Evaluate();
+        }
+    }
+
     protected override NodeState ChaseTarget() // 플레이어 추적
     {
         if (isHit || isDead) return NodeState.Failure;

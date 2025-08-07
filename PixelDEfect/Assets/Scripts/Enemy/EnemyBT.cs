@@ -104,7 +104,12 @@ public class EnemyBT : MonoBehaviour
 
         if (isDeathProcessed) 
             return;
-        
+
+        Hit();
+    }
+    
+    protected virtual void Hit()
+    {
         // 피격 상태 처리
         if (isHit)
         {
@@ -128,20 +133,20 @@ public class EnemyBT : MonoBehaviour
                 }
             }
         }
-        
+
         // 타깃 감지
         if (!isHit && !isDead)
         {
             DetectTarget();
         }
-        
+
         // Behavior Tree 평가
         if (behaviorTree != null)
         {
             behaviorTree.Evaluate();
         }
     }
-    
+
     // 기본 행동 트리 설정
     protected virtual void SetupBaseBehaviorTree()
     {

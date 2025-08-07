@@ -51724,7 +51724,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3818545935961364611, guid: 889cb501e0ff8f7479f88754088dfb39, type: 3}
       propertyPath: isPatrol
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3818545935961364611, guid: 889cb501e0ff8f7479f88754088dfb39, type: 3}
       propertyPath: lightningPrefab
@@ -56677,7 +56677,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7718354453857979170, guid: 420879180bbb55447a9394ecf88a4a41, type: 3}
       propertyPath: isPatrol
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7718354453857979170, guid: 420879180bbb55447a9394ecf88a4a41, type: 3}
       propertyPath: jumpForwardOffset
