@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TimeManager : MonoBehaviour
+public class TimeManager : Singleton<TimeManager>
 {
-    public static TimeManager Instance { get; private set; }
-
 
     [SerializeField]
     private SkillCoolUI skillCoolUI;
@@ -44,20 +42,10 @@ public class TimeManager : MonoBehaviour
     public float TimeFreezeCoolDown => timeFreezeCooldown;
 
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            // DontDestroyOnLoad(this);
-            
-            // 플레이어 찾기 및 이펙트 오브젝트 참조
-            FindPlayerAndEffects();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        base.Awake();
+        FindPlayerAndEffects();
     }
 
     private void Update()

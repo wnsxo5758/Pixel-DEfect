@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CheckpointManager : MonoBehaviour
+public class CheckpointManager : Singleton<CheckpointManager>
 {
-    public static CheckpointManager Instance { get; private set; }
 
     [System.Serializable]
     public class CheckpointData
@@ -28,22 +27,6 @@ public class CheckpointManager : MonoBehaviour
 
     // 플레이어 상태 데이터
     private int savedPlayerHealth;
-    
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            // DontDestroyOnLoad(gameObject);
-
-            respawnPosition = Vector3.zero;
-            fallbackPosition = Vector3.zero;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
     
     // 체크포인트 활성화 및 플레이어 상태 저장
     public void SetRespawnCheckpoint(int id, Vector3 position)

@@ -2,27 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStateManager : MonoBehaviour
-{
-    public static PlayerStateManager Instance { get; private set; }
-
+public class PlayerStateManager : Singleton<PlayerStateManager>
+{ 
     [Header("기본 무기 설정")] 
     [SerializeField] private GameObject defaultWeaponPrefab;
 
     private PlayerStateData playerState;
     private bool isFirstStage = true;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
+        base.Awake();
+        if(Instance != null)
         {
-            Instance = this;
-            // DontDestroyOnLoad(gameObject);
             playerState = new PlayerStateData();
-        }
-        else
-        {
-            Destroy(gameObject);
         }
     }
 

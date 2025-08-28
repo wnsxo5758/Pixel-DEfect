@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkillManager : MonoBehaviour
+public class SkillManager : Singleton<SkillManager>
 {
-    public static SkillManager Instance { get; private set; }
-
     [Header("스킬 설정")] 
     [SerializeField] private SkillData[] allSkills;
     [SerializeField] private bool debug = false;
@@ -18,18 +16,10 @@ public class SkillManager : MonoBehaviour
 
     private HashSet<SkillType> unlockedSkills = new HashSet<SkillType>();
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            // DontDestroyOnLoad(gameObject);
-            InitializeSkills();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        base.Awake();
+        InitializeSkills();
     }
 
     private void InitializeSkills()
