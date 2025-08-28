@@ -58,6 +58,7 @@ public class EnemyBT : MonoBehaviour
     public int MaxHp => maxHp;
     public int CurrentHp => currentHp;
     
+
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
