@@ -32,13 +32,19 @@ public class ManagerRobotBoss : BossBT
     [SerializeField] private float descentDuration = 2f;        // 내려오는 시간
     [SerializeField] private float ceilingHeight = 10f;         // 천장 높이
     [SerializeField] private GameObject[] robotPrefabs;         // 소환할 로봇 프리팹
-    [SerializeField] private int initialRobotCount = 5;         // 초기 소환 로봇 수
-    [SerializeField] private int maxRobotCount = 7;             // 최대 소환 로봇 수
-    [SerializeField] private float minSpawnTime = 5f;           // 소환 최소 간격
-    [SerializeField] private float maxSpawnTime = 10f;          // 소환 최대 간격
     [SerializeField] private bool useDirectPositioning = true;  // 물리 무시하고 직접 위치 설정
     [SerializeField] private Transform ceilingPoint;            // 천장 위치
     [SerializeField] private Transform centerPoint;             // 보스방 중앙 위치 포인트
+
+    [Header("소환 개선")]
+    [SerializeField]
+    private float spawnTime = 3f;
+    [SerializeField]
+    private float currentTime = 0f;
+    [SerializeField]
+    private int maxSpawnCount = 5;
+    [SerializeField]
+    private int currentSpawnCount;
 
     [Header("마나 드레인 설정")] 
     [SerializeField] private GameObject manaColliderPrefab;     // 마나 콜라이더 프리팹
@@ -85,7 +91,7 @@ public class ManagerRobotBoss : BossBT
     // 로봇 소환 패턴 상태 관리
     private enum SummonState { None, MovingToCenter, Ascending, Summoning, Descending, Ending }
     private SummonState currentSummonState = SummonState.None;
-    private float nextRobotSpawnTime;
+
     private bool canSummon = true;
     private List<GameObject> summonedRobots = new List<GameObject>();
     private bool isInvulnerable = false;
@@ -341,32 +347,33 @@ public class ManagerRobotBoss : BossBT
                 if (summonStateTimer >= ascentDuration)
                 {
                     SetSummonState(SummonState.Summoning);
-                    nextRobotSpawnTime = Time.time; // 바로 첫 로봇 소환
                     initialSpawnComplete = false;
                 }
                 break;
             
             case SummonState.Summoning:
+
                 summonStateTimer += Time.deltaTime;
-                
                 // 초기 일괄 소환
                 if (!initialSpawnComplete)
                 {
-                    SpawnInitialRobotBatch();
-                    initialSpawnComplete = true;
-                    
-                    // 다음 추가 소환 시간 설정
-                    nextRobotSpawnTime = Time.time + Random.Range(minSpawnTime, maxSpawnTime);
-                }
-                // 추가 소환
-                else if (Time.time >= nextRobotSpawnTime && summonedRobots.Count < maxRobotCount)
-                {
                     SpawnRobot();
-                    nextRobotSpawnTime = Time.time + Random.Range(minSpawnTime, maxSpawnTime);
+                    initialSpawnComplete = true;
                 }
-                
+                else
+                {
+                    if(currentSpawnCount < maxSpawnCount)
+                    {
+                        currentTime += Time.deltaTime;
+                        if(currentTime >= spawnTime)
+                        {
+                            SpawnRobot();
+                            currentTime = 0f;
+                        }
+                    }
+                }
                 // 패턴 종료 조건 체크
-                if (summonedRobots.Count == 0 && initialSpawnComplete)
+                if (currentSpawnCount == maxSpawnCount && summonedRobots.Count == 0)
                 {
                     SetSummonState(SummonState.Descending);
                     summonStateTimer = 0f;
@@ -395,7 +402,32 @@ public class ManagerRobotBoss : BossBT
         // 소환된 로봇 리스트 정리
         CleanupRobotList();
     }
-    
+
+    // 로봇 소환
+    private void SpawnRobot()
+    {
+        if (robotPrefabs == null || robotPrefabs.Length == 0)
+        {
+            return;
+        }
+        // 랜덤 로봇 선택
+        int randomIndex = Random.Range(0, robotPrefabs.Length);
+        GameObject robotPrefab = robotPrefabs[randomIndex];
+
+        if (robotPrefab == null) return;
+
+        // 소환 위치 계산 (보스 주변)
+        Vector2 spawnPos = CalculateSpawnPosition();
+
+        // 로봇 생성
+        GameObject robot = Instantiate(robotPrefab, spawnPos, Quaternion.identity);
+        currentSpawnCount++;
+        // 리스트에 추가
+        summonedRobots.Add(robot);
+
+    }
+
+
     // 패턴 초기화
     protected override void InitializePhasePatterns()
     {
@@ -1058,59 +1090,6 @@ public class ManagerRobotBoss : BossBT
         }
     }
     
-    // 초기 로봇 일괄 소환 메서드
-    private void SpawnInitialRobotBatch()
-    {
-        // 로봇 프리팹 체크
-        if (robotPrefabs == null || robotPrefabs.Length == 0)
-        {
-            return;
-        }
-        
-        // 초기에 5개 로봇 소환
-        for (int i = 0; i < initialRobotCount; i++)
-        {
-            // 소환 위치 계산 
-            Vector2 spawnPos = CalculateSpawnPosition(i, initialRobotCount);
-            
-            // 랜덤 로봇 선택
-            int randomIndex = Random.Range(0, robotPrefabs.Length);
-            GameObject robotPrefab = robotPrefabs[randomIndex];
-
-            if (robotPrefab == null) continue;
-            
-            // 로봇 생성
-            GameObject robot = Instantiate(robotPrefab, spawnPos, Quaternion.identity);
-            
-            // 리스트에 추가
-            summonedRobots.Add(robot);
-        }
-    }
-    
-    // 로봇 소환
-    private void SpawnRobot()
-    {
-        if (robotPrefabs == null || robotPrefabs.Length == 0)
-        {
-            return;
-        }
-        
-        // 랜덤 로봇 선택
-        int randomIndex = Random.Range(0, robotPrefabs.Length);
-        GameObject robotPrefab = robotPrefabs[randomIndex];
-
-        if (robotPrefab == null) return;
-        
-        // 소환 위치 계산 (보스 주변)
-        Vector2 spawnPos = CalculateSpawnPosition();
-        
-        // 로봇 생성
-        GameObject robot = Instantiate(robotPrefab, spawnPos, Quaternion.identity);
-        
-        // 리스트에 추가
-        summonedRobots.Add(robot);
-        
-    }
 
     private Vector2 CalculateSpawnPosition(int index, int totalCount)
     {

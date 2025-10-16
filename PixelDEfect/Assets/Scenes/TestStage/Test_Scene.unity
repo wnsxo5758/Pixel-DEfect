@@ -54827,6 +54827,18 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 56099412}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: maxSpawnTime
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: minSpawnTime
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: maxRobotCount
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: remainsCollider
       value: 
       objectReference: {fileID: 584288182}
@@ -54834,6 +54846,10 @@ PrefabInstance:
       propertyPath: skillTokenPrefab
       value: 
       objectReference: {fileID: 5719755387888448834, guid: 8a9b7f099eb0cca4586980aa5927457b, type: 3}
+    - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
+      propertyPath: initialRobotCount
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2660704508521109596, guid: 5dd078ec58edddc489ae5c6d6f10658d, type: 3}
       propertyPath: remainsColliderWidth
       value: 6.4
