@@ -10,7 +10,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: currentHP
-    m_EventTreshold: 0
+    m_EventTreshold: 4
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4368036376777320746}
   m_Solo: 0
@@ -35,7 +35,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 4
     m_ConditionEvent: currentHP
-    m_EventTreshold: 3
+    m_EventTreshold: 7
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -5153365164586973197}
   m_Solo: 0
@@ -122,7 +122,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 4
     m_ConditionEvent: currentHP
-    m_EventTreshold: 1
+    m_EventTreshold: 5
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4183462400900842884}
   m_Solo: 0
@@ -257,7 +257,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 4
     m_ConditionEvent: currentHP
-    m_EventTreshold: 4
+    m_EventTreshold: 8
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3488151707919477796}
   m_Solo: 0
@@ -282,7 +282,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: currentHP
-    m_EventTreshold: 2
+    m_EventTreshold: 6
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3488151707919477796}
   m_Solo: 0
@@ -303,7 +303,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HP
+  m_Name: HP 1
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: currentHP
@@ -335,7 +335,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: currentHP
-    m_EventTreshold: 1
+    m_EventTreshold: 5
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -5153365164586973197}
   m_Solo: 0
@@ -360,7 +360,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 4
     m_ConditionEvent: currentHP
-    m_EventTreshold: 2
+    m_EventTreshold: 6
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4368036376777320746}
   m_Solo: 0
@@ -385,7 +385,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: currentHP
-    m_EventTreshold: 3
+    m_EventTreshold: 7
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3884113938856130258}
   m_Solo: 0

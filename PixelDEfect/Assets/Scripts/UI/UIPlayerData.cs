@@ -5,17 +5,17 @@ using UnityEngine;
 using UnityEngine.UI;
 public class UIPlayerData : MonoBehaviour
 {
-    HPIcon hpIcon;
+    public HPIcon[] hpIcons;
     UIDeath uiDeath;
     private void Awake()
     {
-        hpIcon = GetComponentInChildren<HPIcon>();
         uiDeath = GetComponentInChildren<UIDeath>();
     }
 
     public void SetHpAll(int currentHP)
     {
-        hpIcon.SetHP(currentHP);
+        hpIcons[0].SetHP(currentHP);
+        hpIcons[1].SetHP(currentHP);
     }
 
     public void SetDeathUI()
