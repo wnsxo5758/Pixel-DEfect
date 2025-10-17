@@ -46,6 +46,33 @@ public class TimeManager : Singleton<TimeManager>
     {
         base.Awake();
         FindPlayerAndEffects();
+        FindSkillCoolUI();
+    }
+
+    private void Start()
+    {
+        // SceneSystem 이벤트 구독 - 씬 로드 완료 시 SkillCoolUI 재탐색
+        if (SceneSystem.Instance != null)
+        {
+            SceneSystem.Instance.OnSceneLoadComplete += OnSceneLoaded;
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        // 이벤트 구독 해제
+        if (SceneSystem.Instance != null)
+        {
+            SceneSystem.Instance.OnSceneLoadComplete -= OnSceneLoaded;
+        }
+    }
+
+    private void OnSceneLoaded(string sceneName)
+    {
+        // 씬 로드 완료 시 SkillCoolUI 다시 찾기
+        FindSkillCoolUI();
     }
 
     private void Update()
@@ -91,13 +118,19 @@ public class TimeManager : Singleton<TimeManager>
 
         isTimeFrozen = true;
         timeFreezeTimer = timeFreezeDuration;
-        skillCoolUI.StartCooldown();
+
+        // SkillCoolUI가 있으면 쿨다운 시작
+        if (skillCoolUI != null)
+        {
+            skillCoolUI.StartCooldown();
+        }
+
         // 영향 범위 내 모든 개체 찾기
         FindAndRegisterTimeAffectedEntities(originPosition);
-        
+
         // 시각 효과 생성
         CreateVisualEffects(originPosition);
-        
+
         // 이벤트 호출
         OnTimeStopBegin?.Invoke();
     }
@@ -311,7 +344,37 @@ public class TimeManager : Singleton<TimeManager>
     {
         FindPlayerAndEffects();
     }
-    
+
+    /// <summary>
+    /// Canvas/PlayerData/Skillcon에서 SkillCoolUI 컴포넌트 찾기
+    /// </summary>
+    private void FindSkillCoolUI()
+    {
+        Canvas[] canvases = FindObjectsOfType<Canvas>();
+
+        foreach (Canvas canvas in canvases)
+        {
+            // Canvas/PlayerData/Skillcon 경로로 찾기
+            Transform playerDataTransform = canvas.transform.Find("PlayerData");
+            if (playerDataTransform != null)
+            {
+                Transform skillconTransform = playerDataTransform.Find("Skillcon");
+                if (skillconTransform != null)
+                {
+                    skillCoolUI = skillconTransform.GetComponent<SkillCoolUI>();
+
+                    if (skillCoolUI != null)
+                    {
+                        return; // 찾았으면 종료
+                    }
+                }
+            }
+        }
+
+        // SkillCoolUI를 찾지 못한 경우 (Title 씬 등에서는 정상)
+        skillCoolUI = null;
+    }
+
     // 상태 확인 메서드들
     public bool IsTimeFrozen() => isTimeFrozen;
 

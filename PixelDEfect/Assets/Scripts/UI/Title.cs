@@ -1,44 +1,56 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
+/// <summary>
+/// íƒ€ì´í‹€ UI ì»¨íŠ¸ë¡¤ëŸ¬
+/// GameManagerë¥¼ í†µí•´ ê²Œì„ íë¦„ ì œì–´
+/// Fade íš¨ê³¼ëŠ” SceneSystemì—ì„œ ìë™ìœ¼ë¡œ ì²˜ë¦¬ë¨
+/// </summary>
 public class Title : MonoBehaviour
 {
-    [SerializeField] private GameObject loadingPanel;
-    public void StartGame() // °ÔÀÓ ½ÃÀÛ ¹öÆ° ´©¸¦ °æ¿ì
+    /// <summary>
+    /// ê²Œì„ ì‹œì‘ ë²„íŠ¼ í´ë¦­ ì‹œ
+    /// </summary>
+    public void StartGame()
     {
-        Debug.Log("°ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù");
-        StartCoroutine(LoadSceneAsync("Stage1"));
-    }
-    public void LoadGame() // ÀÌ¾î ÇÏ±â¸¦ ´©¸¦ °æ¿ì
-    {
-        Debug.Log("°ÔÀÓÀ» ÀÌ¾îÇÕ´Ï´Ù");
-    }
+        Debug.Log("ê²Œì„ì„ ì‹œì‘í•©ë‹ˆë‹¤");
 
-    public void ExitGame()
-    {
-        Debug.Log("°ÔÀÓÀ» Á¾·áÇÕ´Ï´Ù");
-    }
-
-    private IEnumerator LoadSceneAsync(string sceneName)
-    {
-        // ·Îµù UI Ç¥½Ã
-        if (loadingPanel != null)
-            loadingPanel.SetActive(true);
-
-        // 1ÇÁ·¹ÀÓ ´ë±â (UI °»½Å º¸Àå)
-        yield return null;
-
-        // ¾À ºñµ¿±â ·Îµå
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
-
-        // ·ÎµùÀÌ ³¡³¯ ¶§±îÁö ´ë±â
-        while (!asyncLoad.isDone)
+        // GameManagerë¥¼ í†µí•´ ê²Œì„ ì‹œì‘
+        // Fade íš¨ê³¼ëŠ” SceneSystemì´ ìë™ìœ¼ë¡œ ì²˜ë¦¬
+        if (GameManager.Instance != null)
         {
-            // ÇÊ¿ä ½Ã ·Îµù¹Ù °»½Å (optional)
-            yield return null;
+            GameManager.Instance.StartGame();
+        }
+        else
+        {
+            Debug.LogError("Title: GameManager.Instanceê°€ nullì…ë‹ˆë‹¤!");
         }
     }
 
+    /// <summary>
+    /// ì´ì–´í•˜ê¸° ë²„íŠ¼ í´ë¦­ ì‹œ
+    /// </summary>
+    public void LoadGame()
+    {
+        Debug.Log("ê²Œì„ì„ ì´ì–´í•©ë‹ˆë‹¤");
+
+        // TODO: ì €ì¥ëœ ë°ì´í„°ê°€ ìˆë‹¤ë©´ í•´ë‹¹ ìŠ¤í…Œì´ì§€ë¡œ ì´ë™
+        // í˜„ì¬ëŠ” ê²Œì„ ì‹œì‘ê³¼ ë™ì¼í•˜ê²Œ ë™ì‘
+        StartGame();
+    }
+
+    /// <summary>
+    /// ê²Œì„ ì¢…ë£Œ ë²„íŠ¼ í´ë¦­ ì‹œ
+    /// </summary>
+    public void ExitGame()
+    {
+        Debug.Log("ê²Œì„ì„ ì¢…ë£Œí•©ë‹ˆë‹¤");
+
+#if UNITY_EDITOR
+        // Unity ì—ë””í„°ì—ì„œëŠ” í”Œë ˆì´ ëª¨ë“œ ì¢…ë£Œ
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        // ë¹Œë“œëœ ê²Œì„ì—ì„œëŠ” ì• í”Œë¦¬ì¼€ì´ì…˜ ì¢…ë£Œ
+        Application.Quit();
+#endif
+    }
 }

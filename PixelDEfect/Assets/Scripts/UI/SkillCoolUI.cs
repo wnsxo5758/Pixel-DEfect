@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class SkillCoolUI : MonoBehaviour
 {
     [SerializeField] private Image cooldownImage;
-    [SerializeField] private TimeManager timeManager;
     [SerializeField] private Image clockHandImage;
 
     private float cooldownTime;  // 쿨타임 전체 시간
@@ -15,7 +14,7 @@ public class SkillCoolUI : MonoBehaviour
 
     public void StartCooldown()
     {
-        cooldownTime = timeManager.TimeFreezeCoolDown;
+        cooldownTime = TimeManager.Instance.TimeFreezeCoolDown;
         cooldownTimer = cooldownTime;
         isCooling = true;
     }

@@ -1,60 +1,67 @@
 using UnityEngine;
 
-//½Ì±ÛÅæ 
+/// <summary>
+/// ì œë„¤ë¦­ ì‹±ê¸€í†¤ íŒ¨í„´ ë² ì´ìŠ¤ í´ë˜ìŠ¤
+/// DontDestroyOnLoad ìë™ ì ìš© ë° ì¤‘ë³µ ë°©ì§€
+/// </summary>
 public class Singleton<T> : MonoBehaviour where T : Component
 {
-    //ÀÎ½ºÅÏ½ºÈ­
     private static T instance;
+    private static bool applicationIsQuitting = false;
 
     public static T Instance
     {
         get
         {
+            // ì• í”Œë¦¬ì¼€ì´ì…˜ ì¢…ë£Œ ì¤‘ì—ëŠ” ì¸ìŠ¤í„´ìŠ¤ ìƒì„± ì•ˆ í•¨
+            if (applicationIsQuitting)
+            {
+                return null;
+            }
+
             if (instance == null)
             {
-                //ÇöÀç ¾À¿¡ ÇØ´ç Å¸ÀÔÀÇ ¿ÀºêÁ§Æ®¸¦ Ã£±â
-                instance = (T)FindAnyObjectByType(typeof(T));
-                //¾øÀ¸¸é SetUpInstance·Î »ı¼º
+                // ì”¬ì—ì„œ ë¨¼ì € ì°¾ê¸°
+                instance = FindAnyObjectByType<T>();
+
+                // ì—†ìœ¼ë©´ ìë™ ìƒì„±
                 if (instance == null)
                 {
-                    SetUpInstance();
+                    GameObject obj = new GameObject();
+                    obj.name = typeof(T).Name;
+                    instance = obj.AddComponent<T>();
                 }
             }
             return instance;
         }
     }
 
-    //½ÃÀÛ½Ã ½Ì±ÛÅÏÈ­
     protected virtual void Awake()
     {
-        RemoveDuplicates();
-    }
-    private static void SetUpInstance()
-    {
-        //ÀÎ½ºÅÏ½º°¡ ¾ø´Â °æ¿ì »ı¼º
-        instance = (T)FindAnyObjectByType(typeof(T));
-        if (instance == null)
+        // ì´ë¯¸ ì¸ìŠ¤í„´ìŠ¤ê°€ ì¡´ì¬í•˜ê³ , ê·¸ê²Œ ë‚˜ ìì‹ ì´ ì•„ë‹ˆë©´ íŒŒê´´
+        if (instance != null && instance != this)
         {
-            GameObject gameObj = new GameObject();
-            gameObj.name = typeof(T).Name;
-            instance = gameObj.AddComponent<T>();
-            DontDestroyOnLoad(gameObj);
-        }
-    }
-
-
-    //½Ì±ÛÅÏÀÌ ÀÌ¹Ì Á¸ÀçÇÏ´Â °æ¿ì ÆÄ±«ÇÏ´Â ÄÚµå
-    private void RemoveDuplicates()
-    {
-        if (instance == null)
-        {
-            instance = this as T;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
+            Debug.LogWarning($"[Singleton] {typeof(T).Name} ì¤‘ë³µ ê°ì§€! ê¸°ì¡´ ì¸ìŠ¤í„´ìŠ¤ ìœ ì§€, ìƒˆ ì¸ìŠ¤í„´ìŠ¤ íŒŒê´´.");
             Destroy(gameObject);
+            return;
         }
 
+        // ì²« ë²ˆì§¸ ì¸ìŠ¤í„´ìŠ¤ ì„¤ì •
+        instance = this as T;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    protected virtual void OnDestroy()
+    {
+        // ë‚´ê°€ í˜„ì¬ ì¸ìŠ¤í„´ìŠ¤ë©´ nullë¡œ ì„¤ì •
+        if (instance == this)
+        {
+            instance = null;
+        }
+    }
+
+    protected virtual void OnApplicationQuit()
+    {
+        applicationIsQuitting = true;
     }
 }

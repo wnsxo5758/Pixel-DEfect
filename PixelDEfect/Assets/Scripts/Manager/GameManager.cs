@@ -1,337 +1,324 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+/// <summary>
+/// 게임의 전체 라이프사이클을 관리하는 싱글톤 매니저
+/// 책임: 게임 시작/종료, 플레이어 사망/리스폰, 게임 상태 관리
+/// </summary>
+public class GameManager : Singleton<GameManager>
 {
-    public static GameManager Instance { get; private set; }
-
+    [Header("게임 설정")]
     [SerializeField] private float respawnDelay = 1f;
-    [SerializeField] private float respawnInvulnerabilityTime = 2f;
-    
-    [Header("씬 관리")]
-    [SerializeField] private string titleSceneName = "Title";
-    [SerializeField] private string endSceneName = "EndScene";
-    [SerializeField] private bool destroyOnTitleScene = true;
-    [SerializeField] private bool destroyOnEndScene = true;
-    
-    [Header("투비 컨티뉴")]
-    [SerializeField]
-    private GameObject toBeCon;
-    private GameObject player;
-    
-    [Header("디버그")]
-    [SerializeField] private bool debugMode = false;
-    
+    [SerializeField] private float invulnerabilityTime = 2f;
+
+    [Header("UI")]
+    [SerializeField] private GameObject toBeContinued;
+
+    // 게임 상태
     private bool isPlayerDead = false;
-    private bool isInitialized = false;
-    
-    private void Awake()
+    private GameObject currentPlayer;
+
+    #region Unity Lifecycle
+
+    protected override void Awake()
     {
-        if (Instance == null)
+        base.Awake(); // Singleton<T>의 Awake 호출 (중복 제거 + DontDestroyOnLoad)
+
+        Debug.Log($"[GameManager] Awake 호출 - 씬: {UnityEngine.SceneManagement.SceneManager.GetActiveScene().name}, InstanceID: {GetInstanceID()}");
+    }
+
+    private void Start()
+    {
+        // SceneSystem 이벤트 구독
+        if (SceneSystem.Instance != null)
         {
-            Instance = this;
-            
-            string currentSceneName = SceneManager.GetActiveScene().name;
-            if (ShouldDestroyOnScene(currentSceneName))
+            SceneSystem.Instance.OnSceneLoadComplete += OnSceneLoaded;
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        Debug.Log($"[GameManager] OnDestroy 호출 - 씬: {UnityEngine.SceneManagement.SceneManager.GetActiveScene().name}, InstanceID: {GetInstanceID()}");
+
+        base.OnDestroy(); // Singleton<T>의 OnDestroy 호출 (인스턴스 정리)
+
+        // 이벤트 구독 해제
+        if (SceneSystem.Instance != null)
+        {
+            SceneSystem.Instance.OnSceneLoadComplete -= OnSceneLoaded;
+        }
+    }
+
+    #endregion
+
+    #region Scene Events
+
+    /// <summary>
+    /// 씬 로드 완료 시 호출되는 콜백
+    /// </summary>
+    private void OnSceneLoaded(string sceneName)
+    {
+        StartCoroutine(InitializeSceneDelayed());
+    }
+
+    /// <summary>
+    /// 씬 초기화 (플레이어 찾기 등)
+    /// </summary>
+    private IEnumerator InitializeSceneDelayed()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        // 플레이어 레퍼런스 갱신
+        currentPlayer = GameObject.FindGameObjectWithTag("Player");
+        isPlayerDead = false;
+    }
+
+    #endregion
+
+    #region Player Death & Respawn
+
+    /// <summary>
+    /// 플레이어 사망 처리
+    /// </summary>
+    public void PlayerDied()
+    {
+        if (isPlayerDead) return;
+
+        isPlayerDead = true;
+
+        // 시간 정지 효과 해제
+        DisableTimeEffects();
+    }
+
+    /// <summary>
+    /// 플레이어 리스폰 (UI 버튼 등에서 호출)
+    /// </summary>
+    public void RespawnPlayer()
+    {
+        if (!isPlayerDead)
+        {
+            Debug.LogWarning("GameManager: 플레이어가 사망 상태가 아닙니다.");
+            return;
+        }
+
+        StartCoroutine(RespawnSequence());
+    }
+
+    /// <summary>
+    /// 플레이어 리스폰 시퀀스
+    /// </summary>
+    private IEnumerator RespawnSequence()
+    {
+        yield return new WaitForSeconds(respawnDelay);
+
+        if (currentPlayer == null)
+        {
+            Debug.LogWarning("GameManager: 플레이어를 찾을 수 없어 게임을 재시작합니다.");
+            RestartGame();
+            yield break;
+        }
+
+        // 체크포인트가 있으면 해당 위치로 리스폰
+        if (CheckpointManager.Instance != null)
+        {
+            // 플레이어 컨트롤러 리셋
+            PlayerController controller = currentPlayer.GetComponent<PlayerController>();
+            if (controller != null)
             {
-                // 타이틀이나 엔드 씬에서는 DontDestroyOnLoad 적용하지 않음
-                if (debugMode)
-                    Debug.Log($"GameManager: {currentSceneName}에서는 지속성을 적용하지 않습니다.");
+                controller.ResetOnRespawn();
             }
-            else
+
+            // 체크포인트로 이동
+            CheckpointManager.Instance.RespawnAtCheckpoint(currentPlayer);
+
+            // 체력 회복
+            PlayerHp playerHp = currentPlayer.GetComponent<PlayerHp>();
+            if (playerHp != null)
             {
-                // DontDestroyOnLoad(gameObject);
-                if (debugMode)
-                    Debug.Log("GameManager: DontDestroyOnLoad 적용");
+                playerHp.SetHp(playerHp.GetMaxHp());
             }
+
+            isPlayerDead = false;
         }
         else
         {
-            Destroy(gameObject);
+            // 체크포인트가 없으면 씬 재시작
+            RestartCurrentScene();
         }
     }
-    private void Start()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        player = GameObject.FindGameObjectWithTag("Player");
-    }
 
-    private void OnDestroy()
+    #endregion
+
+    #region Fall Damage
+
+    /// <summary>
+    /// 플레이어 낙사 처리
+    /// </summary>
+    /// <param name="fallDamage">낙사 데미지</param>
+    /// <param name="isWater">물에 빠졌는지 여부</param>
+    public void ProcessPlayerFall(int fallDamage, bool isWater)
     {
-        if (Instance == this)
+        if (currentPlayer == null)
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
+            Debug.LogWarning("GameManager: 플레이어를 찾을 수 없습니다.");
+            return;
         }
+
+        StartCoroutine(FallDamageSequence(fallDamage, isWater));
     }
 
-    public void ProcessPlayerFall(int fallDamage, bool water)
+    /// <summary>
+    /// 낙사 데미지 처리 시퀀스
+    /// </summary>
+    private IEnumerator FallDamageSequence(int fallDamage, bool isWater)
     {
-        if (player == null) return;
-        
-        StartCoroutine(FallRespawnProcess(fallDamage, water));
-    }
-
-    private IEnumerator FallRespawnProcess(int fallDamage, bool water)
-    {
-        PlayerHp playerHp = player.GetComponent<PlayerHp>();
+        PlayerHp playerHp = currentPlayer.GetComponent<PlayerHp>();
         if (playerHp != null)
         {
-            playerHp.TakeFallDamage(fallDamage, water);
+            // 낙사 데미지 적용
+            playerHp.TakeFallDamage(fallDamage, isWater);
 
+            // 사망했으면 리스폰 처리는 PlayerHp가 담당
             if (playerHp.GetCurrentHp() <= 0)
             {
                 yield break;
             }
         }
 
-        // 낙사 체크포인트로 이동
+        // 살아있으면 Fallback 체크포인트로 이동
         if (CheckpointManager.Instance != null)
         {
-            CheckpointManager.Instance.MoveToFallbackCheckpoint(player);
+            CheckpointManager.Instance.MoveToFallbackCheckpoint(currentPlayer);
         }
     }
-    
-    public void PlayerDied()
+
+    #endregion
+
+    #region Game Flow Control
+
+    /// <summary>
+    /// 게임 시작 (타이틀 → Stage1)
+    /// </summary>
+    public void StartGame()
     {
-        isPlayerDead = true;
-        DisableTimeEvents();
+        if (SceneSystem.Instance != null)
+        {
+            SceneSystem.Instance.LoadScene("Stage1");
+        }
     }
 
-    // 타임 매니저 이벤트 중지
-    private void DisableTimeEvents()
+    /// <summary>
+    /// 현재 씬 재시작
+    /// </summary>
+    public void RestartCurrentScene()
+    {
+        StartCoroutine(RestartSequence());
+    }
+
+    private IEnumerator RestartSequence()
+    {
+        yield return new WaitForSeconds(respawnDelay);
+
+        // 체크포인트 초기화
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.ResetCheckpoints();
+        }
+
+        // 현재 씬 재시작
+        if (SceneSystem.Instance != null)
+        {
+            SceneSystem.Instance.RestartCurrentScene();
+        }
+    }
+
+    /// <summary>
+    /// 게임 재시작 (타이틀로 복귀)
+    /// </summary>
+    public void RestartGame()
+    {
+        StartCoroutine(RestartGameSequence());
+    }
+
+    private IEnumerator RestartGameSequence()
+    {
+        yield return new WaitForSeconds(respawnDelay);
+
+        // 체크포인트 초기화
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.ResetCheckpoints();
+        }
+
+        // 플레이어 데이터 초기화
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.ResetPlayerData();
+        }
+
+        // 타이틀로 이동
+        if (SceneSystem.Instance != null)
+        {
+            SceneSystem.Instance.LoadTitleScene();
+        }
+    }
+
+    /// <summary>
+    /// 게임 종료 (엔딩 씬으로)
+    /// </summary>
+    public void EndGame()
+    {
+        if (SceneSystem.Instance != null)
+        {
+            SceneSystem.Instance.LoadEndScene();
+        }
+    }
+
+    /// <summary>
+    /// Stage2 클리어 시 호출
+    /// </summary>
+    public void GameClear()
+    {
+        // To Be Continued UI 표시
+        if (toBeContinued != null)
+        {
+            toBeContinued.SetActive(true);
+        }
+
+        // 엔딩 씬으로 이동
+        StartCoroutine(GameClearSequence());
+    }
+
+    private IEnumerator GameClearSequence()
+    {
+        yield return new WaitForSeconds(3f); // UI 표시 시간
+        EndGame();
+    }
+
+    #endregion
+
+    #region Utility
+
+    /// <summary>
+    /// 시간 정지 효과 해제
+    /// </summary>
+    private void DisableTimeEffects()
     {
         if (TimeManager.Instance != null && TimeManager.Instance.IsTimeFrozen())
         {
             TimeManager.Instance.ResumeTime();
         }
     }
-    
-    // 수동 부활 메서드
-    public void RespawnPlayer()
-    {
-        if (!isPlayerDead) return;
 
-        StartCoroutine(ManualRespawnProcess());
-    }
+    /// <summary>
+    /// 현재 플레이어가 죽었는지 확인
+    /// </summary>
+    public bool IsPlayerDead() => isPlayerDead;
 
-    private IEnumerator ManualRespawnProcess()
-    {
-        // 딜레이 
-        yield return new WaitForSeconds(respawnDelay);
-        
-        // 체크포인트 매니저가 있는지 확인
-        if (CheckpointManager.Instance != null && player != null)
-        {
-            PlayerController controller = player.GetComponent<PlayerController>();
-            if (controller != null)
-            {
-                controller.ResetOnRespawn();
-            }
-            
-            CheckpointManager.Instance.RespawnAtCheckpoint(player);
-            
-            isPlayerDead = false;
-        }
-        else
-        {
-            RestartGame();
-        }
-    }
-    
-    public void RestartGame()
-    {
-        StartCoroutine(RestartTimer());
-    }
+    /// <summary>
+    /// 현재 플레이어 오브젝트 반환
+    /// </summary>
+    public GameObject GetCurrentPlayer() => currentPlayer;
 
-    private IEnumerator RestartTimer()
-    {
-        Scene currentScene = SceneManager.GetActiveScene();
-        
-        yield return new WaitForSeconds(respawnDelay);
-        
-        CheckpointManager.Instance.ResetCheckpoints();
-        SceneManager.LoadScene(currentScene.name);
-    }
-    
-    /// <summary>
-    /// 지연된 초기화
-    /// </summary>
-    private IEnumerator InitializeDelayed()
-    {
-        yield return new WaitForSeconds(0.1f);
-        Initialize();
-    }
-    
-    /// <summary>
-    /// GameManager 초기화
-    /// </summary>
-    private void Initialize()
-    {
-        if (isInitialized) return;
-        
-        FindPlayer();
-        
-        // PlayerPersistenceManager가 없으면 생성
-        if (PlayerPersistenceManager.Instance == null)
-        {
-            GameObject persistenceManagerObj = new GameObject("PlayerPersistenceManager");
-            persistenceManagerObj.AddComponent<PlayerPersistenceManager>();
-            
-            if (debugMode)
-                Debug.Log("GameManager: PlayerPersistenceManager 생성");
-        }
-        
-        // SceneTransitionManager가 없으면 생성
-        if (SceneTransitionManager.Instance == null)
-        {
-            GameObject transitionManagerObj = new GameObject("SceneTransitionManager");
-            transitionManagerObj.AddComponent<SceneTransitionManager>();
-            
-            if (debugMode)
-                Debug.Log("GameManager: SceneTransitionManager 생성");
-        }
-        
-        isInitialized = true;
-        
-        if (debugMode)
-            Debug.Log("GameManager: 초기화 완료");
-    }
-    
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (debugMode)
-            Debug.Log($"GameManager: 씬 로드됨 - {scene.name}");
-        
-        // 특정 씬에서는 GameManager 제거
-        if (ShouldDestroyOnScene(scene.name))
-        {
-            if (debugMode)
-                Debug.Log($"GameManager: {scene.name}에서 제거됨");
-            
-            Destroy(gameObject);
-            return;
-        }
-        
-        StartCoroutine(OnSceneLoadedDelayed(scene));
-    }
-    
-    private IEnumerator OnSceneLoadedDelayed(Scene scene)
-    {
-        yield return new WaitForSeconds(0.1f);
-        
-        // 플레이어 재검색
-        FindPlayer();
-        
-        // PlayerPersistenceManager에 플레이어 설정
-        if (player != null && PlayerPersistenceManager.Instance != null)
-        {
-            PlayerPersistenceManager.Instance.SetupPlayerPersistence(player);
-        }
-        
-        isPlayerDead = false;
-    }
-    
-    /// <summary>
-    /// 플레이어 찾기
-    /// </summary>
-    private void FindPlayer()
-    {
-        // 지속성 플레이어 우선 확인
-        if (PlayerPersistenceManager.Instance != null)
-        {
-            GameObject persistentPlayer = PlayerPersistenceManager.Instance.GetPersistentPlayer();
-            if (persistentPlayer != null)
-            {
-                player = persistentPlayer;
-                if (debugMode)
-                    Debug.Log("GameManager: 지속성 플레이어 찾음");
-                return;
-            }
-        }
-        
-        // 씬에서 플레이어 찾기
-        player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            if (debugMode)
-                Debug.Log("GameManager: 씬에서 플레이어 찾음");
-        }
-        else
-        {
-            if (debugMode)
-                Debug.LogWarning("GameManager: 플레이어를 찾을 수 없습니다.");
-        }
-    }
-    
-    /// <summary>
-    /// 특정 씬에서 GameManager를 제거해야 하는지 확인
-    /// </summary>
-    /// <param name="sceneName">씬 이름</param>
-    /// <returns>제거 여부</returns>
-    private bool ShouldDestroyOnScene(string sceneName)
-    {
-        if (destroyOnTitleScene && sceneName.Equals(titleSceneName, System.StringComparison.OrdinalIgnoreCase))
-            return true;
-        
-        if (destroyOnEndScene && sceneName.Equals(endSceneName, System.StringComparison.OrdinalIgnoreCase))
-            return true;
-        
-        return false;
-    }
-    
-    /// <summary>
-    /// 게임 종료 (엔드 씬으로)
-    /// </summary>
-    public void EndGame()
-    {
-        if (debugMode)
-            Debug.Log("GameManager: 게임 종료");
-        
-        if (SceneTransitionManager.Instance != null)
-        {
-            SceneTransitionManager.Instance.EndGame(endSceneName);
-        }
-        else
-        {
-            // 백업: 직접 엔드 씬으로 이동
-            if (PlayerPersistenceManager.Instance != null)
-            {
-                PlayerPersistenceManager.Instance.DestroyPersistentObjects();
-            }
-            
-            SceneManager.LoadScene(endSceneName);
-        }
-    }
-    
-    /// <summary>
-    /// 타이틀로 돌아가기
-    /// </summary>
-    public void ReturnToTitle()
-    {
-        if (debugMode)
-            Debug.Log("GameManager: 타이틀로 돌아가기");
-        
-        if (SceneTransitionManager.Instance != null)
-        {
-            SceneTransitionManager.Instance.RestartGame(titleSceneName);
-        }
-        else
-        {
-            // 백업: 직접 타이틀 씬으로 이동
-            if (PlayerPersistenceManager.Instance != null)
-            {
-                PlayerPersistenceManager.Instance.DestroyPersistentObjects();
-            }
-            
-            SceneManager.LoadScene(titleSceneName);
-        }
-    }
-    
-    public void ToBe()
-    {
-        toBeCon.SetActive(true);
-    }
+    #endregion
 }

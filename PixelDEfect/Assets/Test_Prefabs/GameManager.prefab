@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 1447637741753454058}
   - component: {fileID: 6974636723069289981}
   - component: {fileID: 6313230333829793806}
-  - component: {fileID: 2180117996559791260}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -50,13 +49,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respawnDelay: 1
-  respawnInvulnerabilityTime: 2
-  titleSceneName: Title
-  endSceneName: EndScene
-  destroyOnTitleScene: 1
-  destroyOnEndScene: 1
-  toBeCon: {fileID: 0}
-  debugMode: 0
+  invulnerabilityTime: 2
+  toBeContinued: {fileID: 0}
 --- !u!114 &2029315015898106650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,7 +136,7 @@ MonoBehaviour:
   player: {fileID: 0}
   positions:
   - {x: 0, y: 3, z: 0}
-  - {x: 194, y: -44.5, z: 0}
+  - {x: 300, y: -25, z: 0}
   - {x: 416, y: -5, z: 0}
   - {x: 702, y: -8, z: 0}
   - {x: 814, y: -61, z: 0}
@@ -174,18 +168,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allSkills: []
+  debug: 0
   skillAcquiredUI: {fileID: 0}
   uiDisplayDuration: 3
---- !u!114 &2180117996559791260
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8547782595274836215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9dbc522ad0861a04f97fee912ee5be3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  defaultWeaponPrefab: {fileID: 0}

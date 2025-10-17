@@ -9,8 +9,9 @@ public class PlayerStateData
     public int maxHp;
     public bool hasWeapon;
     public string weaponPrefabName;
+    public GameObject thrownWeaponPrefab; // 던질 수 있는 무기 프리팹 참조
     public Vector3 spawnPosition;
-    public HashSet<SkillType> unlockedSkills = new HashSet<SkillType>();
+    public List<SkillType> unlockedSkills = new List<SkillType>(); // HashSet → List로 변경 (직렬화 가능)
 
     public PlayerStateData()
     {
@@ -18,7 +19,8 @@ public class PlayerStateData
         maxHp = 4;
         hasWeapon = false;
         weaponPrefabName = "";
+        thrownWeaponPrefab = null;
         spawnPosition = Vector3.zero;
-        unlockedSkills = new HashSet<SkillType>();
+        unlockedSkills = new List<SkillType>();
     }
 }

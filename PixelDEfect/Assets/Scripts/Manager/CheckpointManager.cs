@@ -17,16 +17,56 @@ public class CheckpointManager : Singleton<CheckpointManager>
     // 리스폰 체크포인트
     private int currentRespawnCheckpointID = -1;
     private Vector3 respawnPosition;
-    
+
     // 현재 활성화된 체크포인트 ID
     private int currentFallbackCheckpointID = -1;
     private Vector3 fallbackPosition;
-    
+
     // 모든 체크포인트 상태 관리
     private Dictionary<int, CheckpointData> checkpoints = new Dictionary<int, CheckpointData>();
 
     // 플레이어 상태 데이터
     private int savedPlayerHealth;
+
+    // 현재 씬 이름
+    private string currentSceneName = "";
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        // SceneSystem 이벤트 구독
+        if (SceneSystem.Instance != null)
+        {
+            SceneSystem.Instance.OnSceneLoadComplete += OnSceneLoaded;
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        // 이벤트 구독 해제
+        if (SceneSystem.Instance != null)
+        {
+            SceneSystem.Instance.OnSceneLoadComplete -= OnSceneLoaded;
+        }
+    }
+
+    private void OnSceneLoaded(string sceneName)
+    {
+        // 게임플레이 씬이 변경되면 체크포인트 초기화
+        if (SceneSystem.Instance != null && SceneSystem.Instance.IsGameplayScene(sceneName))
+        {
+            if (currentSceneName != sceneName)
+            {
+                // 다른 스테이지로 넘어갔을 때만 초기화
+                ResetCheckpoints();
+                currentSceneName = sceneName;
+                Debug.Log($"[CheckpointManager] {sceneName} 로드 - 체크포인트 초기화");
+            }
+        }
+    }
     
     // 체크포인트 활성화 및 플레이어 상태 저장
     public void SetRespawnCheckpoint(int id, Vector3 position)

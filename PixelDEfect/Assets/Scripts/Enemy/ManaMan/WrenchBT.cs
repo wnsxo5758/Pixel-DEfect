@@ -5,7 +5,7 @@ using UnityEngine;
 public class WrenchBT : ManaBT
 {
 
-    [Header("°ø°İ °ü·Ã")]
+    [Header("ê³µê²© ê´€ë ¨")]
     [SerializeField]
     private float attackCooldown = 2f;
     [SerializeField]
@@ -13,24 +13,24 @@ public class WrenchBT : ManaBT
     [SerializeField]
     private Transform firePos;
     [SerializeField]
-    private float bulletSpeed; // ÃÑ¾Ë ¼Óµµ
+    private float bulletSpeed; // ì´ì•Œ ì†ë„
     [SerializeField]
     private LayerMask playerLayer;
     [SerializeField]
-    private float attackRange = 6f; //°ø°İ°¡´É ¹üÀ§
+    private float attackRange = 6f; //ê³µê²©ê°€ëŠ¥ ë²”ìœ„
 
 
     private float attackTimer = 0f;
     private bool canAttack = true;
     private bool isAttacking = false;
 
-    [Header("½ºÅ³ °ü·Ã")]
+    [Header("ìŠ¤í‚¬ ê´€ë ¨")]
     [SerializeField]
-    private int skillBulletCount = 5; // ½ºÅ³·Î »ı¼ºµÇ´Â ·»Ä¡¼ö
+    private int skillBulletCount = 5; // ìŠ¤í‚¬ë¡œ ìƒì„±ë˜ëŠ” ë Œì¹˜ìˆ˜
     [SerializeField]
-    private float skillAngle = 60f; //ºÎÃ¤²Ã ¹üÀ§
+    private float skillAngle = 60f; //ë¶€ì±„ê¼´ ë²”ìœ„
 
-    //ÃÑ¾Ë ¸Ş¸ğ¸®Ç®
+    //ì´ì•Œ ë©”ëª¨ë¦¬í’€
     private MemoryPool bulletPool;
 
     protected override void Awake()
@@ -64,38 +64,38 @@ public class WrenchBT : ManaBT
 
     protected override NodeState UseSkill()
     {
-        // ÇÇ°İ ¶Ç´Â »ç¸Á ÁßÀÌ¸é ½ºÅ³ Ãë¼Ò
+        // í”¼ê²© ë˜ëŠ” ì‚¬ë§ ì¤‘ì´ë©´ ìŠ¤í‚¬ ì·¨ì†Œ
         if (isHit || isDead) return NodeState.Failure;
 
         Transform currentTarget = blackboard.GetValue<Transform>("Target");
         if (currentTarget == null) return NodeState.Failure;
 
-        // ½ºÅ³ Å¸°Ù À§Ä¡ ÀúÀå
+        // ìŠ¤í‚¬ íƒ€ê²Ÿ ìœ„ì¹˜ ì €ì¥
         Vector2 skillTargetPos = currentTarget.position;
         blackboard.SetValue("SkillTargetPosition", skillTargetPos);
 
-        // ¹æÇâ ¼³Á¤
+        // ë°©í–¥ ì„¤ì •
         float directionToTarget = Mathf.Sign(currentTarget.position.x - transform.position.x);
         SetDirection(directionToTarget);
 
-        // ÀÌµ¿ ÁßÁö
+        // ì´ë™ ì¤‘ì§€
         movement?.MoveTo(0);
 
-        // ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà
+        // ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰
         if (animator != null)
         {
             animator.SetMovementAnim(0);
             animator.SetChasingState(true);
-            manaAnimator.TriggerSkillAnim(); // Æ®¸®°Å ÀÌ¸§Àº "Skill"
+            manaAnimator.TriggerSkillAnim(); // íŠ¸ë¦¬ê±° ì´ë¦„ì€ "Skill"
         }
 
-        // ½ºÅ³ »óÅÂ ¼³Á¤
+        // ìŠ¤í‚¬ ìƒíƒœ ì„¤ì •
         canUseSkill = false;
         skillTimer = 0f;
         isAttacking = true;
         blackboard.SetValue("IsAttacking", true);
 
-        //°ø°İ »óÅÂ ¼³Á¤ (½ºÅ³ »ç¿ë½Ã °ø°İµµ ÃÊ±âÈ­)
+        //ê³µê²© ìƒíƒœ ì„¤ì • (ìŠ¤í‚¬ ì‚¬ìš©ì‹œ ê³µê²©ë„ ì´ˆê¸°í™”)
         canAttack = false;
         attackTimer = 0f;
         blackboard.SetValue("CanAttack", false);
@@ -153,9 +153,9 @@ public class WrenchBT : ManaBT
 
 
 
-    public void OnSkillEffectTrigger() // ½ºÅ³ Æ®¸®°Å
+    public void OnSkillEffectTrigger() // ìŠ¤í‚¬ íŠ¸ë¦¬ê±°
     {
-        Debug.Log("·»Ä¡º¿ ½ºÅ³ »ç¿ë");
+        Debug.Log("ë Œì¹˜ë´‡ ìŠ¤í‚¬ ì‚¬ìš©");
         Transform target = blackboard.GetValue<Transform>("Target");
         if (target == null) return;
 
@@ -165,7 +165,7 @@ public class WrenchBT : ManaBT
         float baseAngle = Mathf.Atan2(centerDir.y, centerDir.x) * Mathf.Rad2Deg;
 
         int totalBullets = skillBulletCount;
-        if (totalBullets <= 1) totalBullets = 1; // ÃÖ¼Ò 1¹ß
+        if (totalBullets <= 1) totalBullets = 1; // ìµœì†Œ 1ë°œ
 
         float angleStep = skillAngle / (totalBullets - 1);
 
@@ -190,15 +190,15 @@ public class WrenchBT : ManaBT
             }
         }
     }
-    public void OnSkillAnimationFinished() // ½ºÅ³ÀÌ ³¡³µÀ» °æ¿ì
+    public void OnSkillAnimationFinished() // ìŠ¤í‚¬ì´ ëë‚¬ì„ ê²½ìš°
     {
-        Debug.Log("·»Ä¡º¿ ½ºÅ³ ³¡!");
+        Debug.Log("ë Œì¹˜ë´‡ ìŠ¤í‚¬ ë!");
         isAttacking = false;
         blackboard.SetValue("IsAttacking", false);
 
         if (IsTargetInAttackRange())
         {
-            // °ø°İ ¹üÀ§ ³»¿¡ ÀÖÀ¸¸é ÇÃ·¹ÀÌ¾î ¹æÇâ¸¸ ¹Ù¶óº¸µµ·Ï ¼³Á¤
+            // ê³µê²© ë²”ìœ„ ë‚´ì— ìˆìœ¼ë©´ í”Œë ˆì´ì–´ ë°©í–¥ë§Œ ë°”ë¼ë³´ë„ë¡ ì„¤ì •
             Transform currentTarget = blackboard.GetValue<Transform>("Target");
             if (currentTarget != null)
             {

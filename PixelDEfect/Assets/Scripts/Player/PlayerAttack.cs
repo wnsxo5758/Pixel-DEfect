@@ -94,6 +94,7 @@ public class PlayerAttack : MonoBehaviour
     // PlayerController에서 호출되는 근접 공격
     public void PerformMeleeAttack()
     {
+        Debug.Log($"{CanPlayerAttack()}, {!isAttacking}, {canAttack}, {currentWeapon != null}");
         if (CanPlayerAttack() && !isAttacking && canAttack && currentWeapon != null)
         {
             canAttack = false;
@@ -806,6 +807,18 @@ public class PlayerAttack : MonoBehaviour
         return currentWeapon;
     }
 
+    // 던질 무기 프리팹 반환 (외부 접근용)
+    public GameObject GetThrownWeaponPrefab()
+    {
+        return thrownWeaponPrefab;
+    }
+
+    // 던질 무기 프리팹 설정 (외부 접근용)
+    public void SetThrownWeaponPrefab(GameObject prefab)
+    {
+        thrownWeaponPrefab = prefab;
+    }
+
     public void ResetOnRespawn()
     {
         if (lastThrownWeapon != null && !hasWeapon)
@@ -817,7 +830,7 @@ public class PlayerAttack : MonoBehaviour
         isTeleporting = false;
         isTeleportInProgress = false;
 
-        canAttack = hasWeapon;
+        canAttack = true;
         canThrow = hasWeapon;
         canTeleport = false;
 
