@@ -817,7 +817,7 @@ public class PlayerAttack : MonoBehaviour
         isTeleporting = false;
         isTeleportInProgress = false;
 
-        canAttack = hasWeapon;
+        canAttack = true;
         canThrow = hasWeapon;
         canTeleport = false;
 

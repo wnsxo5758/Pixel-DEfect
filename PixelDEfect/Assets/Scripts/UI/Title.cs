@@ -6,37 +6,45 @@ using UnityEngine.SceneManagement;
 public class Title : MonoBehaviour
 {
     [SerializeField] private GameObject loadingPanel;
-    public void StartGame() // ╟тюс ╫цюш ╧Жф╟ ╢╘╦╕ ╟Ф©Л
+    public void StartGame() // О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ О©╫О©╫ф╟ О©╫О©╫О©╫О©╫ О©╫О©╫О©╫
     {
-        Debug.Log("╟тюсю╩ ╫цюшгу╢о╢ы");
+        Debug.Log("О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫у╢о╢О©╫");
         StartCoroutine(LoadSceneAsync("Stage1"));
     }
-    public void LoadGame() // юл╬Н го╠Б╦╕ ╢╘╦╕ ╟Ф©Л
+    public void LoadGame() // О©╫л╬О©╫ О©╫о╠Б╦╕ О©╫О©╫О©╫О©╫ О©╫О©╫О©╫
     {
-        Debug.Log("╟тюсю╩ юл╬Нгу╢о╢ы");
+        Debug.Log("О©╫О©╫О©╫О©╫О©╫О©╫ О©╫л╬О©╫О©╫у╢о╢О©╫");
     }
 
     public void ExitGame()
     {
-        Debug.Log("╟тюсю╩ а╬╥Агу╢о╢ы");
+        Debug.Log("О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫у╢о╢О©╫");
+
+        #if UNITY_EDITOR
+        // Unity Л≈░К■■М└╟Л≈░Л└°К┼■ М■▄К═┬Л²╢ К╙╗К⌠° Л╒┘Кё▄
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+        // К╧▄К⌠°К░° Й╡▄Л·└Л≈░Л└°К┼■ Л∙═М■▄К╕╛Л╪─Л²╢Л┘≤ Л╒┘Кё▄
+        Application.Quit();
+        #endif
     }
 
     private IEnumerator LoadSceneAsync(string sceneName)
     {
-        // ╥н╣Ы UI г╔╫ц
+        // О©╫н╣О©╫ UI г╔О©╫О©╫
         if (loadingPanel != null)
             loadingPanel.SetActive(true);
 
-        // 1га╥╧юс ╢К╠Б (UI ╟╩╫е ╨╦юЕ)
+        // 1О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫ (UI О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫)
         yield return null;
 
-        // ╬ю ╨Я╣©╠Б ╥н╣Е
+        // О©╫О©╫ О©╫Я╣©╠О©╫ О©╫н╣О©╫
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
 
-        // ╥н╣Ыюл Ё║Ё╞ ╤╖╠НаЖ ╢К╠Б
+        // О©╫н╣О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫
         while (!asyncLoad.isDone)
         {
-            // гй©Д ╫ц ╥н╣Ы╧ы ╟╩╫е (optional)
+            // О©╫й©О©╫ О©╫О©╫ О©╫н╣О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ (optional)
             yield return null;
         }
     }
